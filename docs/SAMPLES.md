@@ -2,7 +2,7 @@
 
 [README](../README.md) · [音声登録の詳細](VOICE_REGISTRATION.md) · [困ったとき](TROUBLESHOOTING.md)
 
-対象: `0.1.0-draft` の最新SwiftUIサンプル。操作ガイド・iPhone操作確認の更新: 2026-10-04。
+対象: `0.1.0` の最新SwiftUIサンプル。操作ガイド・iPhone操作確認の更新: 2026-10-04。
 
 同じSwiftUI画面をiPhoneとMacで使います。文章入力を中心に、モデル・声の設定と生成結果を分けた画面です。Macは広いウィンドウで2列、iPhoneは縦に並びます。ライト・ダークモードに対応します。
 
@@ -48,7 +48,7 @@ iPhoneでは画面を縦にスクロールして設定欄へ進みます。Mac�
 2. 「フォルダを選ぶ」（選択後は「モデルを変更」）で `manifest.json` と13個の `.mlpackage` が並ぶ親フォルダを選びます。単体の `.mlpackage` やZIPを選ばないでください。
 3. コピーとハッシュ検証が終わるまで待ちます。外部の元フォルダは残り、アプリ内にコピーされます。
 
-モデル用の [Hugging Faceリポジトリ](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)は作成済みで、Privateの準備版のアップロードと再ダウンロードでのサイズ・SHA-256検証は完了しました。正式公開はまだ完了していません。SDK・サンプルのコード用リポジトリは [Corvelis/irodori-tts-coreml](https://github.com/Corvelis/irodori-tts-coreml) で、現在はPrivateの準備版です。「URLからダウンロード」は、公開後に不変のcommit SHAを含むmanifest URLを指定するための機能です。[CLIの取得例](CLI.md#モデル取得)は検証済みの準備版commitに固定しています。現在のPrivate準備版はサンプルの認証なしURL取得では使用できません。サンプルのURL取得欄には認証トークンの入力機能がなく、ログインなしで取得できる公開URLを使用します。Privateやアクセス承認が必要なリポジトリは、先にMac等へ取得したモデルをフォルダから取り込んでください。
+モデルは [Hugging Face](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)、SDK・サンプルは [GitHub](https://github.com/Corvelis/irodori-tts-coreml) の `v0.1.0` タグから取得します。「URLからダウンロード」には[CLIガイドの固定manifest URL](CLI.md#モデル取得)を指定します。サンプルには認証トークンの入力機能がないため、モデルリポジトリがPrivateやアクセス承認制の場合は、Mac等で認証して取得したフォルダを取り込んでください。一般公開後の認証なし取得確認は[最新の公開・検証状態](https://github.com/Corvelis/irodori-tts-coreml/blob/main/docs/RELEASE.md)に記録します。
 
 原本約2.90 GBに加え、アプリ内コピーとコンパイルキャッシュが必要です。選び直した過去のモデルコピーも残るため、容量に余裕を持たせてください。現在の画面にはモデルの個別削除機能はありません。
 

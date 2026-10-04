@@ -19,7 +19,8 @@ tags:
 
 # Irodori TTS v4.1 Small MF — Core ML community conversion
 
-**Distribution draft (`0.1.0-draft`); not a public release.**
+**Release bundle `0.1.0`.** Publication status and unauthenticated download validation
+are tracked in the [current release status](https://github.com/Corvelis/irodori-tts-coreml/blob/main/docs/RELEASE.md).
 Target model repository: [AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML).
 Meta has explicitly clarified that
 DACVAE model weights are Apache-2.0 in the
@@ -30,7 +31,7 @@ and [release status](RELEASE_STATUS.md). This is not an official Aratako or Appl
 
 日本語Irodori TTS v4.1 Small MFのCore ML版です。Local AIで使用する推論構成を保ち、
 iPhone / Apple Silicon Macで動作するSwiftサンプルと組み合わせて使います。
-SDK・サンプル・変換コード: **[Corvelis/irodori-tts-coreml](https://github.com/Corvelis/irodori-tts-coreml)**。現在はコード・モデルともPrivateの配布準備版です。
+SDK・サンプル・変換コード: **[Corvelis/irodori-tts-coreml](https://github.com/Corvelis/irodori-tts-coreml)**。コード用tagは `v0.1.0`、モデルのbundleVersionは `0.1.0` です。リリース作成時点では両リポジトリをPrivateに保ち、一般公開と公開後の取得確認は別の工程です。
 
 ## Bundle
 
@@ -56,7 +57,7 @@ the SDK sample has also been exercised on an iPhone 17 Pro, including Files mode
 See the code repository's validation report before citing performance numbers.
 The [local validation report](VALIDATION.md) records exact normal/long-utterance
 parity and unresolved small numerical differences in two short-utterance cases.
-Complete quality equivalence is not yet a verified claim for this draft.
+Complete quality equivalence is not a verified claim for this release.
 
 Cold compilation and Core ML specialization are excluded from warm synthesis RTF.
 The first-PCM metric is callback readiness, not measured physical speaker onset.
@@ -82,10 +83,10 @@ a stale SAM sentence. Preserve the clarification record and all included notices
 
 ## Quick start / 最初の使い方
 
-Clone the [separate code repository](https://github.com/Corvelis/irodori-tts-coreml), with this model folder beside it. The current private draft requires GitHub authentication:
+Clone the [separate code repository](https://github.com/Corvelis/irodori-tts-coreml), with this model folder beside it. Private code repositories require GitHub authentication:
 
 ```sh
-git clone https://github.com/Corvelis/irodori-tts-coreml.git
+git clone --branch v0.1.0 --depth 1 https://github.com/Corvelis/irodori-tts-coreml.git
 cd irodori-tts-coreml
 swift build -c release
 .build/release/irodori verify --models ../Irodori-TTS-v4.1-Small-MF-CoreML

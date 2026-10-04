@@ -1,8 +1,8 @@
 {
   "format": "irodori-coreml-provenance-v1",
-  "bundleVersion": "0.1.0-draft",
-  "runtimeVersion": "0.1.0-draft",
-  "releaseStatus": "draft-license-reviewed",
+  "bundleVersion": "0.1.0",
+  "runtimeVersion": "0.1.0",
+  "releaseStatus": "release-prepared",
   "upstreamSources": {
     "format": "irodori-conversion-sources-v1",
     "upstreamCode": {
@@ -123,7 +123,8 @@
   "distribution": {
     "modelRepositoryId": "AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML",
     "modelRepository": "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML",
-    "codeRepository": "https://github.com/Corvelis/irodori-tts-coreml"
+    "codeRepository": "https://github.com/Corvelis/irodori-tts-coreml",
+    "codeTag": "v0.1.0"
   },
-  "reviewedArtifactsLockSha256": "5b733584f68411f2d054e3003ab803f26d2bd172b418e08349db507e80e52b78"
+  "reviewedArtifactsLockSha256": "99f368e413e4c095d4d614d102d0fba2ca513c9fcad3a369ed70f58739028b8f"
 }

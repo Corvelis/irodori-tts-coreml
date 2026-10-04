@@ -2,7 +2,9 @@
 
 Irodori TTS v4.1 Small MF を iPhone / Apple Silicon Mac で動かす、コミュニティ版の共通ランタイムとサンプルです。Local AI で使用している推論エンジンから切り出しました。
 
-**現在は配布準備版 `0.1.0-draft` です。** [Hugging Faceのモデル用リポジトリ](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)は作成済みで、Privateの準備版をアップロードし、全ファイルの再ダウンロードとサイズ・SHA-256検証を完了しました。正式公開はまだ完了していません。SDK・サンプル・変換コードは [Corvelis/irodori-tts-coreml](https://github.com/Corvelis/irodori-tts-coreml) に配置します。現在は両リポジトリともPrivateの準備版です。DACVAE元重みもApache-2.0とするMetaの回答を確認し、[ライセンス確認記録](docs/LICENSE_REVIEW.md)へ保存しました。初版で対象にしたiPhone/Macの操作・試聴確認は完了し、公開先からの取得確認が残っています。[公開準備の状態](docs/RELEASE.md)を参照してください。コードは Apache-2.0、モデルと派生部分は[部品ごとの条件](THIRD_PARTY_NOTICES.md)を維持します。
+**Version `0.1.0`**。Swift SDK、iPhone/Macサンプル、CLI、変換の参考コードを配布します。ソースは [GitHub](https://github.com/Corvelis/irodori-tts-coreml)、モデルは [Hugging Face](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML) に分けています。[v0.1.0 Release](https://github.com/Corvelis/irodori-tts-coreml/releases/tag/v0.1.0) と [利用手順](docs/GETTING_STARTED.md)を参照してください。リリース作成時点では両リポジトリをPrivateに保ち、一般公開とログインなしの取得確認は別の工程として残しています。[最新の公開・検証状態](https://github.com/Corvelis/irodori-tts-coreml/blob/main/docs/RELEASE.md)に記録します。
+
+コードはApache-2.0で、モデルと派生部分は[部品ごとの条件](THIRD_PARTY_NOTICES.md)を維持します。DACVAE元重みのApache-2.0に関するMetaの回答は[ライセンス確認記録](docs/LICENSE_REVIEW.md)に保存しています。初版のiPhone/Mac操作・試聴の確認範囲は[検証記録](docs/VALIDATION.md)に記載しています。
 
 ## ドキュメント
 
@@ -34,10 +36,10 @@ Irodori TTS v4.1 Small MF を iPhone / Apple Silicon Mac で動かす、コミ�
 
 Apple Silicon Mac、XcodeとCommand Line Toolsを使用してください。ビルド対象はmacOS 14以降 / iOS 17以降ですが、全OS版・全端末での動作を確認した意味ではありません。[確認範囲](docs/VALIDATION.md)に記載しています。
 
-ソースは [GitHub](https://github.com/Corvelis/irodori-tts-coreml) から取得します。現在のPrivate準備版へアクセスするにはGitHubの認証が必要です。
+ソースは [GitHub](https://github.com/Corvelis/irodori-tts-coreml) から取得します。リポジトリがPrivateの場合はGitHubの認証が必要です。
 
 ```sh
-git clone https://github.com/Corvelis/irodori-tts-coreml.git
+git clone --branch v0.1.0 --depth 1 https://github.com/Corvelis/irodori-tts-coreml.git
 cd irodori-tts-coreml
 ```
 
@@ -56,11 +58,11 @@ afplay /tmp/irodori-output.wav
 
 `--reference` を省くと参照音声なしで生成します。モデル・参照の準備時間とRTFは別に報告します。初回はCore MLのコンパイルと特殊化に時間がかかります。表示する「最初のPCM」は生成コールバックまでの時間で、スピーカーから音が出るまでの実測ではありません。
 
-モデルの配布先は [AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)です。アップロード・公開後は、HF commit SHAに固定した `manifest.json` のHTTPS URLで取得できます。以下のURLはサイズ・SHA-256を検証済みの準備版commitに固定しています。現時点でPrivateのリポジトリはSDKの認証なしURL取得では使用できません。
+モデルの配布先は [AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)です。アップロード・公開後は、HF commit SHAに固定した `manifest.json` のHTTPS URLで取得できます。以下のURLはバージョン0.1.0のモデルcommitに固定しています。SDKのURL取得には認証機能がないため、リポジトリがPrivateの場合はMac等で認証して取得し、フォルダから取り込みます。
 
 ```sh
 .build/release/irodori download \
-  --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/af30c0101ebd6f714160b900d205b395845e43a6/manifest.json' \
+  --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/3db2ed296c75196a34f4f40f05dc9f552f79d115/manifest.json' \
   --destination /path/to/new-model-folder
 ```
 
@@ -85,7 +87,7 @@ Macは `IrodoriMac`、iPhoneは `IrodoriiOS` schemeを選択します。iPhone�
 
 ## 自分のアプリから呼ぶ
 
-ローカルSwift Packageとして追加し、`IrodoriTTS` productをリンクします。公開後は同じ構成でGitHubのtagを指定できます。
+XcodeのPackage DependenciesにGitHub URLを追加し、Exact Version `0.1.0` を選んで `IrodoriTTS` productをリンクします。ソースZIPやcloneしたフォルダはローカルSwift Packageとしても追加できます。
 
 ```swift
 import IrodoriTTS
@@ -124,10 +126,9 @@ A community Core ML runtime for Irodori TTS v4.1 Small MF, with a shared Swift
 package, iOS/macOS SwiftUI samples, a macOS WAV CLI, and conversion tooling.
 The runtime uses Apple frameworks only. Model weights are a separate ~2.90 GB
 bundle of 13 ML Programs. Clone/open the Xcode project or build with SwiftPM;
-model preparation is required before synthesis. This is a local distribution
-draft. Meta has explicitly clarified that DACVAE model weights are Apache-2.0;
+model preparation is required before synthesis. The code release is v0.1.0. Meta has explicitly clarified that DACVAE model weights are Apache-2.0;
 see docs/LICENSE_REVIEW.md. Preserve the component licenses and notices.
-The initial iPhone/Mac operation and trial-listening checks are complete; GitHub publication, public model release and fresh public-download validation remain pending. No voice recordings or model weights are in this code
+The initial iPhone/Mac operation and trial-listening checks are complete. Release artifacts are prepared while the repositories remain private; public availability and unauthenticated download validation are tracked in docs/RELEASE.md. No voice recordings or model weights are in this code
 repository, and the code license does not override upstream model terms.
 
 For the complete English quick start, see [docs/README.en.md](docs/README.en.md).

@@ -13,7 +13,7 @@
 | `This is not an Irodori Core ML bundle` / `Invalid FP32 component metadata` | 対応する一式を使用。異なる版のモデル・sidecarを混ぜない |
 | `Model checksum mismatch` / `Downloaded file failed verification` | 欠落・途中取得・変更を確認。metadataを書き換えて通さず固定revisionから再取得 |
 | `Destination already exists` | 完成した出力先は上書きしない仕様。既存モデルをverifyして利用するか、新しいフォルダを指定 |
-| 取得に失敗する | HTTPSのmanifest.json URL、ログインなしで取得できる公開先、commit SHA、ネットワーク、容量を確認。サンプルのURL取得欄はPrivate/gatedリポジトリの認証を実装していない。CLIの取得例は検証済みの準備版commitに固定。Privateの準備版は認証なしのURL取得では使用できない |
+| 取得に失敗する | HTTPSのmanifest.json URL、ログインなしで取得できる公開先、commit SHA、ネットワーク、容量を確認。サンプルのURL取得欄はPrivate/gatedリポジトリの認証を実装していない。CLIの取得例は0.1.0の固定commit。Privateのモデルリポジトリは認証なしのURL取得では使用できない |
 
 初回コンパイルには時間がかかります。状態欄とXcode/CLIログを確認し、毎回フォルダを取り込み直すことは避けてください。再取り込みは別コピーを増やします。
 

@@ -22,11 +22,11 @@ afplay /tmp/irodori-output.wav
 
 ## モデル取得
 
-配布先は [AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)です。以下のURLはサイズ・SHA-256を検証済みの準備版commitに固定しています。Privateの準備版はSDKの認証なしURL取得では使用できません。正式公開と公開URLからの取得検証はまだ完了していません。
+配布先は [AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)です。以下のURLはバージョン0.1.0のモデルcommitに固定しています。SDKのURL取得には認証機能がないため、モデルリポジトリがPrivateの場合はMac等で認証して取得したフォルダを使います。一般公開後の取得確認は[最新の公開・検証状態](https://github.com/Corvelis/irodori-tts-coreml/blob/main/docs/RELEASE.md)を参照してください。
 
 ```sh
 .build/release/irodori download \
-  --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/af30c0101ebd6f714160b900d205b395845e43a6/manifest.json' \
+  --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/3db2ed296c75196a34f4f40f05dc9f552f79d115/manifest.json' \
   --destination /path/to/new-model-folder
 ```
 

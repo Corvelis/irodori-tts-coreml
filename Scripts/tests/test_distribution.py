@@ -42,7 +42,11 @@ class DistributionTests(unittest.TestCase):
         self.assertFalse((destination / 'secret.env').exists())
         manifest = s.verify(destination)
         self.assertGreater(len(manifest['files']), len(s.RUNTIME_FILES))
-        self.assertEqual(manifest['releaseStatus'], 'draft-license-reviewed')
+        self.assertEqual(manifest['releaseStatus'], 'release-prepared')
+        provenance = json.loads((destination / 'provenance.json').read_text())
+        self.assertEqual(manifest['bundleVersion'], 'test')
+        self.assertEqual(provenance['bundleVersion'], manifest['bundleVersion'])
+        self.assertEqual(provenance['runtimeVersion'], '0.1.0')
         for name in ['LICENSE_REVIEW.md', 'license-review.json']:
             self.assertIn(name, {row['path'] for row in manifest['files']})
         evidence = json.loads((destination / 'license-review.json').read_text())

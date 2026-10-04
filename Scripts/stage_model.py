@@ -1,4 +1,4 @@
-"""Create a local model distribution draft from reviewed, unmodified artifacts.
+"""Create a model distribution bundle from reviewed, unmodified artifacts.
 
 No upload command is provided. A manifest is integrity metadata, not a grant of
 redistribution rights. License evidence is in docs/LICENSE_REVIEW.md; remaining
@@ -94,6 +94,7 @@ def stage(source, destination, lock_path, repository=REPOSITORY):
         shutil.copy2(repository / 'docs/LICENSE_REVIEW.md', staging / 'LICENSE_REVIEW.md')
         shutil.copy2(repository / 'Distribution/license-review.json', staging / 'license-review.json')
         provenance = json.loads((repository / 'Distribution/provenance.json').read_text())
+        provenance['bundleVersion'] = lock['bundleVersion']
         provenance['reviewedArtifactsLockSha256'] = checksum(lock_path)
         write_json(staging / 'provenance.json', provenance)
         paths = sorted(p.relative_to(staging).as_posix() for p in staging.rglob('*') if p.is_file())
@@ -131,7 +132,7 @@ def main():
     lock = commands.add_parser('lock', help='Record a candidate inventory; this is not a release approval')
     lock.add_argument('--source', type=Path, required=True)
     lock.add_argument('--output', type=Path, required=True)
-    lock.add_argument('--version', default='0.1.0-draft')
+    lock.add_argument('--version', default='0.1.0')
     pack = commands.add_parser('stage')
     pack.add_argument('--source', type=Path, required=True)
     pack.add_argument('--destination', type=Path, required=True)

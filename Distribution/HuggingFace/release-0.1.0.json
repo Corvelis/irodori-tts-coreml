@@ -1,0 +1,19 @@
+{
+  "format": "irodori-coreml-release-v1",
+  "version": "0.1.0",
+  "codeTag": "v0.1.0",
+  "preparedDate": "2026-10-04",
+  "codeRepository": "https://github.com/Corvelis/irodori-tts-coreml",
+  "modelRepository": "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML",
+  "modelCommit": "3db2ed296c75196a34f4f40f05dc9f552f79d115",
+  "manifestURL": "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/3db2ed296c75196a34f4f40f05dc9f552f79d115/manifest.json",
+  "manifestSha256": "9ec645e4396a8ded1d626e528fdd77b3b8ac1cfb4f4d2f8355fc1bfaae017ca6",
+  "modelBundleBytesIncludingManifest": 2898369034,
+  "distributedFilesVerified": 63,
+  "runtimeModelFilesUnchanged": 50,
+  "runtimeSourceFilesUnchanged": 12,
+  "releaseStatus": "release-prepared",
+  "visibilityAtPreparation": "private",
+  "authenticatedFileVerification": "all 63 pinned files verified by size and SHA-256; unchanged model files reuse the earlier verified download cache",
+  "publicDownloadVerification": "pending; not part of steps 1 and 2"
+}

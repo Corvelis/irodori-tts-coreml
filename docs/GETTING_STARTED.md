@@ -2,7 +2,7 @@
 
 [README](../README.md) · [サンプル操作](SAMPLES.md) · [API一覧](API.md)
 
-この手順はソース配布版 `0.1.0-draft` 向けです。コード用リポジトリは [Corvelis/irodori-tts-coreml](https://github.com/Corvelis/irodori-tts-coreml) です。現在はPrivateで、正式リリースtagはまだありません。認証してソースを取得し、まずローカルSwift Packageとして追加します。SDKはモデルを内蔵せず、ダウンロードも自動では行いません。
+この手順はSwift SDK `0.1.0`（GitHub tag `v0.1.0`）向けです。コード用リポジトリは [Corvelis/irodori-tts-coreml](https://github.com/Corvelis/irodori-tts-coreml) です。リポジトリがPrivateの場合は認証が必要です。GitHubのタグ指定またはソースを取得してローカルSwift Packageとして追加します。SDKはモデルを内蔵せず、ダウンロードも自動では行いません。
 
 ## 1. 用意するもの
 
@@ -18,18 +18,22 @@
 
 ## 2. パッケージを追加する
 
-ソースはリポジトリ全体を取得します。現在のPrivate準備版ではGitHubの認証が必要です。
+ソースはリポジトリ全体を取得します。リポジトリがPrivateの場合はGitHubの認証が必要です。
 
 ```sh
-git clone https://github.com/Corvelis/irodori-tts-coreml.git
+git clone --branch v0.1.0 --depth 1 https://github.com/Corvelis/irodori-tts-coreml.git
 ```
+
+GitHubから直接組み込む場合は、Xcodeの **File → Add Package Dependencies…** に `https://github.com/Corvelis/irodori-tts-coreml.git` を入力し、Dependency Ruleを **Exact Version `0.1.0`** にします。product **IrodoriTTS** をアプリtargetへ追加してください。
+
+取得したソースやソースZIPを使う場合は、次のローカル追加手順を使います。
 
 1. 自分のアプリのXcodeプロジェクトを開きます。
 2. **File → Add Package Dependencies… → Add Local…** から、このリポジトリのルートフォルダを選びます。Xcodeの版によって表示名は異なります。
 3. ライブラリproduct **IrodoriTTS** をアプリのtargetに追加します。CLI product `irodori` をアプリへ追加する必要はありません。
 4. Swiftファイルで `import IrodoriTTS` が解決することを確認します。
 
-`Sources/IrodoriNative` を別途コピーしたり、モデルからSwiftクラスを生成したりする必要はありません。公開後はGitHub URLと公開済みtagを指定する方式へ置き換えられます。現在のdraft名は公開済みtagではありません。
+`Sources/IrodoriNative` を別途コピーしたり、モデルからSwiftクラスを生成したりする必要はありません。GitHubの `v0.1.0` タグとローカル追加は同じSDKソースを使います。
 
 Xcodeの説明はAppleの[パッケージ依存の追加](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app)と[ローカルパッケージでの開発](https://developer.apple.com/documentation/xcode/editing-a-package-dependency-as-a-local-package)も参照してください。
 

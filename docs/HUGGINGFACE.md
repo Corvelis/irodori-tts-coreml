@@ -29,7 +29,7 @@ hf auth whoami
 python3 Scripts/stage_model.py verify /path/to/Irodori-TTS-v4.1-Small-MF-CoreML
 ```
 
-現行の配布フォルダは `0.1.0-draft` です。ドキュメントを変更したらmanifestの該当ファイルのサイズとSHA-256も更新し、再検証します。正式版へ切り替える際は版番号、公開状態、GitHub URLを全配布物で合わせてください。
+現行の配布フォルダは `0.1.0` です。ドキュメントを変更したらmanifestの該当ファイルのサイズとSHA-256も更新し、再検証します。現行版のprovenance/manifestは `release-prepared` です。版番号、公開状態、GitHub URLは全配布物で合わせてください。
 
 ## 3. リポジトリのルートへアップロードする
 
@@ -45,14 +45,14 @@ hf upload AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML \
 
 ## 4. 公開と導入を確認する
 
-1. GitHubのコード用リポジトリは `Corvelis/irodori-tts-coreml` に確定しています。正式版を確定し、モデルカードのリンク・版・manifestを合わせます。
+1. コード用リポジトリは `Corvelis/irodori-tts-coreml`、現行版は `0.1.0`、コード用tagは `v0.1.0` です。モデルカード・版・manifestを合わせています。
 2. Files and versionsでモデル一式とライセンスを確認し、アップロードしたcommit SHAを記録します。
 3. 公開内容の確認後にモデルリポジトリをPublicへ切り替えます。
-4. 次の `COMMIT_SHA` を確定したSHAへ置き換え、SDK CLIで未作成の保存先へ取得します。移動する `main` は使用しません。
+4. 次の固定URLから、SDK CLIで未作成の保存先へ取得します。移動する `main` は使用しません。
 
 ```sh
 .build/release/irodori download \
-  --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/COMMIT_SHA/manifest.json' \
+  --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/3db2ed296c75196a34f4f40f05dc9f552f79d115/manifest.json' \
   --destination /path/to/new-model-folder
 .build/release/irodori verify --models /path/to/new-model-folder
 ```
@@ -65,4 +65,8 @@ hf upload AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML \
 
 [機械可読の確認記録](../Distribution/HuggingFace/staging-upload.json)にcommitとmanifestのSHA-256を保存しています。認証済みのPrivate取得確認であり、ログインなしでの公開URLからの取得確認は正式公開後に行います。
 
-GitHubリポジトリ作成後に、モデル側のREADME・配布状態・provenance・manifestの4ファイルへコードURLを反映しました。現在のPrivate準備版commitは `af30c0101ebd6f714160b900d205b395845e43a6` です。全63ファイルを固定commitから取得し、サイズ・SHA-256を確認しました。変更のないモデル本体は、初回に全ファイルを新しく取得して検証したキャッシュを再利用しています。コードのREADMEとCLIガイドには、この検証済みcommitのmanifest URLを記載しています。
+GitHubリポジトリ作成後に、モデル側のREADME・配布状態・provenance・manifestの4ファイルへコードURLを反映しました。この時点のPrivate準備版commitは `af30c0101ebd6f714160b900d205b395845e43a6` でした。全63ファイルを固定commitから取得し、サイズ・SHA-256を確認しました。変更のないモデル本体は、初回に全ファイルを新しく取得して検証したキャッシュを再利用しています。コードのREADMEとCLIガイドには、この検証済みcommitのmanifest URLを記載しています。
+
+## バージョン0.1.0
+
+コード用tagは `v0.1.0`、モデルの固定commitは `3db2ed296c75196a34f4f40f05dc9f552f79d115` です。配布状態は `release-prepared` で、モデル本体50ファイルと推論コード12ファイルは準備版から変更していません。全63ファイルを固定commitで取得・検証し、認証なしの公開URL確認は一般公開後の別工程として残しています。[0.1.0配布記録](../Distribution/HuggingFace/release-0.1.0.json)にモデルcommit、manifestのSHA-256と検証範囲を保存しています。

@@ -4,7 +4,7 @@
 
 This community runtime runs Irodori TTS v4.1 Small MF on iPhone and Apple Silicon Mac. It includes a Swift package, shared SwiftUI samples, a macOS CLI and conversion tools. Runtime dependencies are Apple frameworks only; Python and ONNX Runtime are not required for inference.
 
-**Status: `0.1.0-draft`, not published.** The [Hugging Face model repository](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML) has been created; the draft has been uploaded privately and every distributed file has been re-downloaded and verified by size and SHA-256. Public release and public-download validation are pending. The [GitHub code repository](https://github.com/Corvelis/irodori-tts-coreml) has been created and is being populated privately. Access to both staging repositories requires authentication. Meta has explicitly confirmed that DACVAE model weights are Apache-2.0. See [license review](LICENSE_REVIEW.md); preserve all component licenses and model-card use conditions. See [release status](RELEASE.md) and [component notices](../THIRD_PARTY_NOTICES.md). This is not an official Aratako or Apple release.
+**Version `0.1.0`, GitHub tag `v0.1.0`.** Code and samples are in the [GitHub repository](https://github.com/Corvelis/irodori-tts-coreml); the complete model bundle is in the [Hugging Face repository](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML). The release artifacts are prepared while both repositories remain private. Public availability and unauthenticated download validation are tracked in the [current release status](https://github.com/Corvelis/irodori-tts-coreml/blob/main/docs/RELEASE.md). Private repositories require authentication. Meta has explicitly confirmed that DACVAE model weights are Apache-2.0; preserve all component licenses and model-card use conditions. See [license review](LICENSE_REVIEW.md) and [component notices](../THIRD_PARTY_NOTICES.md). This is not an official Aratako or Apple release.
 
 ## Contents and requirements
 
@@ -17,10 +17,10 @@ Build targets are iOS 17+ and macOS 14+, with Swift tools 5.9 declared in Packag
 
 ## Run on Mac
 
-Clone the [code repository](https://github.com/Corvelis/irodori-tts-coreml). The current private draft requires GitHub authentication. Place the complete model folder next to the source repository.
+Clone the [code repository](https://github.com/Corvelis/irodori-tts-coreml). Private repositories require GitHub authentication. Place the complete model folder next to the source repository.
 
 ```sh
-git clone https://github.com/Corvelis/irodori-tts-coreml.git
+git clone --branch v0.1.0 --depth 1 https://github.com/Corvelis/irodori-tts-coreml.git
 cd irodori-tts-coreml
 ```
 

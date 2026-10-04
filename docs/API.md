@@ -2,7 +2,7 @@
 
 [導入](GETTING_STARTED.md) · [音声登録](VOICE_REGISTRATION.md) · [再生と停止](STREAMING.md)
 
-対象は `0.1.0-draft` の公開Swift APIです。[実装](../Sources/IrodoriTTS)に対応しています。初版準備中で、将来の互換性方針はまだ確定していません。
+対象は `0.1.0` の公開Swift APIです。[実装](../Sources/IrodoriTTS)に対応しています。初版のAPIです。将来の互換性方針はまだ確定していません。
 
 ## IrodoriEngine
 

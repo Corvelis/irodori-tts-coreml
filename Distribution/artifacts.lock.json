@@ -1,6 +1,6 @@
 {
   "format": "irodori-reviewed-artifacts-v1",
-  "bundleVersion": "0.1.0-draft",
+  "bundleVersion": "0.1.0",
   "files": [
     {
       "path": "config.json",
