@@ -9,6 +9,7 @@ SDK・サンプルの新規部分はApache-2.0です。モデルと上流由来�
 | Irodori TTS v4.1 Small MFとIrodori由来の実装 | MIT。[モデル](https://huggingface.co/Aratako/Irodori-TTS-v4.1-Small-MF)、[実装LICENSE](https://github.com/Aratako/Irodori-TTS/blob/89f9d8fbd4d51ea019867ee1197725ede1df13c5/LICENSE) |
 | ModernBERT Japaneseのエンコーダー・tokenizer | MIT。[LICENSE](https://huggingface.co/sbintuitions/modernbert-ja-310m/blob/77675fc96a7e445e982e2ba90246b816efc74ec6/LICENSE) |
 | Japanese Semantic-DACVAEの追加・変更部分 | MIT。[モデル](https://huggingface.co/Aratako/Semantic-DACVAE-Japanese-32dim)。Meta由来部分の条件を保持 |
+| AudioSeal実装・付与/検出の重み | MIT。[公式実装](https://github.com/facebookresearch/audioseal)、[公式モデル](https://huggingface.co/facebook/audioseal)、[同梱LICENSE](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.1.0/LICENSES/AudioSeal-MIT.txt) |
 | Meta DACVAEの実装と元重み | Apache-2.0。[実装LICENSE](https://github.com/facebookresearch/dacvae/blob/main/LICENSE)、[重みのライセンスに関するMetaの回答](https://huggingface.co/facebook/dacvae-watermarked/discussions/1) |
 | Descript DAC由来部分 | MIT。[LICENSE](https://github.com/descriptinc/descript-audio-codec/blob/main/LICENSE) |
 | OnseiのONNX中間成果物 | 上記の部品別条件と帰属を保持。[配布元](https://huggingface.co/raratu/Onsei-iOS-Models) |
@@ -25,7 +26,7 @@ Core ML変換には、cached attentionを使うDiT、精度設定、補助モデ
 
 [Irodoriの使用条件](https://huggingface.co/Aratako/Irodori-TTS-v4.1-Small-MF#ethical-restrictions)に従い、使用許可のある声を使ってください。無断のなりすましや誤情報の拡散に使わず、合成音声を本人の実際の発話として偽らないでください。個人の音声を再配布する権利はモデルライセンスとは別です。
 
-本モデルはSilentCipher / AudioSealによる透かしを付与しません。
+
 
 ## 変換ツールの依存パッケージ
 

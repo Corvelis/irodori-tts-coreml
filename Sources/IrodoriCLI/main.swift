@@ -22,10 +22,11 @@ private final class CollectedPCM: @unchecked Sendable {
         }
         if args.isEmpty || args.contains("--help") {
             print("""
-            irodori synthesize --models DIR --text TEXT --output FILE.wav [--reference FILE.wav] [--caption TEXT] [--repeat N] [--report FILE.json] [--raw]
+            irodori synthesize --models DIR --text TEXT --output FILE.wav [--reference FILE.wav] [--caption TEXT] [--repeat N] [--report FILE.json] [--raw] [--no-watermark] [--watermark-id N]
             irodori benchmark --models DIR --cases FILE.json --output-directory DIR --report FILE.json [--reference FILE.wav] [--repeat N]
             irodori verify --models DIR
             irodori download --manifest HTTPS_URL_PINNED_TO_COMMIT --destination DIR
+            irodori detect-watermark --models DIR --input FILE.wav
             Diagnostic native flags: --irodori-fixed-seed --irodori-seed 11 --irodori-diagnostics
             --raw bypasses document formatting/splitting for exact engine comparisons. Benchmark always uses raw text.
             """)
@@ -38,6 +39,23 @@ private final class CollectedPCM: @unchecked Sendable {
         }
         guard let model = value("--models") else { throw IrodoriError.invalid("--models DIR is required") }
         let modelURL = URL(fileURLWithPath: model)
+        if args[0] == "detect-watermark", let input = value("--input") {
+            let floats = try ReferenceAudio.read(URL(fileURLWithPath: input))
+            var pcm = Data(count: floats.count / 2)
+            pcm.withUnsafeMutableBytes { dst in floats.withUnsafeBytes { src in
+                for i in 0..<(floats.count / 4) {
+                    let f = src.loadUnaligned(fromByteOffset: i * 4, as: Float.self)
+                    let n = Int16(max(-32768, min(32767, (f * 32768).rounded())))
+                    dst.storeBytes(of: n.littleEndian, toByteOffset: i * 2, as: Int16.self)
+                }
+            }}
+            let marker = AudioWatermarker()
+            try await marker.prepare(modelDirectory: modelURL)
+            let result = try await marker.detect(in: pcm)
+            print(String(format: "AudioSeal score=%.4f detected=%@ identifier=%u", result.score,
+                         result.detected ? "true" : "false", result.identifier))
+            await marker.release(); return
+        }
         if args[0] == "verify" { try ModelBundle.validate(at: modelURL, verifyHashes: true); print("All model files verified"); return }
         let benchmark = args[0] == "benchmark"
         let cases: [BenchmarkCase]
@@ -55,13 +73,19 @@ private final class CollectedPCM: @unchecked Sendable {
             try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
         }
         let engine = IrodoriEngine()
+        let identifier: UInt16
+        if let value = value("--watermark-id") {
+            guard let parsed = UInt16(value) else { throw IrodoriError.invalid("--watermark-id must be 0–65535") }
+            identifier = parsed
+        } else { identifier = 0x4952 }
+        let watermark = args.contains("--no-watermark") ? nil : WatermarkOptions(identifier: identifier)
         let loadMs = try await engine.prepare(modelDirectory: modelURL)
         let registration = try await engine.registerReference(value("--reference").map { URL(fileURLWithPath: $0) })
         var runs: [[String: Any]] = []
         for pass in 0..<repeats {
             for (index, item) in cases.enumerated() {
                 let collected = CollectedPCM()
-                let result = try await engine.synthesize(item.text, caption: value("--caption") ?? "", rawText: benchmark || args.contains("--raw")) { collected.append($0.pcm16) }
+                let result = try await engine.synthesize(item.text, caption: value("--caption") ?? "", rawText: benchmark || args.contains("--raw"), watermark: watermark) { collected.append($0.pcm16) }
                 let matches = collected.equals(result.pcm16)
                 guard matches else { throw IrodoriError.invalid("Stream differs from completed PCM") }
                 if benchmark {
@@ -69,6 +93,7 @@ private final class CollectedPCM: @unchecked Sendable {
                     try result.writeWAV(to: url)
                 } else if pass == repeats - 1 { try result.writeWAV(to: URL(fileURLWithPath: value("--output")!)) }
                 runs.append(["name": item.name, "pass": pass, "text": result.preparedText, "synthesisMs": result.synthesisMilliseconds,
+                    "watermark": result.watermark.map { ["algorithm": $0.algorithm, "identifier": $0.identifier, "processingMs": $0.processingMilliseconds] } ?? [:],
                     "firstPcmMs": result.firstPCMMilliseconds, "audioSeconds": result.audioSeconds, "rtf": result.rtf,
                     "pcmSha256": SHA256.hash(data: result.pcm16).map { String(format: "%02x", $0) }.joined(),
                     "streamMatchesCompletedPcm": matches, "metrics": result.metrics, "diagnostics": result.diagnostics])

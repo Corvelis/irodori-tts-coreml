@@ -26,7 +26,7 @@ afplay ./irodori-output.wav
 
 ```sh
 .build/release/irodori download \
-  --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b95d39710d9e3ac4435983fe89f9acd6c02658e9/manifest.json' \
+  --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b02a670f0cb41c382844672fa8f0f03b3b9b8082/manifest.json' \
   --destination ../Irodori-TTS-v4.1-Small-MF-CoreML
 ```
 
@@ -70,3 +70,7 @@ IRODORI_TEST_REFERENCE='./reference.wav' \
 ```
 
 通常のSwiftテストはモデルも参照音声もダウンロードせず、上記環境変数のない実モデルテストをskipします。skipを実モデル検証成功と扱わないでください。機能・音質・速度の比較条件は[性能の測定と制約](VALIDATION.md)を参照してください。
+
+## 音声の透かし
+
+生成音声にはAudioSealの透かしを標準で付与します。再生音声と保存WAVは同じPCMです。RTFには透かしの処理時間も含みます。[付与・検出の使い方](WATERMARK.md)を参照してください。

@@ -20,9 +20,9 @@ OTHERS = ('dit_step_cached_mixed_linear_768', 'decoder_stage_1_2d_fixed_w64',
 PACKAGE_FILES = ('Manifest.json', 'Data/com.apple.CoreML/model.mlmodel',
                  'Data/com.apple.CoreML/weights/weight.bin')
 RUNTIME_FILES = tuple(sorted(['config.json', 'coreml-only.json', 'tokenizer/tokenizer.json',
-                             'tokenizer/tokenizer_config.json'] +
+                             'tokenizer/tokenizer_config.json', 'audioseal.json'] +
     [name + '.json' for name in AUXILIARY] +
-    [name + '.mlpackage/' + file for name in AUXILIARY + OTHERS for file in PACKAGE_FILES]))
+    [name + '.mlpackage/' + file for name in AUXILIARY + OTHERS + ('audioseal_generator', 'audioseal_detector') for file in PACKAGE_FILES]))
 
 
 def safe_file(root, relative):
@@ -66,6 +66,18 @@ def inventory(source):
             meta.get('validated_package_sha256') != digest.hexdigest() or
             core.get('components', {}).get(name, {}).get('package_sha256') != digest.hexdigest()):
             raise ValueError(f'Unvalidated auxiliary package: {name}')
+    watermark = json.loads(safe_file(source, 'audioseal.json').read_text())
+    if (watermark.get('format') != 'irodori-audioseal-v1' or watermark.get('precision') != 'float32'
+        or watermark.get('validatedCoreML') is not True):
+        raise ValueError('Unvalidated AudioSeal metadata')
+    for name in ('audioseal_generator', 'audioseal_detector'):
+        digest = hashlib.sha256()
+        for file in sorted(PACKAGE_FILES):
+            digest.update(file.encode() + b'\0')
+            with safe_file(source, name + '.mlpackage/' + file).open('rb') as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b''): digest.update(chunk)
+        if watermark.get('packages', {}).get(name) != digest.hexdigest():
+            raise ValueError(f'Unvalidated AudioSeal package: {name}')
     return rows
 
 

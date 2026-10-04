@@ -34,6 +34,7 @@ def commands(sources, output):
         if fixed: args.append('--fixed')
         yield py('export_coreml_decoder_2d.py', *args)
     yield py('validate_tiled_stage1.py', onnx)
+    yield py('export_audioseal.py', '--destination', coreml)
 
 
 def main():

@@ -2,7 +2,7 @@
 
 [README](../README.md) · [SDK導入](GETTING_STARTED.md) · [サンプル操作](SAMPLES.md)
 
-SDKとCore MLモデルは別配布です。生成には13個のCore MLパッケージ、tokenizer、configと補助metadataを含むフォルダ一式が必要です。
+SDKとCore MLモデルは別配布です。生成には15個のCore MLパッケージ、tokenizer、configと補助metadataを含むフォルダ一式が必要です。
 
 ## 対応モデル
 
@@ -11,13 +11,13 @@ SDKとCore MLモデルは別配布です。生成には13個のCore MLパッケ�
 | モデル | Irodori TTS v4.1 Small MF Core ML |
 | SDK / bundleVersion | `0.1.0` |
 | 配布先 | [AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML) |
-| 固定commit | `b95d39710d9e3ac4435983fe89f9acd6c02658e9` |
-| manifestのSHA-256 | `d12a4f0b97453db2e903dbbb55720790de6859bf3a68cc593b49aa054d39a744` |
+| 固定commit | `b02a670f0cb41c382844672fa8f0f03b3b9b8082` |
+| manifestのSHA-256 | `f98e77d857c20e977358ec9c9d513721b37e1af0d7e12359c05de26c90ae7186` |
 
 CLI、SDKの `ModelDownloader`、サンプルの「URLからダウンロード」には次のURLを使います。
 
 ```text
-https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b95d39710d9e3ac4435983fe89f9acd6c02658e9/manifest.json
+https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b02a670f0cb41c382844672fa8f0f03b3b9b8082/manifest.json
 ```
 
 ## MacのCLIで取得する
@@ -25,7 +25,7 @@ https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b95d397
 ソースを取得して `swift build -c release` を実行した後、リポジトリのルートで次を実行します。
 
 ```sh
-.build/release/irodori download --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b95d39710d9e3ac4435983fe89f9acd6c02658e9/manifest.json' --destination ../Irodori-TTS-v4.1-Small-MF-CoreML
+.build/release/irodori download --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b02a670f0cb41c382844672fa8f0f03b3b9b8082/manifest.json' --destination ../Irodori-TTS-v4.1-Small-MF-CoreML
 .build/release/irodori verify --models ../Irodori-TTS-v4.1-Small-MF-CoreML
 ```
 
@@ -48,7 +48,7 @@ import IrodoriTTS
 
 func downloadModels(to newDirectory: URL) async throws {
     let manifest = URL(string:
-        "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b95d39710d9e3ac4435983fe89f9acd6c02658e9/manifest.json"
+        "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b02a670f0cb41c382844672fa8f0f03b3b9b8082/manifest.json"
     )!
     try await ModelDownloader().download(manifestURL: manifest, to: newDirectory)
 }
@@ -75,4 +75,4 @@ Irodori-TTS-v4.1-Small-MF-CoreML/
 
 `.mlpackage` 1つだけでは生成できません。フォルダ一式を保持し、ファイル名・階層を変更したり別版のファイルを混ぜたりしないでください。ZIPを使う場合は先に展開します。
 
-配布フォルダは約2.90 GBです。サンプルへの取り込みはアプリ内コピーを作り、初回準備でCore MLコンパイルキャッシュも作成します。原本の容量に加えて数GBの空き容量を確保してください。モデル取得後の音声生成に通信は不要です。
+配布フォルダは約2.99 GBです。サンプルへの取り込みはアプリ内コピーを作り、初回準備でCore MLコンパイルキャッシュも作成します。原本の容量に加えて数GBの空き容量を確保してください。モデル取得後の音声生成に通信は不要です。

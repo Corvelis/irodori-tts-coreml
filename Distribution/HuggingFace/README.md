@@ -25,9 +25,9 @@ tags:
 
 ## 含まれるもの
 
-13個のCore ML ML Programパッケージ、ModernBERT Japaneseのtokenizer、config、7個の補助モデルmetadata、全配布ファイルのサイズとSHA-256を記載した `manifest.json` を含みます。元revisionと変換構成は `provenance.json` に記載しています。
+15個のCore ML ML Programパッケージ、ModernBERT Japaneseのtokenizer、config、7個の補助モデルmetadata、全配布ファイルのサイズとSHA-256を記載した `manifest.json` を含みます。元revisionと変換構成は `provenance.json` に記載しています。
 
-モデル一式は約2.90 GBです。`.mlpackage`を1つだけ取得せず、フォルダ一式を保持してください。構成・ファイル名を変更したり異なる版を混ぜたりしないでください。
+モデル一式は約2.99 GBです。`.mlpackage`を1つだけ取得せず、フォルダ一式を保持してください。構成・ファイル名を変更したり異なる版を混ぜたりしないでください。
 
 ## Macで使う
 
@@ -61,16 +61,22 @@ DiTはcached attention、mixed-linear precision、4 integration stepsを使用�
 
 初回はCore MLのコンパイル・ロード・特殊化に時間がかかります。速度・使用メモリ・発音・声質は端末や入力によって変わります。参照音声との完全な一致やVoice Design指示への追従は保証されません。原本に加え、アプリ内コピーとコンパイルキャッシュの空き容量を確保してください。モデル取得後の生成はオフラインで動作します。
 
+## 音声の透かし
+
+AudioSealのFP32付与・検出モデルを同梱します。対応SDKは再生PCMと保存WAVへの透かし付与を標準で有効にし、RTFにも処理時間を含めます。原音は48 kHzのまま保持し、透かし信号だけを加算します。詳細は[透かしの付与と検出](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.1.0/docs/WATERMARK.md)を参照してください。AudioSealのコードと重みはMITです。
+
 ## ライセンスと使用条件
 
 コミュニティによるCore ML変換で、AratakoやAppleの公式提供ではありません。IrodoriとModernBERT等のMIT、Meta由来部分のApache-2.0を保持します。DACVAE元重みについては[Metaの公式回答](https://huggingface.co/facebook/dacvae-watermarked/discussions/1)を参照してください。[部品別ライセンス](THIRD_PARTY_NOTICES.md)、[利用条件](LICENSE_REVIEW.md)、同梱の `LICENSES/` と `NOTICE` を保持してください。
 
-[上流モデルの使用条件](https://huggingface.co/Aratako/Irodori-TTS-v4.1-Small-MF)に従い、使用許可のある声を使ってください。合成音声を本人の実際の発話として偽らないでください。本モデルはSilentCipher / AudioSealによる透かしを付与しません。
+[上流モデルの使用条件](https://huggingface.co/Aratako/Irodori-TTS-v4.1-Small-MF)に従い、使用許可のある声を使ってください。合成音声を本人の実際の発話として偽らないでください。
 
 ## English
 
 A community Core ML bundle for Japanese Irodori TTS v4.1 Small MF on iPhone and Apple Silicon Mac, with optional reference voices and Japanese Voice Design captions. The matching Swift SDK version is **0.1.0**.
 
-Download the complete ~2.90 GB bundle with the versioned manifest URL above. Keep all 13 packages and accompanying files together. The immutable model commit is also listed in the [download guide](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.1.0/docs/HUGGINGFACE.md). Inference uses Apple frameworks only and runs offline after download. Output is 48 kHz mono PCM16 WAV. Allow extra time and disk space for first-use Core ML compilation.
+Download the complete ~2.99 GB bundle with the versioned manifest URL above. Keep all 15 packages and accompanying files together. The immutable model commit is also listed in the [download guide](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.1.0/docs/HUGGINGFACE.md). Inference uses Apple frameworks only and runs offline after download. Output is 48 kHz mono PCM16 WAV. Allow extra time and disk space for first-use Core ML compilation.
 
-See the [English quick start](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.1.0/docs/README.en.md) for SDK integration and sample operation. Preserve MIT / Apache-2.0 component terms and follow upstream voice-use conditions. This model does not apply audio watermarking.
+AudioSeal watermark generation/detection models are included. The SDK applies the watermark to playback PCM and exported WAV by default, and includes its processing time in RTF. See [the English watermark guide](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.1.0/docs/WATERMARK.en.md).
+
+See the [English quick start](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.1.0/docs/README.en.md) for SDK integration and sample operation. Preserve MIT / Apache-2.0 component terms and follow upstream voice-use conditions.

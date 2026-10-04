@@ -9,6 +9,7 @@ the conditions of the checkpoint, tokenizer, audio codec or reference recordings
 | Irodori implementation and derived conversion modules | [Aratako/Irodori-TTS](https://github.com/Aratako/Irodori-TTS/tree/89f9d8fbd4d51ea019867ee1197725ede1df13c5), Copyright (c) 2026 Aratako | MIT, [text](LICENSES/MIT.txt) |
 | Japanese ModernBERT encoder / tokenizer | [sbintuitions/modernbert-ja-310m](https://huggingface.co/sbintuitions/modernbert-ja-310m/tree/77675fc96a7e445e982e2ba90246b816efc74ec6), SB Intuitions and contributors | MIT, [text](LICENSES/ModernBERT-MIT.txt) |
 | Japanese semantic DACVAE | [Aratako/Semantic-DACVAE-Japanese-32dim](https://huggingface.co/Aratako/Semantic-DACVAE-Japanese-32dim/tree/47376ee24834d7a05a48ebabfe3cde29b3c5e214), Aratako and contributors | Model card declares MIT; ancestry below still applies |
+| AudioSeal implementation and watermark generator/detector weights | [facebookresearch/audioseal](https://github.com/facebookresearch/audioseal), [facebook/audioseal](https://huggingface.co/facebook/audioseal/tree/3c19eba53390776cf2cc9ed5f6c9ac67ce72ecba); Copyright (c) Meta Platforms, Inc. and affiliates. | MIT, [text](LICENSES/AudioSeal-MIT.txt) |
 | DACVAE implementation | [facebookresearch/dacvae](https://github.com/facebookresearch/dacvae), Copyright (c) Meta Platforms, Inc. and affiliates. All Rights Reserved. | Apache-2.0, [text](LICENSES/Apache-2.0.txt) |
 | DACVAE base weights | [facebook/dacvae-watermarked](https://huggingface.co/facebook/dacvae-watermarked/tree/8680102d141858a21bd533543966a2eb2e569f92) | Apache-2.0, [Meta clarification for weights](https://huggingface.co/facebook/dacvae-watermarked/discussions/1); [text](LICENSES/Apache-2.0.txt) |
 | Descript DAC architecture | [descriptinc/descript-audio-codec](https://github.com/descriptinc/descript-audio-codec), Copyright (c) 2023-present, Descript | MIT, [text](LICENSES/Descript-MIT.txt) |
@@ -36,8 +37,7 @@ and notices of the Core ML conversion.
 
 Follow the upstream [Irodori usage conditions and disclaimer](https://huggingface.co/Aratako/Irodori-TTS-v4.1-Small-MF).
 Use voices you are authorized to use; do not impersonate people without consent
-or present synthetic speech as their authentic recording. This conversion does
-not apply SilentCipher watermarking and is not a watermarked-audio guarantee.
+or present synthetic speech as their authentic recording.
 Samples identify their output as synthetic speech. Permission to run a model
 does not establish permission to distribute another person's recordings.
 

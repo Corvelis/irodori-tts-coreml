@@ -29,6 +29,10 @@ class DistributionTests(unittest.TestCase):
             s.write_json(self.source / (name + '.json'), {'compute_precision':'float32', 'validated_coreml':True, 'validated_package_sha256':sha})
             components[name] = {'package_sha256':sha}
         s.write_json(self.source / 'coreml-only.json', {'format':'irodori-coreml-only-v1', 'components':components})
+        digest = hashlib.sha256()
+        for file in sorted(s.PACKAGE_FILES): digest.update(file.encode() + b'\0' + b'test-model')
+        s.write_json(self.source / 'audioseal.json', {'format':'irodori-audioseal-v1','precision':'float32',
+            'validatedCoreML':True,'packages':{name:digest.hexdigest() for name in ['audioseal_generator','audioseal_detector']}})
         self.lock = self.root / 'lock.json'
         s.write_json(self.lock, {'format':'irodori-reviewed-artifacts-v1','bundleVersion':'test','files':s.inventory(self.source)})
     def tearDown(self): self.temp.cleanup()
@@ -63,6 +67,10 @@ class DistributionTests(unittest.TestCase):
 
     def test_unvalidated_auxiliary_is_rejected(self):
         (self.source / 'speaker_encoder.mlpackage/Data/com.apple.CoreML/weights/weight.bin').write_bytes(b'changed weights')
+        with self.assertRaises(ValueError): s.inventory(self.source)
+
+    def test_unvalidated_watermark_is_rejected(self):
+        (self.source / 'audioseal_generator.mlpackage/Data/com.apple.CoreML/weights/weight.bin').write_bytes(b'changed weights')
         with self.assertRaises(ValueError): s.inventory(self.source)
 
     def test_symlink_and_traversal_are_rejected(self):

@@ -16,6 +16,7 @@ public struct SynthesisResult: Sendable {
     public let sentenceCount: Int
     public let metrics: [[String: Double]]
     public let diagnostics: [[String: String]]
+    public let watermark: WatermarkInfo?
     public var audioSeconds: Double { Double(pcm16.count) / 96_000 }
     public var rtf: Double { synthesisMilliseconds / 1000 / max(audioSeconds, 0.000001) }
     public func writeWAV(to url: URL) throws { try ReferenceAudio.writeWAV(pcm16: pcm16, to: url) }
@@ -40,6 +41,7 @@ public final class IrodoriEngine: @unchecked Sendable {
     private let native = IrodoriLocalBridge()
     private var modelURL: URL?
     private var referenceDigest: SHA256.Digest?
+    private var watermarker: WatermarkRuntime?
 
     public init() {}
 
@@ -63,7 +65,9 @@ public final class IrodoriEngine: @unchecked Sendable {
             let start = ProcessInfo.processInfo.systemUptime
             self.modelURL = nil
             self.referenceDigest = nil
+            self.watermarker = nil
             try self.native.loadModel(atPath: url.path, useCoreML: true, fastDiT: true)
+            self.watermarker = try WatermarkRuntime(root: url)
             self.modelURL = url
             return (ProcessInfo.processInfo.systemUptime - start) * 1000
         }
@@ -91,6 +95,7 @@ public final class IrodoriEngine: @unchecked Sendable {
     /// In that mode length-limit errors are returned without splitting or truncating.
     /// Cancellation discards subsequent chunks; an in-flight Core ML prediction finishes first.
     public func synthesize(_ text: String, caption: String = "", rawText: Bool = false, splitSentences: Bool = true,
+                           watermark: WatermarkOptions? = WatermarkOptions(),
                            onChunk: (@Sendable (PCMChunk) -> Void)? = nil) async throws -> SynthesisResult {
         let cancellation = CancellationFlag()
         return try await withTaskCancellationHandler(operation: {
@@ -106,29 +111,48 @@ public final class IrodoriEngine: @unchecked Sendable {
                 let start = ProcessInfo.processInfo.systemUptime
                 var pcm = Data(), sequence = 0, count = 0
                 var synthesisMs = 0.0, firstMs = -1.0
+                var watermarkMs = 0.0
                 var metrics: [[String: Double]] = [], diagnostics: [[String: String]] = []
                 while !pending.isEmpty {
                     try cancellation.check()
                     let sentence = pending.removeFirst()
                     var emitted = false
+                    var received = false
+                    var callbackError: Error?
+                    let stream = watermark.map { WatermarkStream(runtime: self.watermarker!, options: $0) }
+                    let emit: (Data) -> Void = { bytes in
+                        if cancellation.cancelled { return }
+                        emitted = true
+                        if firstMs < 0 { firstMs = (ProcessInfo.processInfo.systemUptime - start) * 1000 }
+                        onChunk?(PCMChunk(pcm16: bytes, sequence: sequence))
+                        sequence += 1
+                    }
                     let sentenceStart = ProcessInfo.processInfo.systemUptime
                     do {
                         let output = try self.native.synthesizeText(sentence, caption: caption, onPcm: { bytes in
-                            if cancellation.cancelled { return }
-                            emitted = true
-                            if firstMs < 0 { firstMs = (ProcessInfo.processInfo.systemUptime - start) * 1000 }
-                            onChunk?(PCMChunk(pcm16: bytes, sequence: sequence))
-                            sequence += 1
+                            if cancellation.cancelled || callbackError != nil { return }
+                            received = true
+                            do {
+                                if let stream { try stream.append(bytes, emit: emit) }
+                                else { emit(bytes) }
+                            } catch { callbackError = error }
                         })
                         try cancellation.check()
+                        if let error = callbackError { throw error }
                         guard let bytes = output["pcm16"] as? Data, !bytes.isEmpty else {
                             throw IrodoriError.invalid("No audio returned")
                         }
-                        if !emitted {
-                            if firstMs < 0 { firstMs = (ProcessInfo.processInfo.systemUptime - start) * 1000 }
-                            onChunk?(PCMChunk(pcm16: bytes, sequence: sequence)); sequence += 1
+                        if let stream {
+                            try stream.append(received ? Data() : bytes, finish: true, emit: emit)
+                            guard stream.pcm.count == bytes.count else { throw IrodoriError.invalid("Watermark output length differs from generated audio") }
+                            pcm.append(stream.pcm)
+                            watermarkMs += stream.milliseconds
+                        } else {
+                            if !received { emit(bytes) }
+                            pcm.append(bytes)
                         }
-                        pcm.append(bytes); count += 1
+                        try cancellation.check()
+                        count += 1
                         synthesisMs += (ProcessInfo.processInfo.systemUptime - sentenceStart) * 1000
                         let m = output["metrics"] as? [String: Any] ?? [:]
                         metrics.append(m.compactMapValues { ($0 as? NSNumber)?.doubleValue })
@@ -143,9 +167,18 @@ public final class IrodoriEngine: @unchecked Sendable {
                     }
                 }
                 return SynthesisResult(pcm16: pcm, preparedText: prepared, synthesisMilliseconds: synthesisMs,
-                    firstPCMMilliseconds: firstMs, sentenceCount: count, metrics: metrics, diagnostics: diagnostics)
+                    firstPCMMilliseconds: firstMs, sentenceCount: count, metrics: metrics, diagnostics: diagnostics,
+                    watermark: watermark.map { WatermarkInfo(identifier: $0.identifier, processingMilliseconds: watermarkMs) })
             }
         }, onCancel: { cancellation.cancel() })
+    }
+
+    /// Analyze 48 kHz mono PCM16; score is evidence of a watermark, not proof of identity.
+    public func detectWatermark(in pcm16: Data) async throws -> WatermarkDetection {
+        try await perform {
+            guard let runtime = self.watermarker else { throw IrodoriError.invalid("Prepare a model first") }
+            return try runtime.detect(pcm16)
+        }
     }
 
     public func clearReferenceCache() async throws {
@@ -160,6 +193,6 @@ public final class IrodoriEngine: @unchecked Sendable {
     }
 
     public func release() async {
-        _ = try? await perform { self.native.releaseResources(); self.modelURL = nil; self.referenceDigest = nil }
+        _ = try? await perform { self.native.releaseResources(); self.modelURL = nil; self.referenceDigest = nil; self.watermarker = nil }
     }
 }

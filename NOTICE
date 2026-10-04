@@ -11,9 +11,15 @@ All Rights Reserved. Apache License, Version 2.0.
 Descript Audio Codec: Copyright (c) 2023-present, Descript. MIT License
 (LICENSES/Descript-MIT.txt).
 
+AudioSeal code and watermark generator/detector weights:
+Copyright (c) Meta Platforms, Inc. and affiliates.
+MIT License (LICENSES/AudioSeal-MIT.txt).
+
 Core ML changes include mixed-precision cached DiT export, FP32 conditioning and
 reference encoder export, staged/tiled audio decoding, Apple runtime integration,
 text preparation, serial lifecycle management and sample applications.
+AudioSeal changes include FP32 Core ML export, 48 kHz PCM integration,
+centered-window processing and attenuation of the watermark near silence.
 The upstream ONNX conversion was obtained from raratu/Onsei-iOS-Models.
 
 No affiliation with or endorsement by upstream authors or Apple is implied.

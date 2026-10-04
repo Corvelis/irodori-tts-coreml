@@ -12,13 +12,18 @@
 |---|---|
 | `prepare(modelDirectory: URL) async throws -> Double` | モデル構造を検証しロード。戻り値はロード時間ms。構造検査の時間はこの値に含まない。同じURLを保持中なら0 |
 | `registerReference(_ url: URL?) async throws -> ReferenceRegistration` | モデル準備後に呼ぶ。参照を読込・変換し特徴を準備。nilで参照なし |
-| `synthesize(_ text: String, caption: String = "", rawText: Bool = false, splitSentences: Bool = true, onChunk: (@Sendable (PCMChunk) -> Void)? = nil) async throws -> SynthesisResult` | 文章から音声を生成。文分割とチャンク通知は任意 |
+| `synthesize(_ text: String, caption: String = "", rawText: Bool = false, splitSentences: Bool = true, watermark: WatermarkOptions? = WatermarkOptions(), onChunk: (@Sendable (PCMChunk) -> Void)? = nil) async throws -> SynthesisResult` | 文章から音声を生成。文分割とチャンク通知は任意 |
+| `detectWatermark(in pcm16: Data) async throws -> WatermarkDetection` | 完成PCMのAudioSeal透かしを分析 |
 | `clearReferenceCache() async throws` | 保持中の参照と参照特徴ディスクキャッシュを削除。元音声やモデルは残す |
 | `release() async` | モデル・参照セッションを解放。次の合成には再度prepareが必要。ディスクキャッシュは残す |
 
 基本順序は `prepare → registerReference → synthesize` です。会話中はengineとモデルを保持します。声を変えるときに登録を更新し、会話が終わったときに解放します。不要な複数engineはモデル保持を重複させます。
 
 ロード済みモデルを同じパスで上書きしてもprepareは再読込しません。モデルは不変のフォルダで管理し、更新後は新しいURLへ切り替えます。prepareの構造検査と、取り込み時の全ファイルハッシュ検証は別です。
+
+## 音声の透かし
+
+`watermark` は標準で有効です。PCMチャンク・完成PCM・WAVへ同じAudioSeal透かしを付け、RTFにも処理時間を含めます。`WatermarkOptions(identifier: UInt16 = 0x4952)` で識別値を指定し、`watermark: nil` で無効化します。`AudioWatermarker` actorはTTSをロードせず単独で付与・検出できます。入力は48 kHz mono PCM16です。[付与・検出・制約](WATERMARK.md)を参照してください。
 
 ## 声・話し方の指示（Voice Design）
 
@@ -53,13 +58,14 @@ let audio = try await engine.synthesize(
 |---|---|
 | `pcm16: Data` | 全文の完成PCM。チャンクを利用する場合もメモリに保持 |
 | `preparedText: String` | 整形後の入力。rawText時は渡した文字列 |
-| `synthesisMilliseconds: Double` | 各文のネイティブ合成呼び出し周辺の経過時間の合計。長さ制限による再試行と同期コールバックの処理時間も含む |
+| `synthesisMilliseconds: Double` | 各文の合成と透かし処理を含む経過時間の合計。長さ制限による再試行と同期コールバックの処理時間も含む |
 | `firstPCMMilliseconds: Double` | 整形・初期文分割後から最初のPCMが用意されるまで。キュー待ち、モデル・参照準備、スピーカー遅延は含まない |
 | `audioSeconds: Double` | PCMバイト数÷96,000 |
 | `rtf: Double` | 合成ミリ秒÷1,000÷音声秒数 |
 | `sentenceCount: Int` | 合成に成功した区間数。上限対処の分割により入力の文数より増える場合がある |
 | `metrics: [[String: Double]]` | 各成功区間のネイティブ数値診断。キーは固定APIとして保証しない |
 | `diagnostics: [[String: String]]` | 各成功区間の文字列診断。キーは実行条件で異なる |
+| `watermark: WatermarkInfo?` | 有効時のalgorithm、identifier、processingMilliseconds。無効時nil |
 | `writeWAV(to: URL) throws` | 48 kHz mono PCM16 WAVをatomicに書く。親フォルダは呼び出し側で作成。既存ファイルは置換 |
 
 RTFは呼び出し元から見た総待ち時間そのものではありません。ASR/LLMを含む応答時間はアプリ側で別途計測します。完成PCMは1分あたり約5.76 MBあり、モデル・中間テンソル・再生バッファのRAMは別に必要です。

@@ -18,7 +18,8 @@ AUXILIARY = ("text_encoder", "speaker_encoder", "duration", "context_kv_text",
 EXISTING = ("config.json", "tokenizer", "dit_step_cached_mixed_linear_768.mlpackage",
             "decoder_stage_1_2d_fixed_w64.mlpackage", "decoder_stage_1_2d_fixed_w57.mlpackage",
             "decoder_stage_1_2d_w128.mlpackage", "decoder_stage_2_2d_fixed_w256.mlpackage",
-            "decoder_stage_3_2d_w511.mlpackage")
+            "decoder_stage_3_2d_w511.mlpackage", "audioseal.json",
+            "audioseal_generator.mlpackage", "audioseal_detector.mlpackage")
 
 
 def fingerprint(package):

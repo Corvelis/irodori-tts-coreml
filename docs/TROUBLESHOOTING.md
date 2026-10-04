@@ -9,7 +9,7 @@
 | `No such module 'IrodoriTTS'` | Package.swiftのあるルートを追加したか、IrodoriTTS productがアプリtargetにリンクされているか |
 | 署名・Teamのエラー | targetのSigning Teamと自分のBundle Identifierを設定。モデルのエラーではない |
 | `Prepare a model first` | 同じengineでprepare完了後に登録・合成しているか。release後は再準備が必要 |
-| ファイルが見つからない / `Missing model file` | 13個のmlpackageが並ぶ親フォルダを指定。一部パッケージだけ、ZIP、古いONNX構成を選ばない |
+| ファイルが見つからない / `Missing model file` | 15個のmlpackageが並ぶ親フォルダを指定。一部パッケージだけ、ZIP、古いONNX構成を選ばない |
 | `This is not an Irodori Core ML bundle` / `Invalid FP32 component metadata` | 対応する一式を使用。異なる版のモデル・sidecarを混ぜない |
 | `Model checksum mismatch` / `Downloaded file failed verification` | 欠落・途中取得・変更を確認。metadataを書き換えて通さず固定revisionから再取得 |
 | `Destination already exists` | 完成した出力先は上書きしない仕様。既存モデルをverifyして利用するか、新しいフォルダを指定 |
@@ -57,7 +57,7 @@
 
 同じengineを再利用し、モデル検証・ダウンロード・録音準備を発話の待ち時間から外します。不要なengineを複数作らず、チャンクコールバックでは重い処理を行わないでください。Releaseビルド、初回/反復、短文/長文を分けて比較します。
 
-約2.90 GBは配布ファイルのサイズです。実行時RAMやキャッシュ込みのディスク容量とは異なります。使用量は端末と処理条件によって変わります。長文の完成PCM、再生待ちバッファ、複数モデル、LLMの同時実行も使用量に影響します。
+約2.99 GBは配布ファイルのサイズです。実行時RAMやキャッシュ込みのディスク容量とは異なります。使用量は端末と処理条件によって変わります。長文の完成PCM、再生待ちバッファ、複数モデル、LLMの同時実行も使用量に影響します。
 
 releaseはセッションを解放しますが、OSのメモリ回収の時刻やRSSがすぐ一定値まで下がることを保証しません。ディスク容量を戻す場合は[保存場所](VOICE_REGISTRATION.md)を確認し、アプリを停止してから自分のアプリの不要なコピーを対象にします。参照削除ではモデルコピーは消えません。
 

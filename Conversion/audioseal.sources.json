@@ -1,0 +1,22 @@
+{
+  "format": "irodori-audioseal-sources-v1",
+  "implementation": {
+    "package": "audioseal",
+    "version": "0.1.4",
+    "wheelSha256": "e1a36741fadeae3b71d2891ed0639a262f0924b6615be737e005dc629f470fae",
+    "repository": "https://github.com/facebookresearch/audioseal",
+    "license": "MIT"
+  },
+  "repository": "facebook/audioseal",
+  "revision": "3c19eba53390776cf2cc9ed5f6c9ac67ce72ecba",
+  "files": [
+    {
+      "filename": "generator_base.pth",
+      "sha256": "7a845b5fbe9364a63a3909d8ab3fe064d13a76ae4c2e983573e08c69b7b51748"
+    },
+    {
+      "filename": "detector_base.pth",
+      "sha256": "8a78e8a83584113523e161fc599fcab10fd0e94c04d2eb9d2fa1e9ec91ab69d9"
+    }
+  ]
+}

@@ -11,7 +11,7 @@ This community runtime runs Irodori TTS v4.1 Small MF on iPhone and Apple Silico
 | Artifact | Contents |
 |---|---|
 | Code repository | IrodoriTTS Swift package, iOS/macOS samples, CLI, conversion tools and docs |
-| Separate model bundle | 13 Core ML ML Programs, tokenizer/config, sidecars and SHA-256 manifest; approximately 2.90 GB |
+| Separate model bundle | 15 Core ML ML Programs, tokenizer/config, sidecars and SHA-256 manifest; approximately 2.99 GB |
 
 Deployment targets are iOS 17+ and macOS 14+, with Swift tools 5.9+. Use an Apple Silicon Mac with Xcode and Command Line Tools. Performance and memory use vary with the device and input. Allow extra disk space for app-owned model copies and Core ML compilation caches.
 
@@ -28,7 +28,7 @@ Run from the source root:
 
 ```sh
 swift build -c release
-.build/release/irodori download --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b95d39710d9e3ac4435983fe89f9acd6c02658e9/manifest.json' --destination ../Irodori-TTS-v4.1-Small-MF-CoreML
+.build/release/irodori download --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b02a670f0cb41c382844672fa8f0f03b3b9b8082/manifest.json' --destination ../Irodori-TTS-v4.1-Small-MF-CoreML
 .build/release/irodori verify --models ../Irodori-TTS-v4.1-Small-MF-CoreML
 .build/release/irodori synthesize \
   --models ../Irodori-TTS-v4.1-Small-MF-CoreML \
@@ -43,7 +43,7 @@ Add `--reference ./reference.wav` to use a reference voice. Output is 48 kHz mon
 
 Open `Examples/IrodoriSamples.xcodeproj`. Choose IrodoriMac for Mac or IrodoriiOS for a connected iPhone. Configure your own signing team and bundle identifier. UI labels are currently Japanese; see [the walkthrough](SAMPLES.md).
 
-1. **フォルダを選ぶ** / **モデルを変更**: select the folder containing manifest.json and all 13 packages, not an individual package. It is verified and copied into the app.
+1. **フォルダを選ぶ** / **モデルを変更**: select the folder containing manifest.json and all 15 packages, not an individual package. It is verified and copied into the app.
 2. Enable the voice-permission toggle for a reference. **音声を選ぶ** imports a file; **録音する** starts recording and **録音を停止** stops it. Begin with a clear 3–10 second clip you are authorized to use.
 3. **準備** prepares the model/reference. **生成して再生** synthesizes the entire prepared input once and plays the completed WAV, also preparing if needed. The GUI sample does not split at punctuation or play partial PCM. Long inputs wait for complete synthesis and are rejected if they exceed model limits, rather than silently split or truncated. The output player supports pause/resume/replay. **停止** stops playback and cancels further synthesis output.
 4. **WAVを保存** exports the completed WAV. The app's generated.wav is replaced by the next successful synthesis.
@@ -62,6 +62,10 @@ In Xcode, choose **File → Add Package Dependencies…**, enter `https://github
 The [integration guide](GETTING_STARTED.md) contains a complete WAV function; [streaming and cancellation](STREAMING.md) provides a controller with a sample player. onChunk runs on the inference queue and provides headerless little-endian PCM16. Dispatch UI/playback work to the main actor. Cancellation discards future chunks but does not interrupt an in-flight Core ML prediction or clear an application's playback queue.
 
 Reference registration derives cached speaker features; it does not train or modify weights. clearReferenceCache removes features, not original audio files. release frees held sessions, not disk caches. See [voice storage and deletion](VOICE_REGISTRATION.md).
+
+## Audio watermarking
+
+AudioSeal is enabled by default for streamed playback and WAV output. Synthesis RTF and first PCM timing include watermark processing. Use `watermark: nil` in Swift or `--no-watermark` in the CLI for comparisons. See [the English watermark guide](WATERMARK.en.md) for identifier customization, detection and standalone APIs.
 
 ## Performance and limitations
 

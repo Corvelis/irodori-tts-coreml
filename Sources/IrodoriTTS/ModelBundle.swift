@@ -26,9 +26,9 @@ public enum ModelBundle {
                                       "decoder_stage_1_2d_fixed_w57", "decoder_stage_1_2d_w128",
                                       "decoder_stage_2_2d_fixed_w256", "decoder_stage_3_2d_w511"]
     public static var requiredPaths: [String] {
-        var paths = ["coreml-only.json", "config.json", "tokenizer/tokenizer.json"]
+        var paths = ["coreml-only.json", "config.json", "tokenizer/tokenizer.json", "audioseal.json"]
         for name in auxiliary { paths.append("\(name).json") }
-        for name in auxiliary + decoderAndDiT {
+        for name in auxiliary + decoderAndDiT + ["audioseal_generator", "audioseal_detector"] {
             paths += ["Manifest.json", "Data/com.apple.CoreML/model.mlmodel", "Data/com.apple.CoreML/weights/weight.bin"]
                 .map { "\(name).mlpackage/\($0)" }
         }

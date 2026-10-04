@@ -17,6 +17,8 @@ python Conversion/convert_all.py --sources artifacts/sources --output artifacts/
 
 `fetch_sources.py` はHF revisionとSHA-256を固定して入力を取得します。検証済みファイルは再利用し、不一致ファイルは上書きせず停止します。公式実装も指定commitの未変更checkoutを要求します。
 
+一括変換にはAudioSeal付与・検出モデルのFP32変換と数値検証も含みます。`audioseal.sources.json` が公式重みのrevision・SHA-256と実装版を固定します。透かし部分だけの変換は `python Conversion/export_audioseal.py --destination artifacts/audioseal` で実行できます。
+
 一括変換はcontext KV分割、decoder段分割、参照統計抽出、補助7モデルのFP32変換・動的形状検証、cached mixed-linear DiT、既存FP16 decoderタイルの変換を順に実行します。ログは出力フォルダに保存します。補助モデルのCore ML対ONNX最大絶対誤差 `1e-3` 以下、およびstage 1タイルの一致を検証します。これは全体の音質判定の代わりにはなりません。
 
 実行時はCore MLだけですが、変換工程では元のONNXとPyTorchチェックポイントを使用します。全段を公式PyTorchから直接変換するツールではありません。

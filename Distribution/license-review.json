@@ -58,5 +58,13 @@
       "sha256": "d1096fc481e432c2b565dc29ccc720282db0c818af37608eac8ab515e03a8d3f",
       "bytes": 4028
     }
-  ]
+  ],
+  "audioseal": {
+    "codeLicense": "MIT",
+    "weightsLicense": "MIT",
+    "implementationVersion": "0.1.4",
+    "modelRepository": "https://huggingface.co/facebook/audioseal",
+    "modelRevision": "3c19eba53390776cf2cc9ed5f6c9ac67ce72ecba",
+    "licenseFile": "LICENSES/AudioSeal-MIT.txt"
+  }
 }

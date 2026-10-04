@@ -32,8 +32,10 @@ CLIの `benchmark` で短文・通常文・短文反復後の長文を測れま�
 
 ## メモリと容量
 
-約2.90 GBは配布ファイルのサイズで、実行時RAMの値ではありません。Core MLの実行状態、中間テンソル、完成PCM、再生バッファ、他のモデルがメモリを使用します。
+約2.99 GBは配布ファイルのサイズで、実行時RAMの値ではありません。Core MLの実行状態、中間テンソル、完成PCM、再生バッファ、他のモデルがメモリを使用します。
 
 SDKはチャンク通知を使う場合も完成PCMを保持します。48 kHz mono PCM16は1分あたり約5.76 MBです。不要な結果・プレイヤーバッファを保持し続けず、engineの重複作成を避けてください。`release()` はセッションを解放しますが、OSのメモリ回収を即時に保証しません。
 
 ディスクにはモデル原本、アプリ内コピー、コンパイルキャッシュ、参照音声・特徴キャッシュが保存されます。[音声登録と削除](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.1.0/docs/VOICE_REGISTRATION.md)を参照してください。
+
+AudioSeal透かしは標準で有効です。RTFと最初のPCM時間に処理を含めます。PCM通知では0.5秒分の音声を先読みします。[透かしの処理と制約](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.1.0/docs/WATERMARK.md)を参照してください。

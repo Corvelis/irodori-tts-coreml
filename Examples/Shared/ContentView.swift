@@ -244,7 +244,7 @@ struct ContentView: View {
                 }.frame(height: 40)
                 Text(model.playbackTime).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
             }
-            Text("AIによる合成音声 · 48 kHz / WAV")
+            Text("AIによる合成音声 · AudioSeal透かし付き · 48 kHz / WAV")
                 .font(.caption2).foregroundStyle(.tertiary)
         }
         .studioCard()
@@ -270,7 +270,7 @@ struct ContentView: View {
             }
             VStack(alignment: .leading, spacing: 5) {
                 Text("Irodori v4.1 Small MF").font(.subheadline.weight(.medium))
-                Text("Core ML · 約2.9 GB").font(.caption).foregroundStyle(.secondary)
+                Text("Core ML · 約3.0 GB").font(.caption).foregroundStyle(.secondary)
             }
             HStack {
                 Button {

@@ -26,7 +26,7 @@ open Examples/IrodoriSamples.xcodeproj
 
 速度比較では **Product → Scheme → Edit Scheme… → Run → Build Configuration** をReleaseにします。同じ端末、モデル、参照音声、文章、電源・熱状態で測定してください。
 
-ソースとモデルは別配布です。サンプルアプリをビルドしただけでは、約2.90 GBのモデルはアプリに入りません。生成にPython、ONNX Runtime、ASR、LLMは不要です。
+ソースとモデルは別配布です。サンプルアプリをビルドしただけでは、約2.99 GBのモデルはアプリに入りません。生成にPython、ONNX Runtime、ASR、LLMは不要です。
 
 ## アプリアイコン
 
@@ -44,12 +44,12 @@ iPhoneでは画面を縦にスクロールして設定欄へ進みます。Mac�
 ## 1. モデルを取り込む
 
 1. モデル配布フォルダをMacまたはiPhoneのFilesから選べる場所へ用意します。圧縮ファイルなら先に展開します。iPhoneではFinderのファイル共有でサンプルへコピーすると、「ファイル」→「このiPhone内」→「Irodori Core ML」から選択できます。
-2. 「フォルダを選ぶ」（選択後は「モデルを変更」）で `manifest.json` と13個の `.mlpackage` が並ぶ親フォルダを選びます。単体の `.mlpackage` やZIPを選ばないでください。
+2. 「フォルダを選ぶ」（選択後は「モデルを変更」）で `manifest.json` と15個の `.mlpackage` が並ぶ親フォルダを選びます。単体の `.mlpackage` やZIPを選ばないでください。
 3. コピーとハッシュ検証が終わるまで待ちます。外部の元フォルダは残り、アプリ内にコピーされます。
 
 モデルは [Hugging Face](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)、SDK・サンプルは [GitHub](https://github.com/Corvelis/irodori-tts-coreml) の `v0.1.0` タグから取得します。直接取得する場合は「URLからダウンロード」に[モデル取得ガイドのmanifest URL](HUGGINGFACE.md#対応モデル)を入力し、「ダウンロードして検証」を押します。
 
-原本約2.90 GBに加え、アプリ内コピーとコンパイルキャッシュが必要です。選び直した過去のモデルコピーも残るため、容量に余裕を持たせてください。現在の画面にはモデルの個別削除機能はありません。
+原本約2.99 GBに加え、アプリ内コピーとコンパイルキャッシュが必要です。選び直した過去のモデルコピーも残るため、容量に余裕を持たせてください。現在の画面にはモデルの個別削除機能はありません。
 
 ## 2. 声を登録する
 
@@ -103,3 +103,7 @@ RTFと生成時間は、ASR、LLM、モデル準備、参照登録、WAV保存�
 | [PCMPlayer.swift](../Examples/Shared/PCMPlayer.swift) | 任意のチャンク再生を組み込むための補助クラス。現在のGUIサンプルからは使用していない |
 
 自分のアプリへSDKだけを追加する場合は[導入ガイド](GETTING_STARTED.md)を参照してください。GUIと同じ全文モードは `engine.synthesize(text, caption: caption, splitSentences: false)` です。[PCMのチャンク再生](STREAMING.md)は、必要なアプリへ別途組み込む例です。
+
+## 音声の透かし
+
+生成音声にはAudioSealの透かしを標準で付与します。再生音声と保存WAVは同じPCMです。RTFには透かしの処理時間も含みます。[付与・検出の使い方](WATERMARK.md)を参照してください。

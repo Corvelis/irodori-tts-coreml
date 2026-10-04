@@ -11,3 +11,5 @@ torchvision==0.26.0
 safetensors==0.5.2
 transformers==4.48.2
 huggingface_hub==0.36.2
+audioseal==0.1.4
+omegaconf==2.3.0

@@ -11,7 +11,7 @@
 | 開発環境 | Apple Silicon Mac、XcodeとCommand Line Tools |
 | Deployment Target | iOS 17以降、またはmacOS 14以降 |
 | ソース | このリポジトリ全体。ルートに `Package.swift` がある状態 |
-| モデル | 対応するCore ML配布フォルダ一式、約2.90 GB |
+| モデル | 対応するCore ML配布フォルダ一式、約2.99 GB |
 | 参照音声 | 任意。自分の声または使用許可のある音声 |
 
 実行にPythonやONNX Runtimeは不要です。速度・使用メモリは端末と入力条件によって変わります。[性能の測定と制約](VALIDATION.md)を参照してください。
@@ -48,14 +48,14 @@ Irodori-TTS-v4.1-Small-MF-CoreML/
   config.json
   tokenizer/
   text_encoder.json                  # 補助モデルのsidecar、計7個
-  text_encoder.mlpackage/            # Core MLパッケージ、計13個
+  text_encoder.mlpackage/            # Core MLパッケージ、計15個
   dit_step_cached_mixed_linear_768.mlpackage/
   ...                               # 一式を保持。省略・名前変更はしない
 ```
 
 アプリからアクセス可能なApplication Support配下などへ一式をコピーします。Filesから選んだURLは、セキュリティスコープを開いている間に検証・コピーし、以後はアプリ内URLを使うのがサンプルの方式です。[実装](../Examples/Shared/SampleModel.swift)を参照してください。
 
-新規取得時は `ModelBundle.validate(at:verifyHashes: true)` で全ファイルを検証します。これは同期I/Oなので、UIのMainActorで実行せずバックグラウンドへ渡します。毎回の発話で約2.90 GBをハッシュし直す必要はありません。
+新規取得時は `ModelBundle.validate(at:verifyHashes: true)` で全ファイルを検証します。これは同期I/Oなので、UIのMainActorで実行せずバックグラウンドへ渡します。毎回の発話で約2.99 GBをハッシュし直す必要はありません。
 
 ## 4. 音声を生成する
 
@@ -88,3 +88,7 @@ func makeWAV(engine: IrodoriEngine, modelURL: URL,
 録音する場合は `NSMicrophoneUsageDescription` とマイク許可要求を用意します。MacのサンドボックスアプリではAudio Input、ユーザー選択ファイルのアクセス、モデル取得時のOutgoing Connectionsも使用します。サンプルの [entitlements](../Examples/macOS/IrodoriMac.entitlements) と [プロジェクト設定](../Examples/IrodoriSamples.xcodeproj/project.pbxproj)を参照できます。
 
 録音、再生のAudio Session、着信などの割り込み、バックグラウンド動作、モデル容量管理はアプリ側の責務です。初版SDKには汎用プレイヤー・録音UI・複数話者一覧は含めていません。
+
+## 音声の透かし
+
+生成音声にはAudioSealの透かしを標準で付与します。再生音声と保存WAVは同じPCMです。RTFには透かしの処理時間も含みます。[付与・検出の使い方](WATERMARK.md)を参照してください。

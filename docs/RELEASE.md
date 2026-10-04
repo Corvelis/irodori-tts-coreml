@@ -16,9 +16,13 @@ shasum -a 256 -c irodori-tts-coreml-source-0.1.0.zip.sha256
 
 ## モデル配布
 
-[Hugging Faceのモデル一式](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)は、13個のCore MLパッケージ、tokenizer、config、補助metadata、manifestと部品別ライセンスを含みます。約2.90 GB、bundleVersion `0.1.0`です。
+[Hugging Faceのモデル一式](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)は、15個のCore MLパッケージ、tokenizer、config、補助metadata、manifestと部品別ライセンスを含みます。約2.99 GB、bundleVersion `0.1.0`です。
 
 SDK `0.1.0`には対応するbundleVersion `0.1.0`の一式を使ってください。取得URLと固定commitは[モデル取得ガイド](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.1.0/docs/HUGGINGFACE.md)にあります。manifestの各ファイルサイズ・SHA-256はCLIの `verify` またはSDKの `ModelBundle.validate(at:verifyHashes: true)` で照合できます。
+
+## 音声の透かし
+
+AudioSeal付与・検出モデルを含み、SDKとサンプルは生成音声への付与を標準で有効にします。再生PCMと保存WAVには同じ透かしが含まれます。[透かしの利用](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.1.0/docs/WATERMARK.md)を参照してください。
 
 ## 実行要件と制約
 
@@ -34,4 +38,4 @@ iOS 17以降 / macOS 14以降が対象です。開発にはApple Silicon MacとX
 
 SDK・サンプルの新規部分はApache-2.0です。モデルと上流由来部分にはMIT / Apache-2.0の部品別条件が適用されます。同梱の `LICENSES/`、`NOTICE`、`THIRD_PARTY_NOTICES.md` を保持してください。
 
-使用許可のある声を使い、[上流モデルの使用条件](https://huggingface.co/Aratako/Irodori-TTS-v4.1-Small-MF)に従ってください。本モデルによる透かし付与はありません。
+使用許可のある声を使い、[上流モデルの使用条件](https://huggingface.co/Aratako/Irodori-TTS-v4.1-Small-MF)に従ってください。

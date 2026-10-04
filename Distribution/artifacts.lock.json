@@ -3,6 +3,41 @@
   "bundleVersion": "0.1.0",
   "files": [
     {
+      "path": "audioseal.json",
+      "bytes": 4707,
+      "sha256": "b51c3ce234918e4b3f02dbdfd85580b17d8e182a99a8333316c5f2242f28987a"
+    },
+    {
+      "path": "audioseal_detector.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 34313,
+      "sha256": "ff280a1ab9ad485ffaedb57af1df626dc5dd08d14d2e93661734f914c45af834"
+    },
+    {
+      "path": "audioseal_detector.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 34577472,
+      "sha256": "792bc6b01a558d7a6c69554e9f9aa19b327ef0ce0833ae56c30a42b3e65921d3"
+    },
+    {
+      "path": "audioseal_detector.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "12e032346f0d184985c6a39e5bd10c28bfdac1f38e222189686e497b0f0b07fa"
+    },
+    {
+      "path": "audioseal_generator.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 61709,
+      "sha256": "7939251c4b571b8b2478d24eb539b5cc5b91ae70f4608819922286c56f9451d7"
+    },
+    {
+      "path": "audioseal_generator.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 58677248,
+      "sha256": "8d43322ebc8e3550f759ab4d2803e7a97341fdc3e61c688cd0ffca6234fe4000"
+    },
+    {
+      "path": "audioseal_generator.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "b4c73528f36565053259feeae1299682f9ff4eb6c6935c6969bc25b84c19417f"
+    },
+    {
       "path": "config.json",
       "bytes": 2178,
       "sha256": "d892d41544af570725846443c091cebb8bf7cfd687153d376128e05e58e665ee"
