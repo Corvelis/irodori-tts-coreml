@@ -1,0 +1,27 @@
+{
+  "format": "irodori-hf-staging-upload-v1",
+  "verifiedDate": "2026-10-04",
+  "repository": "AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML",
+  "bundleVersion": "0.1.0-draft",
+  "visibility": "private",
+  "commit": "af30c0101ebd6f714160b900d205b395845e43a6",
+  "commitUrl": "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/commit/af30c0101ebd6f714160b900d205b395845e43a6",
+  "manifestSha256": "071f86d1a912eb5b4dce5b2c13da71a5db65bfccc75aa45b5eec44117abd4c8c",
+  "totalManifestFileBytes": 2898356600,
+  "uploadedFileCount": 63,
+  "remoteFileCountIncludingGitattributes": 64,
+  "manifestFilesVerified": 62,
+  "runtimeFilesUnchanged": 50,
+  "modelCardServerValidation": "passed",
+  "publicDownloadVerification": "pending; repository is private",
+  "initialUploadCommit": "8d9a9e193e649ef448f2870a84cf4a729cb51a1e",
+  "initialAuthenticatedFreshDownloadVerification": "all 63 uploaded files downloaded and SHA-256 verified",
+  "codeRepository": "https://github.com/Corvelis/irodori-tts-coreml",
+  "linkUpdateFiles": [
+    "README.md",
+    "RELEASE_STATUS.md",
+    "manifest.json",
+    "provenance.json"
+  ],
+  "pinnedCommitFileVerification": "all 63 files at pinned commit verified by size and SHA-256; unchanged blobs reused verified download cache"
+}

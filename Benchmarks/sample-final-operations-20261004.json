@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-04",
+  "mac": {
+    "configuration": "signed Release shared SwiftUI sample, Apple M2, physical built-in microphone, synthetic fixture from built-in speakers",
+    "recording": {
+      "seconds": 17.376,
+      "sampleRate": 48000,
+      "bytes": 1672192,
+      "sha256": "c54d3d602da7bc748c43a4f5b1f3354fbc489c7984c59e5ac5f39380a604b77e",
+      "rms": 0.014634549617767334,
+      "peak": 0.1409912109375,
+      "finite": true,
+      "asr": "これは録音機能を確認するための試験音声です"
+    },
+    "captureCheck": {
+      "envelopeCorrelation": 0.6790399052063565,
+      "fixtureOffsetSeconds": 0.8,
+      "threshold": 0.5,
+      "passed": true
+    },
+    "generated": {
+      "seconds": 9.32,
+      "sampleRate": 48000,
+      "bytes": 894764,
+      "sha256": "500f9bbd56a5f82da87f323d8319af222316281623178739613e77f9f7add6fb",
+      "rms": 0.13216830790042877,
+      "peak": 0.999969482421875,
+      "finite": true,
+      "asr": "こんにちは今日はいい天気なので近くの公園まで散歩に行きましょう"
+    },
+    "inputCharacters": 34,
+    "displayedRTF": 0.692,
+    "displayedSynthesisSeconds": 6.45,
+    "displayedAudioSeconds": 9.32,
+    "modelPreparationMilliseconds": 1566,
+    "referencePreparationMilliseconds": 4174,
+    "recordingRegistrationSynthesisPlayback": "passed",
+    "deletion": "passed twice through GUI; final References and reference-feature cache empty; all 63 imported model-bundle files and generated WAV preserved",
+    "systemInputRestored": "BlackHole 2ch confirmed by UI and Core Audio",
+    "earlierCaptureAttempt": "Fixture playback blocked by shell sandbox; 26.005-second recording was stopped and deleted, not a completed capture test",
+    "subjectiveListening": "User reported listening to the trial audio and finding it acceptable on 2026-10-04; individual clips/devices were not enumerated. This is not a claim for arbitrary inputs or exact upstream equivalence.",
+    "performanceScope": "rounded UI values; initial reference preparation and uncontrolled load/thermal state; not a warm performance comparison"
+  },
+  "iphoneCleanup": {
+    "ownershipCheck": "passed; only known 14.720-second test recording selected",
+    "listeningBackup": "recording and generated WAV copied with byte equality within iPhone Documents; neither exported to Mac",
+    "referenceDeletion": "passed through UI; referencePath absent, References/cache empty confirmed on-device",
+    "fixtureDeletion": "only SHA-256-identified synthetic fixture removed",
+    "preserved": "models, original Documents/reference.wav, previous Save to Files WAV, two listening WAVs and generated.wav",
+    "normalSampleRestored": true,
+    "testRunnerRemoved": true
+  },
+  "audioIncluded": false,
+  "deviceIdentifiersIncluded": false,
+  "userListeningReview": {
+    "date": "2026-10-04",
+    "statement": "はい、音声を聞きました。大丈夫そうです。",
+    "scope": "trial audio accepted by user; no per-clip or blind A/B score"
+  }
+}

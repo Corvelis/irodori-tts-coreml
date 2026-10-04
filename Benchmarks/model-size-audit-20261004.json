@@ -1,0 +1,199 @@
+{
+  "date": "2026-10-04",
+  "scope": "Read-only audit of distributed Core ML blob weights. No compression, conversion, runtime or model change applied. Decimal GB.",
+  "bundleBytesAtAudit": 2898351193,
+  "components": [
+    {
+      "component": "context_kv_speaker.mlpackage",
+      "bytes": 94474336,
+      "weightBytes": 94440832,
+      "weightSha256": "19cc4682e17937e4a34eb4d3233d06a6180c977dce5a1b7c5177e4765f7e7187",
+      "payloadBytesByType": {
+        "float32": 94438400
+      },
+      "float32Values": 23609600,
+      "exactFP16RoundTripValues": 4129,
+      "exactFP16WholeTensorBytes": 5120,
+      "maxFP16RoundTripError": 0.00617218017578125,
+      "duplicateFP32TensorBytes": 0
+    },
+    {
+      "component": "context_kv_text.mlpackage",
+      "bytes": 125962722,
+      "weightBytes": 125899648,
+      "weightSha256": "b079dfcfe188284a64d94ee965446e647edf0b4449f706ac7698da752263971f",
+      "payloadBytesByType": {
+        "float32": 125895680
+      },
+      "float32Values": 31473920,
+      "exactFP16RoundTripValues": 5034,
+      "exactFP16WholeTensorBytes": 5120,
+      "maxFP16RoundTripError": 0.00617218017578125,
+      "duplicateFP32TensorBytes": 0
+    },
+    {
+      "component": "dacvae_encode_stats.mlpackage",
+      "bytes": 109510903,
+      "weightBytes": 109420864,
+      "weightSha256": "78753a0bdb619916a74676ae9ceb7a4aae8f0f03c3a73969eeb649bdf4c4a484",
+      "payloadBytesByType": {
+        "float32": 109413120
+      },
+      "float32Values": 27353280,
+      "exactFP16RoundTripValues": 3200,
+      "exactFP16WholeTensorBytes": 0,
+      "maxFP16RoundTripError": 1.087890625,
+      "duplicateFP32TensorBytes": 0
+    },
+    {
+      "component": "decoder_stage_0.mlpackage",
+      "bytes": 44185670,
+      "weightBytes": 44181824,
+      "weightSha256": "1e591f086e0fd3c685430a3cca658431c22ece27588f80e144c7c674b420f28f",
+      "payloadBytesByType": {
+        "float32": 44181504
+      },
+      "float32Values": 11045376,
+      "exactFP16RoundTripValues": 1318,
+      "exactFP16WholeTensorBytes": 0,
+      "maxFP16RoundTripError": 0.0001990199089050293,
+      "duplicateFP32TensorBytes": 0
+    },
+    {
+      "component": "decoder_stage_1_2d_fixed_w57.mlpackage",
+      "bytes": 84994854,
+      "weightBytes": 84971840,
+      "weightSha256": "d447d33d328a89a3f263e4c8a16bab1e15e71ce03225167890806465e418085e",
+      "payloadBytesByType": {
+        "float16": 84969984
+      },
+      "float32Values": 0,
+      "exactFP16RoundTripValues": 0,
+      "exactFP16WholeTensorBytes": 0,
+      "maxFP16RoundTripError": 0,
+      "duplicateFP32TensorBytes": 0
+    },
+    {
+      "component": "decoder_stage_1_2d_fixed_w64.mlpackage",
+      "bytes": 84994854,
+      "weightBytes": 84971840,
+      "weightSha256": "d447d33d328a89a3f263e4c8a16bab1e15e71ce03225167890806465e418085e",
+      "payloadBytesByType": {
+        "float16": 84969984
+      },
+      "float32Values": 0,
+      "exactFP16RoundTripValues": 0,
+      "exactFP16WholeTensorBytes": 0,
+      "maxFP16RoundTripError": 0,
+      "duplicateFP32TensorBytes": 0
+    },
+    {
+      "component": "decoder_stage_1_2d_w128.mlpackage",
+      "bytes": 84994428,
+      "weightBytes": 84971840,
+      "weightSha256": "d447d33d328a89a3f263e4c8a16bab1e15e71ce03225167890806465e418085e",
+      "payloadBytesByType": {
+        "float16": 84969984
+      },
+      "float32Values": 0,
+      "exactFP16RoundTripValues": 0,
+      "exactFP16WholeTensorBytes": 0,
+      "maxFP16RoundTripError": 0,
+      "duplicateFP32TensorBytes": 0
+    },
+    {
+      "component": "decoder_stage_2_2d_fixed_w256.mlpackage",
+      "bytes": 18916906,
+      "weightBytes": 18893888,
+      "weightSha256": "c112d32d1ce5471a87dcf5ac43f5c650534e7d262e4b5e8e5cc6e6bee72c2e46",
+      "payloadBytesByType": {
+        "float16": 18892032
+      },
+      "float32Values": 0,
+      "exactFP16RoundTripValues": 0,
+      "exactFP16WholeTensorBytes": 0,
+      "maxFP16RoundTripError": 0,
+      "duplicateFP32TensorBytes": 0
+    },
+    {
+      "component": "decoder_stage_3_2d_w511.mlpackage",
+      "bytes": 4784451,
+      "weightBytes": 4737408,
+      "weightSha256": "db491104d6bc430470d8b7d5bf1ed80bbe38a0e595067e3da92500f8cd180650",
+      "payloadBytesByType": {
+        "float16": 4733568
+      },
+      "float32Values": 0,
+      "exactFP16RoundTripValues": 0,
+      "exactFP16WholeTensorBytes": 0,
+      "maxFP16RoundTripError": 0,
+      "duplicateFP32TensorBytes": 0
+    },
+    {
+      "component": "dit_step_cached_mixed_linear_768.mlpackage",
+      "bytes": 636649552,
+      "weightBytes": 636088576,
+      "weightSha256": "779f8a6960bf67595fd44caf89aad32b1d4cb74c962a1d398993c29cd860acbf",
+      "payloadBytesByType": {
+        "float32": 325632,
+        "float16": 635740288
+      },
+      "float32Values": 81408,
+      "exactFP16RoundTripValues": 84,
+      "exactFP16WholeTensorBytes": 0,
+      "maxFP16RoundTripError": 0.20361328125,
+      "duplicateFP32TensorBytes": 0
+    },
+    {
+      "component": "duration.mlpackage",
+      "bytes": 87148629,
+      "weightBytes": 87116672,
+      "weightSha256": "9b22c3b8c04241a605026cb328a6fe41c41b63a69d3c8928662bb78e4acb1101",
+      "payloadBytesByType": {
+        "float32": 87114752
+      },
+      "float32Values": 21778688,
+      "exactFP16RoundTripValues": 3643,
+      "exactFP16WholeTensorBytes": 4096,
+      "maxFP16RoundTripError": 0.00048828125,
+      "duplicateFP32TensorBytes": 0
+    },
+    {
+      "component": "speaker_encoder.mlpackage",
+      "bytes": 242439648,
+      "weightBytes": 242240496,
+      "weightSha256": "93178199f40e4eace672d1a7512b839177930f7fce46aa191f5a544c5eaf82a3",
+      "payloadBytesByType": {
+        "float32": 242233904
+      },
+      "float32Values": 60558476,
+      "exactFP16RoundTripValues": 10298,
+      "exactFP16WholeTensorBytes": 11056,
+      "maxFP16RoundTripError": 0.0009763240814208984,
+      "duplicateFP32TensorBytes": 0
+    },
+    {
+      "component": "text_encoder.mlpackage",
+      "bytes": 1272460558,
+      "weightBytes": 1272150016,
+      "weightSha256": "a9fe8844672b654abbf4dc09e3b285bacc44161a42c92d311e0ddfb1093c478a",
+      "payloadBytesByType": {
+        "float32": 1272139008
+      },
+      "float32Values": 318034752,
+      "exactFP16RoundTripValues": 45885,
+      "exactFP16WholeTensorBytes": 36864,
+      "maxFP16RoundTripError": 0.0009739398956298828,
+      "duplicateFP32TensorBytes": 0
+    }
+  ],
+  "duplicateDecoderStage1WeightSavingsBytes": 169943680,
+  "theoreticalTextOnlyFP16BundleBytes": 2262281689,
+  "theoreticalAllFP32ToFP16BundleBytes": 1910480193,
+  "fp16CandidateStatus": "Changes weight values; not validated for waveform quality or latency. Whole-tensor lossless FP16 savings were only 31,128 bytes.",
+  "sharedWeightCandidateStatus": "Three decoder stage-1 weight.bin files have identical SHA-256. Runtime sharing or archive deduplication not implemented/validated.",
+  "sources": [
+    "https://apple.github.io/coremltools/docs-guides/source/multifunction-models.html",
+    "https://apple.github.io/coremltools/docs-guides/source/opt-overview.html"
+  ]
+}

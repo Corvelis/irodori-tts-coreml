@@ -1,0 +1,19 @@
+name: Source checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  apple:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Swift tests (real-model tests require opt-in local assets)
+        run: swift test -c release
+      - name: Distribution tooling tests
+        run: python3 -m unittest discover -s Scripts/tests
+      - name: Python syntax
+        run: python3 -m compileall -q Conversion Scripts
+      - name: macOS sample
+        run: xcodebuild -project Examples/IrodoriSamples.xcodeproj -scheme IrodoriMac -configuration Release -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO build
+      - name: iOS sample
+        run: xcodebuild -project Examples/IrodoriSamples.xcodeproj -scheme IrodoriiOS -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build

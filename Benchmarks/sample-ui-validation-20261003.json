@@ -1,0 +1,56 @@
+{
+  "date": "2026-10-03",
+  "sampleMode": "sanitized whole input, one synthesis call, complete WAV playback",
+  "nativeInferenceChanged": false,
+  "runtimeModelFilesChanged": false,
+  "nativeFilesComparedToLocalAI": 6,
+  "runtimeModelFilesComparedToReviewedLock": 50,
+  "builds": {
+    "macOSRelease": "passed",
+    "iPhoneRelease": "passed",
+    "iOSSimulatorRelease": "passed"
+  },
+  "swiftTests": {
+    "passed": 9,
+    "failed": 0,
+    "includesRealModelWholeInputTest": true
+  },
+  "distributionTests": {
+    "passed": 6,
+    "failed": 0
+  },
+  "modelManifestFilesVerified": 62,
+  "iPhoneHostTest": {
+    "model": "iPhone 17 Pro",
+    "osVersion": "27.0.1",
+    "passed": 1,
+    "failed": 0,
+    "assertions": [
+      "sentenceCount == 1",
+      "completed WAV PCM == SDK result PCM",
+      "play",
+      "pause",
+      "resume",
+      "stop"
+    ],
+    "reference": "none",
+    "caption": "saved Japanese instruction",
+    "coldShapeMeasurement": {
+      "rtf": 0.3778120383520383,
+      "synthesisMilliseconds": 1329.8983749991748,
+      "audioSeconds": 3.52
+    },
+    "measurementLimitations": "First shape, not a warm performance comparison. Excludes model/reference preparation, ASR, LLM and audible speaker onset."
+  },
+  "uiChecks": {
+    "macOS": "actual GUI model picker/import/synthesis/playback and dark appearance inspected",
+    "iOSSimulator": "iPhone 16 Pro sized layout inspected"
+  },
+  "remainingChecks": [
+    "iPhone complete Files picker selection",
+    "microphone recording",
+    "external sharing destinations",
+    "subjective voice quality for diverse input"
+  ],
+  "privateAudioIncluded": false
+}

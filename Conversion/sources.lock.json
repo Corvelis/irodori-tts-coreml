@@ -1,0 +1,83 @@
+{
+  "format": "irodori-conversion-sources-v1",
+  "upstreamCode": {
+    "repository": "https://github.com/Aratako/Irodori-TTS.git",
+    "revision": "89f9d8fbd4d51ea019867ee1197725ede1df13c5"
+  },
+  "repositories": [
+    {
+      "id": "raratu/Onsei-iOS-Models",
+      "revision": "158b33fdb7fe95753922586c76bc8640feafd897",
+      "destination": "onnx",
+      "files": [
+        {
+          "path": "v4.1-small-mf/config.json",
+          "destination": "config.json",
+          "bytes": 2178,
+          "sha256": "d892d41544af570725846443c091cebb8bf7cfd687153d376128e05e58e665ee"
+        },
+        {
+          "path": "v4.1-small-mf/context_kv.onnx",
+          "destination": "context_kv.onnx",
+          "bytes": 220370315,
+          "sha256": "e2a0851dab34612e1676a81316b6bc0de0ded6de27c78b8a740d6338c229adb3"
+        },
+        {
+          "path": "v4.1-small-mf/dacvae_decode.onnx",
+          "destination": "dacvae_decode.onnx",
+          "bytes": 261400162,
+          "sha256": "48f55372b800130ce3f56895501fcb154bac486a9ac805da1c39ccd06e2d1e48"
+        },
+        {
+          "path": "v4.1-small-mf/dacvae_encode.onnx",
+          "destination": "dacvae_encode.onnx",
+          "bytes": 109452758,
+          "sha256": "3ccc52d3a5b7af5a7f2ade7f187e277c6f7d457b609db2206ea25b8956b34169"
+        },
+        {
+          "path": "v4.1-small-mf/duration.onnx",
+          "destination": "duration.onnx",
+          "bytes": 87172678,
+          "sha256": "b807f0e9a3e86bce4fd4324db6da2ded1627f6af3ed155b918e249f2fde50809"
+        },
+        {
+          "path": "v4.1-small-mf/speaker_encoder.onnx",
+          "destination": "speaker_encoder.onnx",
+          "bytes": 242880837,
+          "sha256": "ecfa3a47f0a5bde19a4fcdca46d27fe51da97fbf68897476dca313017931945f"
+        },
+        {
+          "path": "v4.1-small-mf/text_encoder.onnx",
+          "destination": "text_encoder.onnx",
+          "bytes": 1272933729,
+          "sha256": "961efbf4b01e47114e75b62210f29db1568acf244308c7b8657c245061fc2f39"
+        },
+        {
+          "path": "v4.1-small-mf/tokenizer/tokenizer.json",
+          "destination": "tokenizer/tokenizer.json",
+          "bytes": 6718495,
+          "sha256": "6a0734cf21c802169defaffe719bc2ef12bb9d0be37e54b61ed27aa89394723d"
+        },
+        {
+          "path": "v4.1-small-mf/tokenizer/tokenizer_config.json",
+          "destination": "tokenizer/tokenizer_config.json",
+          "bytes": 668,
+          "sha256": "d229a271c64de1a7939d20d3665498e873fa91d5ee2edf135d73ec752cb9c9d3"
+        }
+      ]
+    },
+    {
+      "id": "Aratako/Irodori-TTS-v4.1-Small-MF",
+      "revision": "ccc78f5d480b6e51b69b2d5042a14c4da04fea6e",
+      "destination": "checkpoint",
+      "files": [
+        {
+          "path": "model.safetensors",
+          "destination": "model.safetensors",
+          "bytes": 3093131788,
+          "sha256": "a3f204b3ee06058f4e639a1af38408e7e3af5b6c75176897ecb8bfaaebb4fd54"
+        }
+      ]
+    }
+  ]
+}

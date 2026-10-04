@@ -1,0 +1,148 @@
+{
+  "date": "2026-10-04",
+  "device": {
+    "model": "iPhone 17 Pro",
+    "os": "iOS 27.0.1 (24A446)"
+  },
+  "configuration": "Release, unchanged shared SwiftUI sample and Swift SDK; temporary XCTest UI/host harness",
+  "sampleMode": "sanitized whole input, one synthesis call, complete WAV playback",
+  "sourceFilesUnchanged": 44,
+  "runtimeModelFilesUnchanged": 50,
+  "uiChecks": {
+    "modelFolderPickerImport": "passed: Files folder picker through manifest verification and app copy",
+    "microphoneControls": "passed: permission, start, stop, registration and preparation",
+    "audioFilePickerImport": "passed: synthetic fixture selected through Files, registered and prepared",
+    "referenceAndCacheDeletion": "passed: test-created references and cache deleted; original Documents/reference.wav preserved",
+    "repeatedSynthesis": "passed: six consecutive UI generations, including two 108-character inputs",
+    "playback": "passed: playback, pause, resume and stop",
+    "saveToFiles": "passed: ShareLink > Save to Files > On My iPhone > Irodori Core ML; saved WAV bytes equal generated WAV on device"
+  },
+  "microphoneArtifact": {
+    "sampleRate": 48000,
+    "channels": 1,
+    "durationSeconds": 14.605,
+    "rms": 0.002385,
+    "peak": 0.03717,
+    "finite": true,
+    "controlledFixtureEnvelopeCorrelation": 0.2558,
+    "requiredCorrelation": 0.5,
+    "controlledFixtureCheck": "failed; clear capture of intended synthetic speech not established"
+  },
+  "savedWAV": {
+    "durationSeconds": 6.4,
+    "rms": 0.1538,
+    "peak": 0.832489,
+    "bytes": 614444,
+    "fileBytesExact": true
+  },
+  "saveFlowSynthesisMeasurements": [
+    {
+      "displayedRTF": 0.461,
+      "displayedSynthesisSeconds": 2.93,
+      "displayedAudioSeconds": 6.36
+    },
+    {
+      "displayedRTF": 0.433,
+      "displayedSynthesisSeconds": 2.74,
+      "displayedAudioSeconds": 6.32
+    },
+    {
+      "displayedRTF": 0.244,
+      "displayedSynthesisSeconds": 1.56,
+      "displayedAudioSeconds": 6.38
+    },
+    {
+      "displayedRTF": 0.299,
+      "displayedSynthesisSeconds": 1.9,
+      "displayedAudioSeconds": 6.36
+    },
+    {
+      "displayedRTF": 0.323,
+      "displayedSynthesisSeconds": 2.04,
+      "displayedAudioSeconds": 6.32
+    },
+    {
+      "displayedRTF": 0.928,
+      "displayedSynthesisSeconds": 5.94,
+      "displayedAudioSeconds": 6.4
+    }
+  ],
+  "saveFlowMeasurementConditions": "31-character save-check text; separate launches including UI automation retries. Rounded UI statistics, random seed. Thermal/load not controlled; slow final generation retained.",
+  "repeatedSynthesis": {
+    "reference": "none",
+    "caption": "落ち着いた、やさしい話し方。自然な抑揚で話す。",
+    "seed": "random sample default",
+    "measurements": [
+      {
+        "id": "short1",
+        "characters": 3,
+        "displayedRTF": 1.674,
+        "displayedSynthesisSeconds": 1.1,
+        "displayedAudioSeconds": 0.66
+      },
+      {
+        "id": "short2",
+        "characters": 7,
+        "displayedRTF": 0.309,
+        "displayedSynthesisSeconds": 0.33,
+        "displayedAudioSeconds": 1.06
+      },
+      {
+        "id": "normal1",
+        "characters": 34,
+        "displayedRTF": 0.221,
+        "displayedSynthesisSeconds": 1.33,
+        "displayedAudioSeconds": 6.02
+      },
+      {
+        "id": "long1",
+        "characters": 108,
+        "displayedRTF": 0.119,
+        "displayedSynthesisSeconds": 2.42,
+        "displayedAudioSeconds": 20.34
+      },
+      {
+        "id": "short3",
+        "characters": 3,
+        "displayedRTF": 0.432,
+        "displayedSynthesisSeconds": 0.28,
+        "displayedAudioSeconds": 0.64
+      },
+      {
+        "id": "long2",
+        "characters": 108,
+        "displayedRTF": 0.103,
+        "displayedSynthesisSeconds": 2.1,
+        "displayedAudioSeconds": 20.34
+      }
+    ],
+    "limitations": "Rounded UI statistics; TTS synthesis only, excludes model/reference preparation, ASR, LLM and audible speaker onset. No controlled comparison of thermal/load conditions. UI playback and valid WAV do not establish subjective voice quality or Japanese pronunciation."
+  },
+  "remainingChecks": [
+    "public HF revision download",
+    "broader subjective voice quality across varied text/reference/caption; outside tested initial scope"
+  ],
+  "privateAudioIncluded": false,
+  "rawDeviceDumpsIncluded": false,
+  "microphoneRetry": {
+    "condition": "iPhone placed near Mac; known synthetic fixture played from Mac speakers; verification and replay on iPhone, no recording exported",
+    "sampleRate": 48000,
+    "channels": 1,
+    "durationSeconds": 14.72,
+    "rms": 0.008583,
+    "peak": 0.079407,
+    "finite": true,
+    "controlledFixtureEnvelopeCorrelation": 0.921,
+    "requiredCorrelation": 0.5,
+    "controlledFixtureCheck": "passed",
+    "recordingRegistrationSynthesisPlayback": "passed",
+    "synthesis": {
+      "characters": 32,
+      "displayedRTF": 0.325,
+      "displayedSynthesisSeconds": 2.51,
+      "displayedAudioSeconds": 7.72
+    },
+    "subjectiveListening": "User reported listening to the trial audio and finding it acceptable on 2026-10-04; individual clips/devices were not enumerated. This is not a claim for arbitrary inputs or exact upstream equivalence."
+  },
+  "finalOperationsReport": "sample-final-operations-20261004.json"
+}

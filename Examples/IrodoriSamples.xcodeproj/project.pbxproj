@@ -1,0 +1,498 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		078739B727C39DF9B11A0F03 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E44CCCC8BECE35E2C310BA2 /* Foundation.framework */; };
+		0BCFDB90B5AE5E4E381B41F5 /* PCMPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97F8BC922A5CBFD3D739F16 /* PCMPlayer.swift */; };
+		0F1E0330CB3ED26727B08335 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71F3213D2E3FE109ADC36269 /* Assets.xcassets */; };
+		1BF3F23BB1A4FA9FE9D04A19 /* SampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA68563B9EEEBD92A5B9C51 /* SampleApp.swift */; };
+		1C8A4BE22680437929A9890E /* IrodoriTTS in Frameworks */ = {isa = PBXBuildFile; productRef = 1E50EE13B6D6B7C0D16EF205 /* IrodoriTTS */; };
+		416868DDE903A7D88F330707 /* SampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA68563B9EEEBD92A5B9C51 /* SampleApp.swift */; };
+		4820D735F3E9370C594747F2 /* IrodoriTTS in Frameworks */ = {isa = PBXBuildFile; productRef = 0D40490522E0FE151C9E3876 /* IrodoriTTS */; };
+		4A87A1C20CACEEF5BD082174 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB9C946C6B5136194142A4F8 /* Cocoa.framework */; };
+		8961D2C3136BCEA4EFD0F163 /* PCMPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97F8BC922A5CBFD3D739F16 /* PCMPlayer.swift */; };
+		A6154A1F8A9566FCAB2BCB6B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01DDD14D4D1B19D69119E92 /* ContentView.swift */; };
+		A69A10CF44C1BC92A81C0C9B /* SampleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D054EB3DD880176C092D5871 /* SampleModel.swift */; };
+		BFFF18F0E9D23E47388D96F8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71F3213D2E3FE109ADC36269 /* Assets.xcassets */; };
+		F091DDF5D0580AB99EEB8AA2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01DDD14D4D1B19D69119E92 /* ContentView.swift */; };
+		F460FB6586FE719021FB2EE7 /* SampleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D054EB3DD880176C092D5871 /* SampleModel.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0E44CCCC8BECE35E2C310BA2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		71F3213D2E3FE109ADC36269 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		884BAFC5307660BDEED75C9F /* IrodoriMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IrodoriMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8DA68563B9EEEBD92A5B9C51 /* SampleApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SampleApp.swift; sourceTree = "<group>"; };
+		9FC1216873AB2585D9628DB1 /* IrodoriiOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IrodoriiOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB9C946C6B5136194142A4F8 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		D01DDD14D4D1B19D69119E92 /* ContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D054EB3DD880176C092D5871 /* SampleModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SampleModel.swift; sourceTree = "<group>"; };
+		E97F8BC922A5CBFD3D739F16 /* PCMPlayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PCMPlayer.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		271F52A55F7B56AB6624FECE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4A87A1C20CACEEF5BD082174 /* Cocoa.framework in Frameworks */,
+				4820D735F3E9370C594747F2 /* IrodoriTTS in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B5545B423EEDC65AEEAAA61B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				078739B727C39DF9B11A0F03 /* Foundation.framework in Frameworks */,
+				1C8A4BE22680437929A9890E /* IrodoriTTS in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		54AD2792F034C2D33940DFD5 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				0E44CCCC8BECE35E2C310BA2 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		648684D85C1071A0901C3A0C = {
+			isa = PBXGroup;
+			children = (
+				D09C322ACDD91E2CDA66D8EB /* Products */,
+				BCA734F0CA4F04911F10C8C8 /* Frameworks */,
+				D73DFC6CE1FF39F6D886C208 /* Shared */,
+			);
+			sourceTree = "<group>";
+		};
+		89056F66322813C7C4654E63 /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				BB9C946C6B5136194142A4F8 /* Cocoa.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
+		BCA734F0CA4F04911F10C8C8 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				54AD2792F034C2D33940DFD5 /* iOS */,
+				89056F66322813C7C4654E63 /* OS X */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D09C322ACDD91E2CDA66D8EB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9FC1216873AB2585D9628DB1 /* IrodoriiOS.app */,
+				884BAFC5307660BDEED75C9F /* IrodoriMac.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D73DFC6CE1FF39F6D886C208 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				D01DDD14D4D1B19D69119E92 /* ContentView.swift */,
+				E97F8BC922A5CBFD3D739F16 /* PCMPlayer.swift */,
+				8DA68563B9EEEBD92A5B9C51 /* SampleApp.swift */,
+				D054EB3DD880176C092D5871 /* SampleModel.swift */,
+				71F3213D2E3FE109ADC36269 /* Assets.xcassets */,
+			);
+			name = Shared;
+			path = Shared;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		85A28258FE8C25CADBAFF7F4 /* IrodoriMac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E6B3DD469CC2F3BD759EEE9A /* Build configuration list for PBXNativeTarget "IrodoriMac" */;
+			buildPhases = (
+				508AE2E770D9046DC57CBCD8 /* Sources */,
+				271F52A55F7B56AB6624FECE /* Frameworks */,
+				1E5BAD34FF3D0E39379AF2FC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = IrodoriMac;
+			packageProductDependencies = (
+				0D40490522E0FE151C9E3876 /* IrodoriTTS */,
+			);
+			productName = IrodoriMac;
+			productReference = 884BAFC5307660BDEED75C9F /* IrodoriMac.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B3DCE5256CCE3A696D996A63 /* IrodoriiOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 17C3A42B831B86F9FA11A57A /* Build configuration list for PBXNativeTarget "IrodoriiOS" */;
+			buildPhases = (
+				AC86EAEE68A53EFE73613B1C /* Sources */,
+				B5545B423EEDC65AEEAAA61B /* Frameworks */,
+				3960FB64CF8CF706B077A243 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = IrodoriiOS;
+			packageProductDependencies = (
+				1E50EE13B6D6B7C0D16EF205 /* IrodoriTTS */,
+			);
+			productName = IrodoriiOS;
+			productReference = 9FC1216873AB2585D9628DB1 /* IrodoriiOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		83C4ACCFEFACDD85B4178478 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = 778AF7022B40E4BE4F16A405 /* Build configuration list for PBXProject "IrodoriSamples" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 648684D85C1071A0901C3A0C;
+			minimizedProjectReferenceProxies = 0;
+			packageReferences = (
+				CDF1D062CEC936417B54AFD7 /* XCLocalSwiftPackageReference ".." */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = D09C322ACDD91E2CDA66D8EB /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B3DCE5256CCE3A696D996A63 /* IrodoriiOS */,
+				85A28258FE8C25CADBAFF7F4 /* IrodoriMac */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1E5BAD34FF3D0E39379AF2FC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BFFF18F0E9D23E47388D96F8 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3960FB64CF8CF706B077A243 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0F1E0330CB3ED26727B08335 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		508AE2E770D9046DC57CBCD8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F091DDF5D0580AB99EEB8AA2 /* ContentView.swift in Sources */,
+				0BCFDB90B5AE5E4E381B41F5 /* PCMPlayer.swift in Sources */,
+				1BF3F23BB1A4FA9FE9D04A19 /* SampleApp.swift in Sources */,
+				F460FB6586FE719021FB2EE7 /* SampleModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AC86EAEE68A53EFE73613B1C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A6154A1F8A9566FCAB2BCB6B /* ContentView.swift in Sources */,
+				8961D2C3136BCEA4EFD0F163 /* PCMPlayer.swift in Sources */,
+				416868DDE903A7D88F330707 /* SampleApp.swift in Sources */,
+				A69A10CF44C1BC92A81C0C9B /* SampleModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		244871CAFE715E02C11660C3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		623063D14637B8CC28A5CDA2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-iOS";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Irodori Core ML";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "参照音声として自分の声を録音します。";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.example.irodori.coreml.ios;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		6C16A150F9C6334E2616EF52 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-macOS";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = macOS/IrodoriMac.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Irodori Core ML";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "参照音声として自分の声を録音します。";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.example.irodori.coreml.osx;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		6CBF2708BBF639DD71247326 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		A5F40D730C6DAE8F1186C39D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-iOS";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = iOS/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Irodori Core ML";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "参照音声として自分の声を録音します。";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.example.irodori.coreml.ios;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E292A881E3764E54AF6FBC3D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-macOS";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = macOS/IrodoriMac.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Irodori Core ML";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "参照音声として自分の声を録音します。";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.example.irodori.coreml.osx;
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		17C3A42B831B86F9FA11A57A /* Build configuration list for PBXNativeTarget "IrodoriiOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				623063D14637B8CC28A5CDA2 /* Release */,
+				A5F40D730C6DAE8F1186C39D /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		778AF7022B40E4BE4F16A405 /* Build configuration list for PBXProject "IrodoriSamples" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6CBF2708BBF639DD71247326 /* Debug */,
+				244871CAFE715E02C11660C3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E6B3DD469CC2F3BD759EEE9A /* Build configuration list for PBXNativeTarget "IrodoriMac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6C16A150F9C6334E2616EF52 /* Release */,
+				E292A881E3764E54AF6FBC3D /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		CDF1D062CEC936417B54AFD7 /* XCLocalSwiftPackageReference ".." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ..;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0D40490522E0FE151C9E3876 /* IrodoriTTS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CDF1D062CEC936417B54AFD7 /* XCLocalSwiftPackageReference ".." */;
+			productName = IrodoriTTS;
+		};
+		1E50EE13B6D6B7C0D16EF205 /* IrodoriTTS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CDF1D062CEC936417B54AFD7 /* XCLocalSwiftPackageReference ".." */;
+			productName = IrodoriTTS;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 83C4ACCFEFACDD85B4178478 /* Project object */;
+}

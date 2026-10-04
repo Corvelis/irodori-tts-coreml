@@ -1,0 +1,75 @@
+{
+  "format": "irodori-license-review-v1",
+  "checkedAt": "2026-10-01T23:47:27.443247+00:00",
+  "scope": "Existing pinned Irodori MF / ModernBERT / Japanese DACVAE Core ML components, source runtime, samples and conversion scripts",
+  "conclusion": "component-licenses-reviewed; preserve MIT, Apache-2.0, attribution and model-card usage conditions",
+  "dacvaeClarification": {
+    "discussionUrl": "https://huggingface.co/facebook/dacvae-watermarked/discussions/1",
+    "author": "lematt1991",
+    "name": "Matt Le",
+    "facebookOrgMember": true,
+    "eventId": "69458aa9682b3352e8a576e3",
+    "publishedAt": "2025-12-19T17:26:01.000Z",
+    "statement": "Yes, also apache-2.0. Updated the model card",
+    "appliesTo": "model weights, in response to an explicit weights-license question",
+    "baseWeightsRevision": "8680102d141858a21bd533543966a2eb2e569f92",
+    "readmeSamSentenceStillPresent": true,
+    "readmeCorrectionPr": "https://huggingface.co/facebook/dacvae-watermarked/discussions/2"
+  },
+  "sources": [
+    {
+      "name": "dacvae-discussion-1",
+      "url": "https://huggingface.co/api/models/facebook/dacvae-watermarked/discussions/1",
+      "sha256": "320c71ce8ac0b2ff9bbe5e13f009161947d4a5454e2119178375397b96b2bb1a",
+      "bytes": 11648
+    },
+    {
+      "name": "dacvae-model-info",
+      "url": "https://huggingface.co/api/models/facebook/dacvae-watermarked",
+      "sha256": "0182a787c2cf3e6daab1b752b895903c86184710ee68b5458497f26d50fcf0c7",
+      "bytes": 574
+    },
+    {
+      "name": "dacvae-code-license",
+      "url": "https://raw.githubusercontent.com/facebookresearch/dacvae/main/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358
+    },
+    {
+      "name": "irodori-model-card",
+      "url": "https://huggingface.co/Aratako/Irodori-TTS-v4.1-Small-MF/resolve/ccc78f5d480b6e51b69b2d5042a14c4da04fea6e/README.md",
+      "sha256": "a0ce54c3fb6b19a3af8f41d38e127162c04ae4217d036c16774bb749dd2a20bb",
+      "bytes": 10535
+    },
+    {
+      "name": "semantic-model-card",
+      "url": "https://huggingface.co/Aratako/Semantic-DACVAE-Japanese-32dim/resolve/47376ee24834d7a05a48ebabfe3cde29b3c5e214/README.md",
+      "sha256": "105a6541b90e1c7817f2c5012f431ad107fed066aaa35d5b501c6d09d31f99ec",
+      "bytes": 5128
+    },
+    {
+      "name": "modernbert-license",
+      "url": "https://huggingface.co/sbintuitions/modernbert-ja-310m/resolve/77675fc96a7e445e982e2ba90246b816efc74ec6/LICENSE",
+      "sha256": "284353c80e0d52c06e97af62fd40e4dd1d253fa28f5d1e756121ea1d5d441509",
+      "bytes": 1070
+    },
+    {
+      "name": "onsei-notices",
+      "url": "https://huggingface.co/raratu/Onsei-iOS-Models/resolve/158b33fdb7fe95753922586c76bc8640feafd897/THIRD_PARTY_NOTICES.md",
+      "sha256": "c671773f21c400c2fdfa6ac14eef6f38eb72401fc309a66d539581b0d5f20b0b",
+      "bytes": 3269
+    },
+    {
+      "name": "onsei-model-card",
+      "url": "https://huggingface.co/raratu/Onsei-iOS-Models/resolve/158b33fdb7fe95753922586c76bc8640feafd897/README.md",
+      "sha256": "d1096fc481e432c2b565dc29ccc720282db0c818af37608eac8ab515e03a8d3f",
+      "bytes": 4028
+    }
+  ],
+  "excludedFromScope": [
+    "Rights to individual recordings",
+    "Subjective audio quality",
+    "All-device compatibility",
+    "Clean full conversion rerun"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "source_project": "StackChan Pet Talk / Local AI",
+  "files": {
+    "Sources/IrodoriNative/IrodoriLocalBridge.mm": {
+      "source": "ios/Runner/IrodoriLocalBridge.mm",
+      "sha256": "659205f7188313181120835ab9f4d404148d12946311f88b05079d13b8c469f5"
+    },
+    "Sources/IrodoriNative/include/IrodoriLocalBridge.h": {
+      "source": "ios/Runner/IrodoriLocalBridge.h",
+      "sha256": "3ef6a31ab5e59b785e6511cd52afca081526cae9c2a8a3428e876f2129e04167"
+    },
+    "Sources/IrodoriNative/IrodoriCoreMLSession.h": {
+      "source": "ios/Runner/IrodoriCoreMLSession.h",
+      "sha256": "e0abbeaaeff7a34ddd779bc660efe459a8d25e8b7101188a74e17443bf53578c"
+    },
+    "Sources/IrodoriNative/IrodoriTextConditioning.h": {
+      "source": "ios/Runner/IrodoriTextConditioning.h",
+      "sha256": "5d210d518a5ab2953515f23e670b51e64440664cfa2074f0ccf1b18333bc46f6"
+    },
+    "Sources/IrodoriNative/IrodoriPcmPrefix.h": {
+      "source": "ios/Runner/IrodoriPcmPrefix.h",
+      "sha256": "3ebffde7258a102e7d2633c83dcd7843e8fe35ca451177da3454863df546f5a8"
+    },
+    "Sources/IrodoriNative/IrodoriSamplingSchedule.h": {
+      "source": "ios/Runner/IrodoriSamplingSchedule.h",
+      "sha256": "6e092aa1ed4f686bcf9fcee2cee7193c395a174b4d42820fcf6d2ba82fede73e"
+    }
+  },
+  "updatedFor": "Voice Design caption support; source matches Local AI native files as of 2026-10-02"
+}
