@@ -23,6 +23,8 @@ python Conversion/convert_all.py --sources artifacts/sources --output artifacts/
 
 実行時はCore MLだけですが、変換工程では元のONNXとPyTorchチェックポイントを使用します。全段を公式PyTorchから直接変換するツールではありません。
 
+既存のstage 1デコーダー3モデルの同一重みを共有する場合は、[重み共有形式のガイド](COMPACT_MODELS.md)に従って `share_decoder_weights.py` を実行してください。重みの精度は変えず、iOS 18 / macOS 15以降のmultifunctionモデルを作成します。
+
 ## 配布候補の作成
 
 `Distribution/artifacts.lock.json` は配布版モデルのファイルサイズとSHA-256を定義します。

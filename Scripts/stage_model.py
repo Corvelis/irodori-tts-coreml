@@ -23,6 +23,16 @@ RUNTIME_FILES = tuple(sorted(['config.json', 'coreml-only.json', 'tokenizer/toke
                              'tokenizer/tokenizer_config.json', 'audioseal.json'] +
     [name + '.json' for name in AUXILIARY] +
     [name + '.mlpackage/' + file for name in AUXILIARY + OTHERS + ('audioseal_generator', 'audioseal_detector') for file in PACKAGE_FILES]))
+SHARED_RUNTIME_FILES = tuple(sorted(
+    [name for name in RUNTIME_FILES if not any(name.startswith(old + '.mlpackage/')
+      for old in OTHERS if old.startswith('decoder_stage_1_'))] +
+    ['decoder_stage_1_multifunction.mlpackage/' + file for file in PACKAGE_FILES]))
+
+
+def runtime_files(format):
+    if format in ('irodori-coreml-only-v1', 'irodori-coreml-distribution-v1'): return RUNTIME_FILES
+    if format in ('irodori-coreml-only-v2', 'irodori-coreml-distribution-v2'): return SHARED_RUNTIME_FILES
+    raise ValueError('Wrong runtime bundle format')
 
 
 def safe_file(root, relative):
@@ -51,10 +61,12 @@ def entry(root, path):
 
 
 def inventory(source):
-    rows = [entry(source, name) for name in RUNTIME_FILES]
     # Check the original auxiliary numerical validation applies to these exact packages.
     core = json.loads((source / 'coreml-only.json').read_text())
-    if core.get('format') != 'irodori-coreml-only-v1': raise ValueError('Wrong runtime bundle format')
+    rows = [entry(source, name) for name in runtime_files(core.get('format'))]
+    if core.get('format') == 'irodori-coreml-only-v2' and core.get('decoder_stage_1_functions') != {
+        'fixed64':'w64', 'fixed57':'w57', 'flexible128':'w128'}:
+        raise ValueError('Wrong shared decoder functions')
     for name in AUXILIARY:
         meta = json.loads((source / (name + '.json')).read_text())
         digest = hashlib.sha256()
@@ -89,6 +101,8 @@ def stage(source, destination, lock_path, repository=REPOSITORY):
     if destination.exists(): raise FileExistsError(destination)
     lock = json.loads(lock_path.read_text())
     rows = inventory(source)
+    core_format = json.loads((source / 'coreml-only.json').read_text())['format']
+    shared = core_format == 'irodori-coreml-only-v2'
     if lock.get('format') != 'irodori-reviewed-artifacts-v1' or lock.get('files') != rows:
         raise ValueError('Artifacts differ from the reviewed lock. Validate new artifacts before replacing the lock.')
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -100,17 +114,25 @@ def stage(source, destination, lock_path, repository=REPOSITORY):
         for name in ['NOTICE', 'THIRD_PARTY_NOTICES.md']:
             shutil.copy2(repository / name, staging / name)
         shutil.copytree(repository / 'LICENSES', staging / 'LICENSES')
-        shutil.copy2(repository / 'Distribution/HuggingFace/README.md', staging / 'README.md')
-        shutil.copy2(repository / 'docs/RELEASE.md', staging / 'MODEL_BUNDLE.md')
+        model_card = repository / ('Distribution/HuggingFace/README-shared.md' if shared else 'Distribution/HuggingFace/README.md')
+        shutil.copy2(model_card, staging / 'README.md')
+        shutil.copy2(model_card if shared else repository / 'docs/RELEASE.md', staging / 'MODEL_BUNDLE.md')
         shutil.copy2(repository / 'docs/VALIDATION.md', staging / 'VALIDATION.md')
         shutil.copy2(repository / 'docs/LICENSE_REVIEW.md', staging / 'LICENSE_REVIEW.md')
         shutil.copy2(repository / 'Distribution/license-review.json', staging / 'license-review.json')
         provenance = json.loads((repository / 'Distribution/provenance.json').read_text())
         provenance['bundleVersion'] = lock['bundleVersion']
         provenance['reviewedArtifactsLockSha256'] = checksum(lock_path)
+        if shared:
+            provenance['runtimeVersion'] = '0.2.0'
+            provenance['minimumOS'] = {'iOS': '18.0', 'macOS': '15.0'}
+            provenance['modelLayout'] = 'irodori-coreml-distribution-v2'
+            provenance['conversionRecipe'] = 'Conversion/convert_all.py followed by Conversion/share_decoder_weights.py'
+            # An artifact candidate need not have a published Git tag.
+            provenance['distribution'].pop('codeTag', None)
         write_json(staging / 'provenance.json', provenance)
         paths = sorted(p.relative_to(staging).as_posix() for p in staging.rglob('*') if p.is_file())
-        manifest = {'format': 'irodori-coreml-distribution-v1', 'bundleVersion': lock['bundleVersion'],
+        manifest = {'format': core_format.replace('coreml-only', 'coreml-distribution'), 'bundleVersion': lock['bundleVersion'],
                     'files': [entry(staging, path) for path in paths]}
         # Verify copied inference files before the directory becomes visible.
         actual = {item['path']: item for item in manifest['files']}
@@ -127,9 +149,13 @@ def stage(source, destination, lock_path, repository=REPOSITORY):
 def verify(root):
     manifest = json.loads(safe_file(root, 'manifest.json').read_text())
     rows = manifest['files']
-    if manifest.get('format') != 'irodori-coreml-distribution-v1': raise ValueError('Wrong manifest format')
+    if manifest.get('format') not in ('irodori-coreml-distribution-v1', 'irodori-coreml-distribution-v2'):
+        raise ValueError('Wrong manifest format')
     paths = [x['path'] for x in rows]
-    if len(set(paths)) != len(paths) or not set(RUNTIME_FILES).issubset(paths): raise ValueError('Incomplete manifest')
+    if len(set(paths)) != len(paths) or not set(runtime_files(manifest['format'])).issubset(paths): raise ValueError('Incomplete manifest')
+    core_format = json.loads(safe_file(root, 'coreml-only.json').read_text())['format']
+    if core_format.replace('coreml-only', 'coreml-distribution') != manifest['format']:
+        raise ValueError('Model layout and manifest format differ')
     for item in rows:
         if entry(root, item['path']) != item: raise ValueError(f"Checksum mismatch: {item['path']}")
     actual = {p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file() or p.is_symlink()}

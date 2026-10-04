@@ -73,6 +73,34 @@ class DistributionTests(unittest.TestCase):
         (self.source / 'audioseal_generator.mlpackage/Data/com.apple.CoreML/weights/weight.bin').write_bytes(b'changed weights')
         with self.assertRaises(ValueError): s.inventory(self.source)
 
+    def test_shared_decoder_layout_can_be_staged_and_verified(self):
+        import shutil
+        for name in s.OTHERS:
+            if name.startswith('decoder_stage_1_'):
+                shutil.rmtree(self.source / (name + '.mlpackage'))
+        for file in s.PACKAGE_FILES:
+            target = self.source / ('decoder_stage_1_multifunction.mlpackage/' + file)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(b'shared-decoder')
+        core = json.loads((self.source / 'coreml-only.json').read_text())
+        core.update(format='irodori-coreml-only-v2', decoder_stage_1_functions={
+            'fixed64':'w64', 'fixed57':'w57', 'flexible128':'w128'})
+        s.write_json(self.source / 'coreml-only.json', core)
+        s.write_json(self.lock, {'format':'irodori-reviewed-artifacts-v1', 'bundleVersion':'test',
+                                'files':s.inventory(self.source)})
+        destination = self.root / 'shared-bundle'
+        s.stage(self.source, destination, self.lock)
+        manifest = s.verify(destination)
+        self.assertEqual(manifest['format'], 'irodori-coreml-distribution-v2')
+        provenance = json.loads((destination / 'provenance.json').read_text())
+        self.assertEqual(provenance['runtimeVersion'], '0.2.0')
+        self.assertNotIn('codeTag', provenance['distribution'])
+        self.assertIn('iOS 18', (destination / 'README.md').read_text())
+        self.assertFalse((destination / 'decoder_stage_1_2d_fixed_w64.mlpackage').exists())
+        core['decoder_stage_1_functions']['fixed64'] = 'wrong'
+        s.write_json(self.source / 'coreml-only.json', core)
+        with self.assertRaises(ValueError): s.inventory(self.source)
+
     def test_symlink_and_traversal_are_rejected(self):
         (self.source / 'escape').symlink_to(self.root)
         for name in ['../lock.json', '/etc/passwd', 'a//b', 'escape/lock.json']:

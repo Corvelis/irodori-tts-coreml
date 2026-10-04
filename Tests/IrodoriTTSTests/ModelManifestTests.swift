@@ -8,6 +8,19 @@ final class ModelManifestTests: XCTestCase {
         return try JSONSerialization.data(withJSONObject: ["format": "irodori-coreml-distribution-v1", "bundleVersion": "test", "files": rows])
     }
     func testCompleteManifest() throws { XCTAssertEqual(try ModelBundle.manifest(from: data()).files.count, ModelBundle.requiredPaths.count) }
+    func testSharedDecoderManifestRequiresItsOwnLayout() throws {
+        let rows = ModelBundle.sharedDecoderRequiredPaths.map {
+            ["path": $0, "bytes": 1, "sha256": String(repeating: "a", count: 64)] as [String: Any]
+        }
+        var object: [String: Any] = ["format": "irodori-coreml-distribution-v2", "bundleVersion": "test", "files": rows]
+        XCTAssertEqual(try ModelBundle.manifest(from: JSONSerialization.data(withJSONObject: object)).files.count, rows.count)
+        object["files"] = ModelBundle.requiredPaths.map {
+            ["path": $0, "bytes": 1, "sha256": String(repeating: "a", count: 64)] as [String: Any]
+        }
+        XCTAssertThrowsError(try ModelBundle.manifest(from: JSONSerialization.data(withJSONObject: object)))
+        object["format"] = "irodori-coreml-distribution-v3"
+        XCTAssertThrowsError(try ModelBundle.manifest(from: JSONSerialization.data(withJSONObject: object)))
+    }
     func testIncompleteDuplicateOrMalformedManifest() throws {
         let variants: [(inout [[String: Any]]) -> Void] = [
             { $0.removeFirst() }, { $0.append($0[0]) },

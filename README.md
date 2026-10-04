@@ -85,6 +85,7 @@ func makeWAV(engine: IrodoriEngine, models: URL, output: URL) async throws {
 | CLIで生成・速度を測る | [CLI](docs/CLI.md) / [性能の測定と制約](docs/VALIDATION.md) |
 | エラーを解決する | [トラブル対処](docs/TROUBLESHOOTING.md) |
 | モデルを再変換する | [変換の参考実装](docs/CONVERSION.md) |
+| 重複するモデル重みを共有する | [重み共有形式と互換性](docs/COMPACT_MODELS.md) |
 | 配布物と利用条件を確認する | [配布内容と互換性](docs/RELEASE.md) / [ライセンス](docs/LICENSE_REVIEW.md) |
 
 ## ライセンス
