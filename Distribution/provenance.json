@@ -2,7 +2,6 @@
   "format": "irodori-coreml-provenance-v1",
   "bundleVersion": "0.1.0",
   "runtimeVersion": "0.1.0",
-  "releaseStatus": "release-prepared",
   "upstreamSources": {
     "format": "irodori-conversion-sources-v1",
     "upstreamCode": {
@@ -108,9 +107,7 @@
   "containsONNX": false,
   "containsReferenceAudio": false,
   "containsWatermarking": false,
-  "nativeSourceProvenance": "Benchmarks/native-source-provenance.json in the code repository",
   "conversionRecipe": "Conversion/convert_all.py in the code repository",
-  "validationScope": "See docs/VALIDATION.md in the matching code release; initial target is behavior parity with Local AI, not exact PyTorch PCM parity.",
   "licenseReview": {
     "path": "license-review.json",
     "humanReadable": "LICENSE_REVIEW.md",
@@ -126,5 +123,5 @@
     "codeRepository": "https://github.com/Corvelis/irodori-tts-coreml",
     "codeTag": "v0.1.0"
   },
-  "reviewedArtifactsLockSha256": "99f368e413e4c095d4d614d102d0fba2ca513c9fcad3a369ed70f58739028b8f"
+  "reviewedArtifactsLockSha256": "a78ae7dd61a2ba2c37ecd338d18c00d73977c0932213050d6c4b3ded9df61152"
 }

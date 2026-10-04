@@ -1,7 +1,7 @@
 Irodori TTS Core ML — community conversion and sample runtime
 
-The runtime was extracted from Local AI / StackChan Pet Talk. This repository's
-runtime, sample applications and conversion tooling are distributed under the
+This repository's runtime, sample applications and conversion tooling are
+distributed under the
 Apache License, Version 2.0, except for identified upstream-derived portions.
 
 Irodori-TTS: Copyright (c) 2026 Aratako. MIT License (LICENSES/MIT.txt).
@@ -20,6 +20,5 @@ No affiliation with or endorsement by upstream authors or Apple is implied.
 The code license does not relicense model weights or user reference recordings.
 Meta clarified that DACVAE model weights are Apache-2.0 in the official model
 discussion: https://huggingface.co/facebook/dacvae-watermarked/discussions/1 .
-The README still contains an outdated SAM sentence; retain this clarification
-with LICENSES/Apache-2.0.txt. See LICENSE_REVIEW.md (docs/LICENSE_REVIEW.md in
-the code repository) and the release-status document before public release.
+Preserve the component licenses, attribution and Core ML change notices.
+See THIRD_PARTY_NOTICES.md for the complete component terms.

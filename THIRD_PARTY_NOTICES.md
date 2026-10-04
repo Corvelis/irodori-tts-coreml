@@ -32,7 +32,7 @@ alongside this explicit weights clarification, not silently treated as corrected
 The license-review record is LICENSE_REVIEW.md in the model bundle and
 `docs/LICENSE_REVIEW.md` in the code repository. Preserve Apache-2.0 for the
 Meta-derived portions, MIT for the other listed portions, their attribution,
-and notices of the Core ML conversion. This remains a local release draft.
+and notices of the Core ML conversion.
 
 Follow the upstream [Irodori usage conditions and disclaimer](https://huggingface.co/Aratako/Irodori-TTS-v4.1-Small-MF).
 Use voices you are authorized to use; do not impersonate people without consent

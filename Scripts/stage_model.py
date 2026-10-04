@@ -1,8 +1,8 @@
 """Create a model distribution bundle from reviewed, unmodified artifacts.
 
 No upload command is provided. A manifest is integrity metadata, not a grant of
-redistribution rights. License evidence is in docs/LICENSE_REVIEW.md; remaining
-release checks are in docs/RELEASE.md.
+redistribution rights. Component licenses and use conditions are described in
+docs/LICENSE_REVIEW.md.
 """
 import argparse
 import hashlib
@@ -89,7 +89,7 @@ def stage(source, destination, lock_path, repository=REPOSITORY):
             shutil.copy2(repository / name, staging / name)
         shutil.copytree(repository / 'LICENSES', staging / 'LICENSES')
         shutil.copy2(repository / 'Distribution/HuggingFace/README.md', staging / 'README.md')
-        shutil.copy2(repository / 'docs/RELEASE.md', staging / 'RELEASE_STATUS.md')
+        shutil.copy2(repository / 'docs/RELEASE.md', staging / 'MODEL_BUNDLE.md')
         shutil.copy2(repository / 'docs/VALIDATION.md', staging / 'VALIDATION.md')
         shutil.copy2(repository / 'docs/LICENSE_REVIEW.md', staging / 'LICENSE_REVIEW.md')
         shutil.copy2(repository / 'Distribution/license-review.json', staging / 'license-review.json')
@@ -99,7 +99,6 @@ def stage(source, destination, lock_path, repository=REPOSITORY):
         write_json(staging / 'provenance.json', provenance)
         paths = sorted(p.relative_to(staging).as_posix() for p in staging.rglob('*') if p.is_file())
         manifest = {'format': 'irodori-coreml-distribution-v1', 'bundleVersion': lock['bundleVersion'],
-                    'releaseStatus': provenance['releaseStatus'],
                     'files': [entry(staging, path) for path in paths]}
         # Verify copied inference files before the directory becomes visible.
         actual = {item['path']: item for item in manifest['files']}
@@ -146,7 +145,7 @@ def main():
         print('Candidate inventory written; validate performance/audio before distribution.')
     elif args.command == 'stage':
         manifest = stage(args.source, args.destination, args.lock)
-        print(f"Staged {len(manifest['files'])} files, {manifest['totalFileBytes']} bytes; public release is pending.")
+        print(f"Staged {len(manifest['files'])} files, {manifest['totalFileBytes']} bytes.")
     else:
         manifest = verify(args.directory); print(f"Verified {len(manifest['files'])} files.")
 

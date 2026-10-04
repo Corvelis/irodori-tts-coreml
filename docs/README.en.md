@@ -1,10 +1,10 @@
 # Irodori TTS Core ML — getting started
 
-[日本語](../README.md) · [API reference (Japanese)](API.md) · [Validation](VALIDATION.md)
+[日本語](../README.md) · [API reference (Japanese)](API.md) · [Performance](VALIDATION.md)
 
 This community runtime runs Irodori TTS v4.1 Small MF on iPhone and Apple Silicon Mac. It includes a Swift package, shared SwiftUI samples, a macOS CLI and conversion tools. Runtime dependencies are Apple frameworks only; Python and ONNX Runtime are not required for inference.
 
-**Version `0.1.0`, GitHub tag `v0.1.0`.** Code and samples are in the [GitHub repository](https://github.com/Corvelis/irodori-tts-coreml); the complete model bundle is in the [Hugging Face repository](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML). The release artifacts are prepared while both repositories remain private. Public availability and unauthenticated download validation are tracked in the [current release status](https://github.com/Corvelis/irodori-tts-coreml/blob/main/docs/RELEASE.md). Private repositories require authentication. Meta has explicitly confirmed that DACVAE model weights are Apache-2.0; preserve all component licenses and model-card use conditions. See [license review](LICENSE_REVIEW.md) and [component notices](../THIRD_PARTY_NOTICES.md). This is not an official Aratako or Apple release.
+**Version 0.1.0, GitHub tag v0.1.0.** [Download the SDK and samples](https://github.com/Corvelis/irodori-tts-coreml/releases/tag/v0.1.0) and the separate [Core ML model bundle](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML). Preserve the MIT / Apache-2.0 component terms and model-card use conditions; see [license details](LICENSE_REVIEW.md) and [component notices](../THIRD_PARTY_NOTICES.md). This is a community implementation, not an official Aratako or Apple release.
 
 ## Contents and requirements
 
@@ -13,11 +13,11 @@ This community runtime runs Irodori TTS v4.1 Small MF on iPhone and Apple Silico
 | Code repository | IrodoriTTS Swift package, iOS/macOS samples, CLI, conversion tools and docs |
 | Separate model bundle | 13 Core ML ML Programs, tokenizer/config, sidecars and SHA-256 manifest; approximately 2.90 GB |
 
-Build targets are iOS 17+ and macOS 14+, with Swift tools 5.9 declared in Package.swift. Use an Apple Silicon Mac with Xcode. Minimum targets are not a claim that every device and OS version has been tested. On iPhone 17 Pro, Files model/audio selection and import, microphone permission/start/stop/registration/preparation, repeated synthesis, playback/pause/resume/stop, reference deletion and Save to Files have been exercised. The saved WAV is byte-identical to the generated WAV. The repeated controlled microphone test passed (envelope correlation 0.9210, required >0.5); the earlier failed attempt remains in the validation history. The user listened to the trial audio and found it acceptable. The signed Mac GUI has been exercised with both its built-in microphone and BlackHole input, recording/registration/synthesis/playback, reference/cache deletion and byte-identical WAV export. The system input was restored after testing; the trial audio has been accepted by the user after listening. Other sharing destinations are untested. See [validation](VALIDATION.md).
+Deployment targets are iOS 17+ and macOS 14+, with Swift tools 5.9+. Use an Apple Silicon Mac with Xcode and Command Line Tools. Performance and memory use vary with the device and input. Allow extra disk space for app-owned model copies and Core ML compilation caches.
 
 ## Run on Mac
 
-Clone the [code repository](https://github.com/Corvelis/irodori-tts-coreml). Private repositories require GitHub authentication. Place the complete model folder next to the source repository.
+Clone the [code repository](https://github.com/Corvelis/irodori-tts-coreml), then download the matching model bundle into a new folder beside it:
 
 ```sh
 git clone --branch v0.1.0 --depth 1 https://github.com/Corvelis/irodori-tts-coreml.git
@@ -28,15 +28,16 @@ Run from the source root:
 
 ```sh
 swift build -c release
+.build/release/irodori download --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b95d39710d9e3ac4435983fe89f9acd6c02658e9/manifest.json' --destination ../Irodori-TTS-v4.1-Small-MF-CoreML
 .build/release/irodori verify --models ../Irodori-TTS-v4.1-Small-MF-CoreML
 .build/release/irodori synthesize \
   --models ../Irodori-TTS-v4.1-Small-MF-CoreML \
   --text 'こんにちは。今日はいい天気ですね。' \
-  --output /tmp/irodori-output.wav --report /tmp/irodori-report.json
-afplay /tmp/irodori-output.wav
+  --output ./irodori-output.wav --report ./irodori-report.json
+afplay ./irodori-output.wav
 ```
 
-Add `--reference /path/to/your-authorized-voice.wav` to use a reference voice. Output is 48 kHz mono PCM16 WAV. First use may take much longer because Core ML compiles and specializes models. See [CLI usage](CLI.md) for repeated measurements and reports.
+Add `--reference ./reference.wav` to use a reference voice. Output is 48 kHz mono PCM16 WAV. First use may take much longer because Core ML compiles and specializes models. See [CLI usage](CLI.md) for repeated measurements and reports.
 
 ## Open the samples
 
@@ -48,15 +49,15 @@ Open `Examples/IrodoriSamples.xcodeproj`. Choose IrodoriMac for Mac or IrodoriiO
 4. **WAVを保存** exports the completed WAV. The app's generated.wav is replaced by the next successful synthesis.
 5. **登録音声とキャッシュを削除** deletes all reference copies/recordings owned by this sample and the feature cache. External originals, models and generated WAV are retained.
 
-For a first playback, leave the reference unset and the caption empty, import the model folder and press **生成して再生** using the default text. Separate preparation is optional. The URL downloader requires a publicly accessible HTTPS manifest; the sample has no private/gated-repository authentication UI.
+For a first playback, leave the reference unset and the caption empty, import the model folder and press **生成して再生** using the default text. Separate preparation is optional. The URL downloader uses the matching manifest URL in the [model download guide](HUGGINGFACE.md).
 
-The redesigned UI uses two columns on wide Mac windows and a vertical layout on iPhone, with separate model/voice settings and RTF, synthesis time and audio duration.
+The UI uses two columns on wide Mac windows and a vertical layout on iPhone, with separate model/voice settings and RTF, synthesis time and audio duration.
 
 One voice is selected at a time; there is no named voice library UI. Selection persists, but the consent toggle resets on launch. The previous generated WAV remains on disk, but its playback card is not restored on relaunch. Imported models and compilation caches need extra disk space. Old model copies are not automatically deleted.
 
 ## Use the SDK in your app
 
-Add the repository root as a local Swift package in Xcode and link the **IrodoriTTS** library product. Keep one IrodoriEngine per conversation. Call prepare(modelDirectory:), then registerReference(URL?), then synthesize. Pass nil for no reference. The SDK does not bundle/download models automatically or play audio by itself.
+In Xcode, choose **File → Add Package Dependencies…**, enter `https://github.com/Corvelis/irodori-tts-coreml.git`, select **Exact Version 0.1.0**, and link the **IrodoriTTS** library product. You can also add the repository root as a local Swift package. Keep one IrodoriEngine per conversation. Call prepare(modelDirectory:), then registerReference(URL?), then synthesize. Pass nil for no reference. The SDK does not bundle/download models automatically or play audio by itself.
 
 The [integration guide](GETTING_STARTED.md) contains a complete WAV function; [streaming and cancellation](STREAMING.md) provides a controller with a sample player. onChunk runs on the inference queue and provides headerless little-endian PCM16. Dispatch UI/playback work to the main actor. Cancellation discards future chunks but does not interrupt an in-flight Core ML prediction or clear an application's playback queue.
 
@@ -64,8 +65,8 @@ Reference registration derives cached speaker features; it does not train or mod
 
 ## Performance and limitations
 
-RTF is synthesis time divided by output duration. Preparation, ASR, LLM, queue waiting and physical speaker latency are excluded. First PCM means callback readiness, not audible onset. No AFM/Gemma concurrency claim is made here. The SDK retains complete PCM even when streaming; it is not an unbounded constant-memory stream.
+RTF is synthesis time divided by output duration. Preparation, ASR, LLM, queue waiting and physical speaker latency are excluded. First PCM means callback readiness, not audible onset. The SDK retains complete PCM even when streaming; it is not an unbounded constant-memory stream.
 
-Default text preparation handles Markdown, URLs and punctuation, then splits sentences and retries supported length-limit failures. `splitSentences: false` preserves sanitization while synthesizing one whole utterance and rejecting length-limit errors without a split retry. The GUI sample uses this mode and omits onChunk. The SDK/CLI defaults and optional decoder PCM callbacks remain available. rawText bypasses sanitization as well as sentence splitting. There is no pronunciation dictionary. Optional Japanese Voice Design captions are supported by `synthesize(text, caption: instruction)` and CLI `--caption`; see [API](API.md). Two short-utterance comparison cases still have unresolved small numerical differences; do not describe this draft as fully quality-equivalent. See [validation](VALIDATION.md) and [troubleshooting](TROUBLESHOOTING.md).
+Default text preparation handles Markdown, URLs and punctuation, then splits sentences and retries supported length-limit failures. `splitSentences: false` preserves sanitization while synthesizing one whole utterance and rejecting length-limit errors without a split retry. The GUI sample uses this mode and omits onChunk. The SDK/CLI defaults and optional decoder PCM callbacks remain available. rawText bypasses sanitization as well as sentence splitting. There is no pronunciation dictionary. Optional Japanese Voice Design captions are supported by `synthesize(text, caption: instruction)` and CLI `--caption`; see [API](API.md). Voice Design adherence and exact reference-voice similarity are not guaranteed. See [performance and input limitations](VALIDATION.md) and [troubleshooting](TROUBLESHOOTING.md).
 
-The [conversion guide](CONVERSION.md) explains pinned sources and numerical checks. The clean end-to-end conversion workflow has not yet been fully rerun. Models, recordings, compiled caches and generated audio are excluded from the source archive.
+The [conversion guide](CONVERSION.md) explains pinned sources and numerical checks. Conversion scripts are reference implementations. Use the distributed models for normal operation, and validate numerical outputs and generated speech when reconverting. Models, recordings, compiled caches and generated audio are excluded from the source archive.

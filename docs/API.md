@@ -2,7 +2,7 @@
 
 [導入](GETTING_STARTED.md) · [音声登録](VOICE_REGISTRATION.md) · [再生と停止](STREAMING.md)
 
-対象は `0.1.0` の公開Swift APIです。[実装](../Sources/IrodoriTTS)に対応しています。初版のAPIです。将来の互換性方針はまだ確定していません。
+対象は `0.1.0` のSwift APIです。[実装](../Sources/IrodoriTTS)に対応しています。
 
 ## IrodoriEngine
 
@@ -33,7 +33,7 @@ let audio = try await engine.synthesize(
 
 同じengine内では直前の指示のエンコーダー出力をメモリーに保持し、連続する文や生成で再利用します。指示の変更時は再計算し、空文字・release・モデル変更で破棄します。ディスクには保存しません。初回・変更時の追加時間は `captionEncoderMs`、再利用は `captionCacheHit`、有効状態は `captionEnabled` で確認できます。指示用の状態は最大約512KiBです。
 
-参照と矛盾する声質指定や複雑な指示は、崩れや不自然な音につながる場合があります。参照を使う場合はその声に合う感情・話し方を指定してください。指示への追従は保証されません。[公式MFモデルの制約](https://huggingface.co/Aratako/Irodori-TTS-v4.1-Small-MF#%E2%9A%A0%EF%B8%8F-limitations)も参照してください。既存のモデルファイルと4ステップ設定は変更していません。
+参照と矛盾する声質指定や複雑な指示は、崩れや不自然な音につながる場合があります。参照を使う場合はその声に合う感情・話し方を指定してください。指示への追従は保証されません。[公式MFモデルの制約](https://huggingface.co/Aratako/Irodori-TTS-v4.1-Small-MF#%E2%9A%A0%EF%B8%8F-limitations)も参照してください。対応モデルは4ステップで合成します。
 
 ## 入出力の型
 
@@ -94,7 +94,7 @@ let result = try await engine.synthesize(
 try result.writeWAV(to: outputURL)
 ```
 
-既存の呼び出しとCLIは引数を省くと従来の文分割を使います。Local AIの読み上げ方式も、このサンプル変更では変えていません。
+SDKとCLIは、文分割の指定を省くと既定の文分割を使います。
 
 `rawText: true` は整形・文分割・上限時の分割再試行を無効にする比較用モードです。長文やチャット表示文には通常モードを使ってください。ASR、LLM、画像理解、読み辞書はこのSDKに含まれません。Voice Designは上記の `caption` で指定できます。
 

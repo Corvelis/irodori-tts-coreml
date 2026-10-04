@@ -49,8 +49,8 @@
     },
     {
       "path": "coreml-only.json",
-      "bytes": 1860,
-      "sha256": "dc14d84d05ec9ad1f679f833361c4e6c6eb7bbe57cba3f5fc3a29264e5fffd84"
+      "bytes": 1756,
+      "sha256": "2a8f61f35aabfa4fa59496d00628c184a63a2e8faac17fd4b7a06cade1285d88"
     },
     {
       "path": "dacvae_encode_stats.json",

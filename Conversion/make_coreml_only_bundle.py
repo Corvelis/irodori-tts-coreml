@@ -1,9 +1,8 @@
 """Assemble an intermediate fast-only Core ML bundle for local validation.
 
 This is not a release packager. Scripts/stage_model.py adds distribution metadata
-and full-file hashes after native audio validation. Public release also needs
-the remaining checks described in docs/RELEASE.md; license evidence is recorded
-in docs/LICENSE_REVIEW.md.
+and full-file hashes. Component licenses and use conditions are described in
+docs/LICENSE_REVIEW.md.
 
 Only allowlisted models/tokenizer assets are copied, excluding ONNX, standard
 DiT, user reference audio, feature caches and benchmark artifacts.
@@ -74,7 +73,6 @@ def assemble(existing, auxiliary, destination, reference_encoder=None, link=Fals
     total = sum(p.stat().st_size for source in destination.iterdir()
                 for p in ([source] if source.is_file() else source.rglob("*")) if p.is_file())
     manifest = {"format": "irodori-coreml-only-v1", "experimental": True,
-                "release_gate": "pending device performance and listening comparison",
                 "model_bytes": total, "components": validation,
                 "reference_sampling": "Apple libc++ default_random_engine seed=0, normal<float>",
                 "contains_onnx": False, "contains_standard_dit": False}

@@ -2,7 +2,7 @@
 
 [README](../README.md) · [サンプル操作](SAMPLES.md) · [API一覧](API.md)
 
-この手順はSwift SDK `0.1.0`（GitHub tag `v0.1.0`）向けです。コード用リポジトリは [Corvelis/irodori-tts-coreml](https://github.com/Corvelis/irodori-tts-coreml) です。リポジトリがPrivateの場合は認証が必要です。GitHubのタグ指定またはソースを取得してローカルSwift Packageとして追加します。SDKはモデルを内蔵せず、ダウンロードも自動では行いません。
+この手順はSwift SDK `0.1.0`（GitHub tag `v0.1.0`）向けです。コード用リポジトリは [Corvelis/irodori-tts-coreml](https://github.com/Corvelis/irodori-tts-coreml) です。GitHubのタグ指定またはソースを取得してローカルSwift Packageとして追加します。SDKはモデルを内蔵せず、ダウンロードも自動では行いません。
 
 ## 1. 用意するもの
 
@@ -14,11 +14,11 @@
 | モデル | 対応するCore ML配布フォルダ一式、約2.90 GB |
 | 参照音声 | 任意。自分の声または使用許可のある音声 |
 
-最低OSはビルド設定です。全端末での動作・速度・メモリを確認した意味ではありません。[検証記録](VALIDATION.md)を参照してください。実行にPythonやONNX Runtimeは不要です。
+実行にPythonやONNX Runtimeは不要です。速度・使用メモリは端末と入力条件によって変わります。[性能の測定と制約](VALIDATION.md)を参照してください。
 
 ## 2. パッケージを追加する
 
-ソースはリポジトリ全体を取得します。リポジトリがPrivateの場合はGitHubの認証が必要です。
+サンプルやローカルSwift Packageを使う場合は、リポジトリ全体を取得します。
 
 ```sh
 git clone --branch v0.1.0 --depth 1 https://github.com/Corvelis/irodori-tts-coreml.git
@@ -39,7 +39,7 @@ Xcodeの説明はAppleの[パッケージ依存の追加](https://developer.appl
 
 ## 3. モデルを用意する
 
-`modelURL` はモデルの親フォルダです。1つの `.mlpackage` を指定しないでください。
+[モデル取得ガイド](HUGGINGFACE.md)に従って一式を取得します。`modelURL` はモデルの親フォルダです。1つの `.mlpackage` を指定しないでください。
 
 ```text
 Irodori-TTS-v4.1-Small-MF-CoreML/

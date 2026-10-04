@@ -1,72 +1,78 @@
-# Hugging Faceへのアップロード
+# モデルの取得と配置
 
-[README](../README.md) · [公開準備の状態](RELEASE.md)
+[README](../README.md) · [SDK導入](GETTING_STARTED.md) · [サンプル操作](SAMPLES.md)
 
-モデル用リポジトリ: [AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)
+SDKとCore MLモデルは別配布です。生成には13個のCore MLパッケージ、tokenizer、configと補助metadataを含むフォルダ一式が必要です。
 
-Privateの準備版はアップロードと、固定commit SHAからの全ファイルの再ダウンロード・サイズ・SHA-256検証を完了しました。正式公開と公開URLからの取得検証はまだ完了していません。SDK、サンプル、変換コードは [Corvelis/irodori-tts-coreml](https://github.com/Corvelis/irodori-tts-coreml) へ置きます。両リポジトリを現在はPrivateに保ち、モデルカードとコードのREADMEへ相互リンクを設定します。モデルカードはMIT/Apache-2.0の部品別ライセンスを保持します。
+## 対応モデル
 
-## 1. Macから認証する
+| 項目 | 内容 |
+|---|---|
+| モデル | Irodori TTS v4.1 Small MF Core ML |
+| SDK / bundleVersion | `0.1.0` |
+| 配布先 | [AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML) |
+| 固定commit | `b95d39710d9e3ac4435983fe89f9acd6c02658e9` |
+| manifestのSHA-256 | `d12a4f0b97453db2e903dbbb55720790de6859bf3a68cc593b49aa054d39a744` |
 
-`hf` CLIを使います。この準備環境ではインストール済みです。現在インストールしているhuggingface_hub 0.36.2のCLIはトークン入力で認証します。
+CLI、SDKの `ModelDownloader`、サンプルの「URLからダウンロード」には次のURLを使います。
 
-1. [Access Tokens](https://huggingface.co/settings/tokens)で、対象モデルリポジトリへ書き込めるトークンを作成します。fine-grainedを選ぶ場合は対象リポジトリを限定します。
-2. ターミナルで以下を実行し、表示された入力欄へトークンを貼り付けます。入力文字は表示されません。トークンをコマンド引数やドキュメント、チャットには含めません。
-3. `Add token as git credential?` は `n` で構いません。この手順はGit経由でアップロードしません。
-
-```sh
-hf auth login
-hf auth whoami
+```text
+https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b95d39710d9e3ac4435983fe89f9acd6c02658e9/manifest.json
 ```
 
-`whoami` で `AILogDev` と表示されることを確認します。対象リポジトリへのアクセスと公開範囲は、アップロード前に認証済みAPIまたはWeb画面で別途確認します。新しいCLIにはブラウザ認証もあります。詳細は[公式CLIガイド](https://huggingface.co/docs/huggingface_hub/guides/cli#hf-auth-login)を参照してください。
+## MacのCLIで取得する
 
-## 2. アップロード対象を確認する
-
-約2.90 GBのモデル配布フォルダ全体を使います。ルートには `manifest.json`、`README.md`、13個の `.mlpackage`、tokenizer、sidecar、ライセンスとprovenanceが並びます。`.mlpackage` 内の階層も保持します。SDKソースZIPはこのリポジトリへ入れません。
+ソースを取得して `swift build -c release` を実行した後、リポジトリのルートで次を実行します。
 
 ```sh
-python3 Scripts/stage_model.py verify /path/to/Irodori-TTS-v4.1-Small-MF-CoreML
+.build/release/irodori download --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b95d39710d9e3ac4435983fe89f9acd6c02658e9/manifest.json' --destination ../Irodori-TTS-v4.1-Small-MF-CoreML
+.build/release/irodori verify --models ../Irodori-TTS-v4.1-Small-MF-CoreML
 ```
 
-現行の配布フォルダは `0.1.0` です。ドキュメントを変更したらmanifestの該当ファイルのサイズとSHA-256も更新し、再検証します。現行版のprovenance/manifestは `release-prepared` です。版番号、公開状態、GitHub URLは全配布物で合わせてください。
+保存先は未作成のフォルダを指定します。取得済みなら `verify` で確認して利用します。中断した取得は、同じURLと保存先で再実行すると検証済みファイルを再利用します。ファイルサイズとSHA-256は取得時に検証されます。
 
-## 3. リポジトリのルートへアップロードする
+## サンプルから取得する
 
-準備段階ではリポジトリをPrivateに保ち、設定画面または認証済みAPIで公開範囲と既存ファイルを確認します。以下のコマンドは公開範囲を変更しません。
+1. サンプルの「モデル」設定を開きます。
+2. 「URLからダウンロード」に上のmanifest URLを貼り付けます。
+3. 「ダウンロードして検証」を押し、取得と検証が完了するまで待ちます。
+4. 「生成して再生」で音声を生成します。
 
-```sh
-hf upload AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML \
-  /path/to/Irodori-TTS-v4.1-Small-MF-CoreML \
-  . --repo-type model --commit-message 'Upload reviewed Core ML distribution draft'
+取得済みなら「フォルダを選ぶ」で取り込みます。iPhoneへMacから渡す場合は、Finderのファイル共有でサンプルへフォルダをコピーし、「ファイル」→「このiPhone内」→「Irodori Core ML」から選択できます。
+
+## SDKから取得する
+
+```swift
+import Foundation
+import IrodoriTTS
+
+func downloadModels(to newDirectory: URL) async throws {
+    let manifest = URL(string:
+        "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b95d39710d9e3ac4435983fe89f9acd6c02658e9/manifest.json"
+    )!
+    try await ModelDownloader().download(manifestURL: manifest, to: newDirectory)
+}
 ```
 
-最後の `.` は、配布フォルダの中身をリポジトリのルートへ配置する指定です。同名のリモートファイルは更新されるので、最初のアップロード前にも既存内容を確認します。`--delete` は使用しません。CLIが大きなファイルを処理します。[公式アップロード手順](https://huggingface.co/docs/huggingface_hub/guides/upload#upload-from-the-cli)
+`newDirectory` はアプリが書き込める新しい保存先です。取得後のフォルダURLを `engine.prepare(modelDirectory:)` へ渡します。
 
-## 4. 公開と導入を確認する
+## フォルダ構成と容量
 
-1. コード用リポジトリは `Corvelis/irodori-tts-coreml`、現行版は `0.1.0`、コード用tagは `v0.1.0` です。モデルカード・版・manifestを合わせています。
-2. Files and versionsでモデル一式とライセンスを確認し、アップロードしたcommit SHAを記録します。
-3. 公開内容の確認後にモデルリポジトリをPublicへ切り替えます。
-4. 次の固定URLから、SDK CLIで未作成の保存先へ取得します。移動する `main` は使用しません。
-
-```sh
-.build/release/irodori download \
-  --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/3db2ed296c75196a34f4f40f05dc9f552f79d115/manifest.json' \
-  --destination /path/to/new-model-folder
-.build/release/irodori verify --models /path/to/new-model-folder
+```text
+Irodori-TTS-v4.1-Small-MF-CoreML/
+  manifest.json
+  coreml-only.json
+  config.json
+  tokenizer/
+  text_encoder.json
+  text_encoder.mlpackage/
+  dit_step_cached_mixed_linear_768.mlpackage/
+  ...
+  LICENSES/
+  NOTICE
+  THIRD_PARTY_NOTICES.md
 ```
 
-取得した一式でモデル準備・音声生成・再生を確認し、コードのreleaseにモデルcommit SHAを記載します。SDK/サンプルのURL取得にはPrivate/gatedリポジトリの認証機能がないため、Privateのままではログインなしのダウンロード確認はできません。
+`.mlpackage` 1つだけでは生成できません。フォルダ一式を保持し、ファイル名・階層を変更したり別版のファイルを混ぜたりしないでください。ZIPを使う場合は先に展開します。
 
-## 準備版のアップロード記録
-
-2026-10-04にPrivateの `0.1.0-draft` をアップロードしました。モデルカードはHugging Face側の検証を通過し、固定commit `8d9a9e193e649ef448f2870a84cf4a729cb51a1e` から配布対象の全63ファイルを新しいキャッシュへダウンロードしてサイズ・SHA-256を検証しました。モデル本体の50ファイルは既存のレビュー済みロックと一致しています。HFが用意する `.gitattributes` を含むリモートのファイル数は64です。
-
-[機械可読の確認記録](../Distribution/HuggingFace/staging-upload.json)にcommitとmanifestのSHA-256を保存しています。認証済みのPrivate取得確認であり、ログインなしでの公開URLからの取得確認は正式公開後に行います。
-
-GitHubリポジトリ作成後に、モデル側のREADME・配布状態・provenance・manifestの4ファイルへコードURLを反映しました。この時点のPrivate準備版commitは `af30c0101ebd6f714160b900d205b395845e43a6` でした。全63ファイルを固定commitから取得し、サイズ・SHA-256を確認しました。変更のないモデル本体は、初回に全ファイルを新しく取得して検証したキャッシュを再利用しています。コードのREADMEとCLIガイドには、この検証済みcommitのmanifest URLを記載しています。
-
-## バージョン0.1.0
-
-コード用tagは `v0.1.0`、モデルの固定commitは `3db2ed296c75196a34f4f40f05dc9f552f79d115` です。配布状態は `release-prepared` で、モデル本体50ファイルと推論コード12ファイルは準備版から変更していません。全63ファイルを固定commitで取得・検証し、認証なしの公開URL確認は一般公開後の別工程として残しています。[0.1.0配布記録](../Distribution/HuggingFace/release-0.1.0.json)にモデルcommit、manifestのSHA-256と検証範囲を保存しています。
+配布フォルダは約2.90 GBです。サンプルへの取り込みはアプリ内コピーを作り、初回準備でCore MLコンパイルキャッシュも作成します。原本の容量に加えて数GBの空き容量を確保してください。モデル取得後の音声生成に通信は不要です。

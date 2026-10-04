@@ -1,4 +1,4 @@
-# Primary versions used during component conversion; clean full-pipeline re-run is pending.
+# Primary dependency versions for the reference conversion scripts.
 # Runtime users do not need these packages.
 torch==2.11.0
 coremltools==9.0

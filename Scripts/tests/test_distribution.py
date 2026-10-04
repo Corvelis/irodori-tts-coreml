@@ -42,7 +42,6 @@ class DistributionTests(unittest.TestCase):
         self.assertFalse((destination / 'secret.env').exists())
         manifest = s.verify(destination)
         self.assertGreater(len(manifest['files']), len(s.RUNTIME_FILES))
-        self.assertEqual(manifest['releaseStatus'], 'release-prepared')
         provenance = json.loads((destination / 'provenance.json').read_text())
         self.assertEqual(manifest['bundleVersion'], 'test')
         self.assertEqual(provenance['bundleVersion'], manifest['bundleVersion'])
@@ -50,8 +49,10 @@ class DistributionTests(unittest.TestCase):
         for name in ['LICENSE_REVIEW.md', 'license-review.json']:
             self.assertIn(name, {row['path'] for row in manifest['files']})
         evidence = json.loads((destination / 'license-review.json').read_text())
-        self.assertTrue(evidence['dacvaeClarification']['facebookOrgMember'])
-        self.assertEqual(evidence['dacvaeClarification']['eventId'], '69458aa9682b3352e8a576e3')
+        self.assertEqual(evidence['dacvaeClarification']['discussionUrl'],
+                         'https://huggingface.co/facebook/dacvae-watermarked/discussions/1')
+        self.assertEqual(evidence['dacvaeClarification']['appliesTo'],
+                         'model weights, in response to an explicit weights-license question')
         (destination / 'config.json').write_bytes(b'modified')
         with self.assertRaises(ValueError): s.verify(destination)
 

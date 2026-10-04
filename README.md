@@ -1,134 +1,93 @@
 # Irodori TTS Core ML
 
-Irodori TTS v4.1 Small MF を iPhone / Apple Silicon Mac で動かす、コミュニティ版の共通ランタイムとサンプルです。Local AI で使用している推論エンジンから切り出しました。
+Irodori TTS v4.1 Small MFをiPhoneとApple Silicon Macで動かすSwift SDKです。日本語の音声合成、参照音声による声の指定、テキストによる話し方の指示に対応します。
 
-**Version `0.1.0`**。Swift SDK、iPhone/Macサンプル、CLI、変換の参考コードを配布します。ソースは [GitHub](https://github.com/Corvelis/irodori-tts-coreml)、モデルは [Hugging Face](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML) に分けています。[v0.1.0 Release](https://github.com/Corvelis/irodori-tts-coreml/releases/tag/v0.1.0) と [利用手順](docs/GETTING_STARTED.md)を参照してください。リリース作成時点では両リポジトリをPrivateに保ち、一般公開とログインなしの取得確認は別の工程として残しています。[最新の公開・検証状態](https://github.com/Corvelis/irodori-tts-coreml/blob/main/docs/RELEASE.md)に記録します。
+[English](docs/README.en.md) · [v0.1.0 Release](https://github.com/Corvelis/irodori-tts-coreml/releases/tag/v0.1.0) · [Core MLモデル](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)
 
-コードはApache-2.0で、モデルと派生部分は[部品ごとの条件](THIRD_PARTY_NOTICES.md)を維持します。DACVAE元重みのApache-2.0に関するMetaの回答は[ライセンス確認記録](docs/LICENSE_REVIEW.md)に保存しています。初版のiPhone/Mac操作・試聴の確認範囲は[検証記録](docs/VALIDATION.md)に記載しています。
+## 配布内容
 
-## ドキュメント
-
-| やりたいこと | ガイド |
+| 配布物 | 内容 |
 |---|---|
-| 自分のアプリへSDKを組み込む | [Xcodeへの導入と最初のWAV生成](docs/GETTING_STARTED.md) |
-| iPhone / Macのサンプルを動かす | [署名・モデル取り込み・操作手順](docs/SAMPLES.md) |
-| 声を録音・登録・削除する | [音声登録、0 ms表示、保存場所](docs/VOICE_REGISTRATION.md) |
-| テキストで声・話し方を指定する | [Voice Designの引数と制約](docs/API.md#声話し方の指示voice-design) |
-| APIの引数・返り値を調べる | [Swift APIリファレンス](docs/API.md) |
-| 生成しながら再生・停止する | [ストリーミングとLLMへの接続](docs/STREAMING.md) |
-| Macで測定する | [CLIとベンチマーク](docs/CLI.md) |
-| エラー・読み・速度を切り分ける | [トラブル対処とFAQ](docs/TROUBLESHOOTING.md) |
-| モデルを再変換・配布する | [変換](docs/CONVERSION.md) / [Hugging Faceへのアップロード](docs/HUGGINGFACE.md) / [公開準備](docs/RELEASE.md) / [検証記録](docs/VALIDATION.md) |
-| Read in English | [English getting started](docs/README.en.md) |
+| Swift SDK | Xcode / Swift Package Managerから追加する `IrodoriTTS` ライブラリ |
+| iPhone / Macサンプル | モデル取得、録音・音声取り込み、音声合成、再生、WAV保存 |
+| Mac CLI | モデル取得・検証、WAV生成、RTF測定 |
+| Core MLモデル | [Hugging Face](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)で別配布。13パッケージとtokenizer等、約2.90 GB |
+| 変換コード | 再変換・数値比較の参考実装 |
 
-## 入っているもの
+音声合成にはAppleのフレームワークを使用します。実行にPythonやONNX Runtimeは不要で、モデル取得後はオフラインで生成できます。モデルはSDKに内蔵していません。
 
-- `Sources/IrodoriTTS`：Swift API、文章整形、参照音声、モデル検証・取得。
-- `Sources/IrodoriNative`：検証済み Objective-C++ / Core ML 推論エンジン。
-- `Examples/IrodoriSamples.xcodeproj`：iPhone / Mac 共通の SwiftUI サンプル。
-- `Sources/IrodoriCLI`：Mac用WAV生成・検証・ベンチマークCLI。
-- `Conversion`：固定revisionからの取得と、変換・部品検証スクリプト。
-- `Distribution`：Hugging Faceモデルカード、モデル全ファイルのロック、出典情報。
+## 要件
 
-実行時に Python / PyTorch / ONNX Runtime は不要です。音声は48 kHz・モノラル・16 bit PCMです。約2.90 GBのモデルはコードと分けて置きます。標準DiT版は含みません。
+- 開発環境: Apple Silicon Mac、Xcode、Command Line Tools。
+- アプリのDeployment Target: iOS 17以降 / macOS 14以降。Swift tools 5.9以降。
+- 保存容量: モデル原本約2.90 GBに加え、アプリ内コピーとCore MLコンパイルキャッシュを保存する空き容量。
+- 出力音声: 48 kHz、モノラル、PCM16 WAV。
 
-## Macで動かす
+初回はCore MLのコンパイルとロードに時間がかかります。速度・使用メモリは端末、文章、参照音声、同時に動く処理によって変わります。
 
-Apple Silicon Mac、XcodeとCommand Line Toolsを使用してください。ビルド対象はmacOS 14以降 / iOS 17以降ですが、全OS版・全端末での動作を確認した意味ではありません。[確認範囲](docs/VALIDATION.md)に記載しています。
+## Macで音声を生成する
 
-ソースは [GitHub](https://github.com/Corvelis/irodori-tts-coreml) から取得します。リポジトリがPrivateの場合はGitHubの認証が必要です。
+モデルの取得先は新しいフォルダを指定してください。
 
 ```sh
 git clone --branch v0.1.0 --depth 1 https://github.com/Corvelis/irodori-tts-coreml.git
 cd irodori-tts-coreml
-```
-
-モデル配布フォルダは `manifest.json`、`coreml-only.json`、13個の `.mlpackage` が直接並ぶフォルダです。準備済みモデルを隣に置いた場合:
-
-```sh
 swift build -c release
+.build/release/irodori download --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b95d39710d9e3ac4435983fe89f9acd6c02658e9/manifest.json' --destination ../Irodori-TTS-v4.1-Small-MF-CoreML
 .build/release/irodori verify --models ../Irodori-TTS-v4.1-Small-MF-CoreML
-.build/release/irodori synthesize \
-  --models ../Irodori-TTS-v4.1-Small-MF-CoreML \
-  --text 'こんにちは。今日はいい天気ですね。' \
-  --reference /path/to/your-authorized-voice.wav \
-  --output /tmp/irodori-output.wav --report /tmp/irodori-report.json
-afplay /tmp/irodori-output.wav
+.build/release/irodori synthesize --models ../Irodori-TTS-v4.1-Small-MF-CoreML --text 'こんにちは。今日はいい天気ですね。' --output ./irodori-output.wav
+afplay ./irodori-output.wav
 ```
 
-`--reference` を省くと参照音声なしで生成します。モデル・参照の準備時間とRTFは別に報告します。初回はCore MLのコンパイルと特殊化に時間がかかります。表示する「最初のPCM」は生成コールバックまでの時間で、スピーカーから音が出るまでの実測ではありません。
+参照音声を使う場合は `--reference ./reference.wav` を追加します。自分の声など使用許可のある音声を用意してください。`--caption '落ち着いた、やさしい話し方。'` で話し方を指定できます。
 
-モデルの配布先は [AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)です。アップロード・公開後は、HF commit SHAに固定した `manifest.json` のHTTPS URLで取得できます。以下のURLはバージョン0.1.0のモデルcommitに固定しています。SDKのURL取得には認証機能がないため、リポジトリがPrivateの場合はMac等で認証して取得し、フォルダから取り込みます。
+## iPhone / Macサンプルを使う
 
-```sh
-.build/release/irodori download \
-  --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/3db2ed296c75196a34f4f40f05dc9f552f79d115/manifest.json' \
-  --destination /path/to/new-model-folder
-```
+1. `Examples/IrodoriSamples.xcodeproj` をXcodeで開きます。
+2. Macは `IrodoriMac`、iPhoneは `IrodoriiOS` schemeを選びます。自分のSigning Teamと一意のBundle Identifierを設定して実行します。
+3. 「モデル」の「URLからダウンロード」に[モデル取得ガイドのmanifest URL](docs/HUGGINGFACE.md#対応モデル)を入力して取得します。取得済みなら「フォルダを選ぶ」でモデル一式の親フォルダを取り込みます。
+4. まず「参照なし」で「生成して再生」を押します。声を指定する場合は、録音または音声ファイルの取り込みを行います。
 
-各ファイルをディスクへ保存し、サイズとSHA-256を検証してから使用可能にします。再試行時は完了済みファイルを再利用します。ダウンロード途中の1ファイルは取り直します。
+サンプルは入力全体を一度に合成し、完成したWAVを再生します。再生・一時停止・再開・停止・WAV保存に対応します。上限を超えた場合は文章を短くしてください。[サンプルの使い方](docs/SAMPLES.md)に詳しい操作があります。
 
-## iPhone / Macのサンプル
+## 自分のアプリへSDKを追加する
 
-```sh
-open Examples/IrodoriSamples.xcodeproj
-```
-
-Macは `IrodoriMac`、iPhoneは `IrodoriiOS` schemeを選択します。iPhone実機では自分のSigning Teamと一意のBundle Identifierを設定してください。
-
-1. モデルフォルダをFiles経由で取り込むか、固定revisionのmanifest URLから取得。
-2. 自分の声・許可のある声を録音または選択。参照なしでも実行できます。
-3. 文章を入力し「生成して再生」。入力全体を一度に合成し、完成WAVを再生します。RTF・生成時間・音声長を表示し、一時停止・再開・WAV保存ができます。
-4. 「登録音声とキャッシュを削除」で、このサンプルが保持する登録音声と特徴キャッシュを削除。
-
-サンプルは句読点による分割・先行再生を行いません。SDKの文分割・PCM通知は任意の組み込み用として残ります。Macは2列、iPhoneは縦配置の画面です。
-
-取り込み元ファイルは保持し、アプリ内にコピーします。モデル原本に加え、アプリ内コピーとCore MLコンパイルキャッシュの空き容量が必要です。少なくとも複数GBの余裕を確保してください。署名済みアプリ、TestFlight、App Store配布は今回の対象に含めていません。
-
-## 自分のアプリから呼ぶ
-
-XcodeのPackage DependenciesにGitHub URLを追加し、Exact Version `0.1.0` を選んで `IrodoriTTS` productをリンクします。ソースZIPやcloneしたフォルダはローカルSwift Packageとしても追加できます。
+Xcodeの **File → Add Package Dependencies…** に `https://github.com/Corvelis/irodori-tts-coreml.git` を入力し、Exact Version **0.1.0** を選びます。アプリtargetへ **IrodoriTTS** productを追加してください。
 
 ```swift
+import Foundation
 import IrodoriTTS
 
-let engine = IrodoriEngine() // 会話ごとに保持し、発話のたびに作り直さない
-try await engine.prepare(modelDirectory: modelURL)
-try await engine.registerReference(referenceURL) // URL?。nilなら参照なし
-let result = try await engine.synthesize("**様々**な方法を試します。") { chunk in
-    // 推論キューから呼ばれる48 kHz mono PCM16。UI更新はMainActorへ渡す。
-    // 最小の再生例は Examples/Shared/PCMPlayer.swift を参照。
+func makeWAV(engine: IrodoriEngine, models: URL, output: URL) async throws {
+    try await engine.prepare(modelDirectory: models)
+    try await engine.registerReference(nil)
+    let audio = try await engine.synthesize(
+        "こんにちは。今日はいい天気ですね。",
+        caption: "落ち着いた、やさしい話し方。",
+        splitSentences: false
+    )
+    try audio.writeWAV(to: output)
+    print("RTF:", audio.rtf)
 }
-try result.writeWAV(to: outputURL)
-print(result.rtf, result.firstPCMMilliseconds)
-await engine.release()
 ```
 
-Xcodeへの追加からは [SDK導入](docs/GETTING_STARTED.md)、録音と削除は [音声登録](docs/VOICE_REGISTRATION.md)、再生コードは [ストリーミング](docs/STREAMING.md) を参照してください。公開APIは [APIリファレンス](docs/API.md)、再変換は [変換手順](docs/CONVERSION.md) にあります。
+`models` はモデル一式の親フォルダ、`output` はアプリが書き込めるWAVの保存先です。出力先の親フォルダを作成してから呼び出します。`IrodoriEngine()` を保持して生成ごとに再利用し、使い終わったら `await engine.release()` を呼びます。音声再生はアプリ側で実装します。
 
-## 検証
+## ドキュメント
 
-```sh
-swift test -c release
-python3 -m unittest discover -s Scripts/tests
-.build/release/irodori benchmark \
-  --models ../Irodori-TTS-v4.1-Small-MF-CoreML \
-  --cases Benchmarks/cases.json --reference /path/to/your-authorized-voice.wav \
-  --repeat 3 --report /tmp/irodori-benchmark.json --output-directory /tmp/irodori-benchmark-audio \
-  --irodori-fixed-seed --irodori-seed 11 --irodori-diagnostics
-```
+| 目的 | ガイド |
+|---|---|
+| モデルを取得する | [モデル取得と配置](docs/HUGGINGFACE.md) |
+| SDKをXcodeへ追加する | [導入ガイド](docs/GETTING_STARTED.md) / [API](docs/API.md) |
+| 録音・再生する | [サンプル操作](docs/SAMPLES.md) / [音声登録と削除](docs/VOICE_REGISTRATION.md) |
+| チャンク通知・停止を実装する | [再生と停止](docs/STREAMING.md) |
+| CLIで生成・速度を測る | [CLI](docs/CLI.md) / [性能の測定と制約](docs/VALIDATION.md) |
+| エラーを解決する | [トラブル対処](docs/TROUBLESHOOTING.md) |
+| モデルを再変換する | [変換の参考実装](docs/CONVERSION.md) |
+| 配布物と利用条件を確認する | [配布内容と互換性](docs/RELEASE.md) / [ライセンス](docs/LICENSE_REVIEW.md) |
 
-モデルの精度設定、ステップ数、デコーダ処理を保った切り出しです。元PyTorchモデルとの完全一致や、任意の入力での音質・速度を保証するものではありません。ベンチマークはTTS単体で、ASR/LLMは含みません。生成音声・参照音声はGitに追加しないでください。
+## ライセンス
 
-## English overview
+SDK・サンプルの新規部分はApache-2.0です。モデルと上流由来部分にはMIT / Apache-2.0の部品別条件が適用されます。[LICENSE](LICENSE)、[NOTICE](NOTICE)、[部品別ライセンス](THIRD_PARTY_NOTICES.md)を参照してください。コミュニティによる変換・実装で、AratakoやAppleの公式提供ではありません。
 
-A community Core ML runtime for Irodori TTS v4.1 Small MF, with a shared Swift
-package, iOS/macOS SwiftUI samples, a macOS WAV CLI, and conversion tooling.
-The runtime uses Apple frameworks only. Model weights are a separate ~2.90 GB
-bundle of 13 ML Programs. Clone/open the Xcode project or build with SwiftPM;
-model preparation is required before synthesis. The code release is v0.1.0. Meta has explicitly clarified that DACVAE model weights are Apache-2.0;
-see docs/LICENSE_REVIEW.md. Preserve the component licenses and notices.
-The initial iPhone/Mac operation and trial-listening checks are complete. Release artifacts are prepared while the repositories remain private; public availability and unauthenticated download validation are tracked in docs/RELEASE.md. No voice recordings or model weights are in this code
-repository, and the code license does not override upstream model terms.
-
-For the complete English quick start, see [docs/README.en.md](docs/README.en.md).
+使用許可のある声を使い、[上流モデルの使用条件](https://huggingface.co/Aratako/Irodori-TTS-v4.1-Small-MF)に従ってください。合成音声を本人の実際の発話として偽らないでください。本モデルによる透かし付与はありません。

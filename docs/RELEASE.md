@@ -1,43 +1,37 @@
-# 公開準備の状態
+# 配布内容と互換性
 
-バージョン: `0.1.0`。コード用tag: `v0.1.0`。ソースは [Corvelis/irodori-tts-coreml](https://github.com/Corvelis/irodori-tts-coreml)、モデルは [AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)へ分けています。版番号、ドキュメント、モデルmanifest/provenanceを揃え、ソースZIP・SHA-256・固定モデルURLをGitHub Releaseへ配置します。作成時点では両リポジトリをPrivateに保ち、一般公開と公開後の認証なし取得確認は別の工程です。アップロード手順はコードリポジトリの `docs/HUGGINGFACE.md`、利用手順は `docs/GETTING_STARTED.md` に記載しています。
+Version **0.1.0** · [GitHub Release](https://github.com/Corvelis/irodori-tts-coreml/releases/tag/v0.1.0) · [モデル取得ガイド](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.1.0/docs/HUGGINGFACE.md)
 
-## できているもの
+## ソース配布
 
-独立したSwift Package、iPhone/Mac SwiftUIサンプル、Mac CLI、固定revisionの変換入力ロック、変換順序のスクリプト、全モデルファイルのSHA-256、HFモデルカード、部品別ライセンスを用意しています。サンプルは全文合成後のWAV再生、iPhoneの縦配置/Macの2列UIに更新済みです。実施した検証と残りの検証はコードリポジトリの `docs/VALIDATION.md` に記載します。
+`irodori-tts-coreml-source-0.1.0.zip` にSwift SDK、iPhone / Macサンプル、Mac CLI、変換の参考コード、ドキュメントとライセンスを含みます。モデルは別途取得してください。
 
-## 公開前の確認事項
+ZIPを展開するとルートに `Package.swift` と `Examples/IrodoriSamples.xcodeproj` があります。SDKはXcodeのPackage DependenciesからExact Version `0.1.0`を指定して追加することもできます。
 
-1. **配布ライセンスの確認は完了。** [Metaの公式回答](https://huggingface.co/facebook/dacvae-watermarked/discussions/1)でDACVAE元重みもApache-2.0と確認しました。READMEにはSAM表記が残りますが、明示的な重みの回答を根拠として扱います。[ライセンス確認記録](LICENSE_REVIEW.md)を同梱し、MIT/Apache-2.0、帰属、変換の変更表示、上流の使用条件を保持します。実機・公開準備は別に確認します。
-2. **公開先と版の確定。** モデル用リポジトリは `AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML` に確定しました。コード用リポジトリは `Corvelis/irodori-tts-coreml` に確定し、モデルカードに実際のコードURLを記載しました。コードとモデルの版番号は `0.1.0`、コード用tagは `v0.1.0` に確定しました。コードの取得案内とGitHub ReleaseにHFのcommit SHAを固定します。モデルの正式公開と公開URLからの取得検証はまだ完了していません。
-3. **品質確認の最終判定。** 同一bridgeとSDKの追加比較は短文/長文の全24組でPCM一致し、再測定でも一致しました。今回の試験音声はユーザーが試聴し「大丈夫そう」と回答しています。以前の別参照を使ったC++比較には短文2例の数値差が残っており、完全な品質同等性を表示しません。Macの保存音声で全文ASRに出なかった挨拶は、先頭区間のASRで認識し、欠落としないよう記録を補正しています。詳細は `docs/VALIDATION.md` に記録しています。
-4. **初版の確認範囲を確定。** iPhone 17 ProでFilesのモデル/音声選択・取り込み、録音の基本操作/登録/準備、指示付き反復生成と再生/一時停止/再開/停止、再起動/参照削除、FilesへのWAV保存と生成元とのbyte一致を確認しました。既知の合成音声のiPhoneマイク取り込みは再試験で成功しました。Macも署名済みアプリのBlackHole入力から録音/登録/生成/再生とWAV保存の全byte一致を確認済みです。Macの内蔵マイクからの録音/登録/生成/再生と登録音声/キャッシュ削除も確認済みです。今回の試験音声の聴感はユーザー確認済みです。公開URLからの取得は残っています。AirDrop/メール等は初版の実機検証済み範囲に含めません。現行Local AIの会話実測とSDKサンプルのTTS単体実測を分けて `docs/VALIDATION.md` に記録しています。
-5. **変換ツールの表示範囲。** 個別変換器は元のモデル生成時に使用していますが、新しい仮想環境での取得から全再変換までの一括手順は未検証です。初版は「全工程未検証の参考実装」と明記し、配布済みモデルの使用を案内します。全再変換を検証済みとして提供する場合は、別途最初から最後までの再実行が必要です。
+ZIPの照合にはReleaseにある `.zip.sha256` を同じフォルダへ保存し、次を実行します。
 
-## 公開時の構成
+```sh
+shasum -a 256 -c irodori-tts-coreml-source-0.1.0.zip.sha256
+```
 
-GitHubにはソース、サンプル、変換器、docs、LICENSE/NOTICEだけを入れます。
-モデル、録音、生成音声、特徴キャッシュ、コンパイル結果、Apple SDK本体、秘密情報を含めません。
-モデル一式はHugging Face側に置き、`manifest.json` とファイルの整合を維持します。
-モデルバージョンはコードと独立に管理してください。
+## モデル配布
 
-`Scripts/stage_model.py` は許可したファイルだけをコピーし、モデルカードとライセンスを加えます。
-モデルの演算グラフや重みは変更しません。既存の出力先は上書きしません。
-現在の出力は `release-prepared` です。初版の配布物とライセンス・版番号を整理した状態です。対象端末の操作・試聴確認の範囲はVALIDATION.mdに記録しています。一般公開後の認証なし取得や、新規環境での全再変換を確認済みという意味ではありません。モデルカード、確認記録、provenance、manifestを一緒に更新し、全ファイルのサイズとSHA-256を再検証します。モデルの演算グラフや重みは変更しません。
+[Hugging Faceのモデル一式](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)は、13個のCore MLパッケージ、tokenizer、config、補助metadata、manifestと部品別ライセンスを含みます。約2.90 GB、bundleVersion `0.1.0`です。
 
-ユーザーがモデル用HFリポジトリを作成し、URLを配布ドキュメントとprovenanceへ反映しました。登録済みの認証は `AILogDev` の対象リポジトリへの書き込み権限を確認済みです。今回の作業ではPrivateのモデル準備版のアップロードと整合性確認を完了しました。記録はコード側の `Distribution/HuggingFace/staging-upload.json` に保存しています。GitHubリポジトリはユーザーが作成しました。SDK・サンプル・変換コード・文書はPrivateのリポジトリへ配置済みです。第三者への問い合わせとPublicへの切り替えは実施していません。
+SDK `0.1.0`には対応するbundleVersion `0.1.0`の一式を使ってください。取得URLと固定commitは[モデル取得ガイド](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.1.0/docs/HUGGINGFACE.md)にあります。manifestの各ファイルサイズ・SHA-256はCLIの `verify` またはSDKの `ModelBundle.validate(at:verifyHashes: true)` で照合できます。
 
-## ドキュメントと配布物を更新するとき
+## 実行要件と制約
 
-入口はコードリポジトリのREADME.mdです。SDK導入、サンプル操作、音声登録、API、ストリーミング、CLI、トラブル対処、英語の導入をdocsに整理しています。手書きのガイドで、自動生成DocCや全ページの英訳はまだありません。
+iOS 17以降 / macOS 14以降が対象です。開発にはApple Silicon MacとXcodeを使用します。実行時はAppleフレームワークを使用し、出力は48 kHz mono PCM16です。参照音声と日本語のVoice Design指示は任意です。
 
-公開前は、初めて利用する人が導入ガイドだけでモデル取得から最初の再生まで進めるかを、対象端末で確認してください。UIのボタン名、実際の公開URL、コードtagとHF commit SHA、実測条件を最終版へ合わせます。
+本文はBOSを含め256トークン、潜在系列は768フレームまでです。GUIサンプルは全文を一度に合成し、完成したWAVを再生します。上限を超える文章は短くしてください。SDKでは文分割とPCMチャンク通知を利用できます。
 
-モデルに同梱するREADME・本書・検証記録を更新した場合は、モデルmanifestの該当ファイルのサイズとSHA-256も更新して検証します。コードのZIPは Scripts/export_source.py で未作成の出力先へ作り直し、音声・モデル・キャッシュが混ざっていないことを確認します。元の準備時のZIPは自動では更新されません。
+速度と使用メモリは実行環境・文章・参照音声によって変わります。初回準備と反復生成は分けて測定してください。[性能の測定と制約](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.1.0/docs/VALIDATION.md)を参照してください。保存容量はモデル原本に加え、アプリ内コピーとコンパイルキャッシュ分も必要です。
 
+変換コードは参考実装です。一般利用には配布済みモデルを使い、独自に再変換したモデルは生成音声と数値誤差を検証してください。
 
-## 初版の完了判定
+## 利用条件
 
-**版番号と配布物を揃えた0.1.0のリリース成果物です。一般公開と公開後の導入確認は未実施です。** ローカルのビルド・モデル検証、iPhone操作の主要経路、Macの内蔵マイク/BlackHole録音・登録・生成/再生・削除/WAV保存、SDKと同一native bridgeの反復PCM比較は確認済みです。今回の試験音声はユーザーの試聴確認も完了しました。GitHubとモデル用HFリポジトリは確定し、版番号は0.1.0に確定しました。固定モデルcommitはコード側の `Distribution/HuggingFace/release-0.1.0.json` とGitHub Releaseに記録します。残る公開工程は、Publicへの切り替えと公開URLからの認証なし取得検証です。iPhone試験データを整理し、確認用音声を端末内だけに残して通常サンプルへ復帰済みです。公開後には、不変のHF commit SHAから新しい保存先へ取得し、ハッシュ検証→準備→生成→再生を確認して公開版の導入検証を完了します。
+SDK・サンプルの新規部分はApache-2.0です。モデルと上流由来部分にはMIT / Apache-2.0の部品別条件が適用されます。同梱の `LICENSES/`、`NOTICE`、`THIRD_PARTY_NOTICES.md` を保持してください。
 
-ソースZIPを別フォルダへ展開してSwift PackageをReleaseビルド/テストし（8成功・3skip・失敗0）、iPhone/MacサンプルもReleaseビルドしました。MacのWAV保存修正後も通常のXcodeプロジェクトで署名付きiPhone Releaseをビルドしています。最後のZIPには同じビルド済みソースを収録し、別途文書・manifest・梱包の整合を確認します。
+使用許可のある声を使い、[上流モデルの使用条件](https://huggingface.co/Aratako/Irodori-TTS-v4.1-Small-MF)に従ってください。本モデルによる透かし付与はありません。

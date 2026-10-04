@@ -2,13 +2,12 @@
 
 [README](../README.md) · [音声登録の詳細](VOICE_REGISTRATION.md) · [困ったとき](TROUBLESHOOTING.md)
 
-対象: `0.1.0` の最新SwiftUIサンプル。操作ガイド・iPhone操作確認の更新: 2026-10-04。
+対象: `0.1.0` のiPhone / Mac共通SwiftUIサンプル。
 
 同じSwiftUI画面をiPhoneとMacで使います。文章入力を中心に、モデル・声の設定と生成結果を分けた画面です。Macは広いウィンドウで2列、iPhoneは縦に並びます。ライト・ダークモードに対応します。
 
 **このサンプルは句読点で文章を分割せず、入力全体を一度に合成し、完成WAVを再生します。** SDKの句読点分割とPCMチャンク通知は、独自アプリへ組み込むための任意機能として残っています。
 
-iPhone 17 Proでは、Filesでのモデル/音声選択から取り込み、録音の基本操作と登録・準備、反復生成、再生・一時停止・再開・停止、登録音声/キャッシュ削除、FilesへのWAV保存まで実機で確認しました。保存WAVは生成元とファイル全byteが一致しました。既知の試験音声のマイク取り込みは再試験で確認済みです。今回の試験音声についてはユーザーの試聴確認も完了しています。全文一回の合成と完成WAV/SDKのPCM一致は以前の実機ホスト検査でも確認しています。MacはGUIからモデル選択・取り込み、内蔵マイク/BlackHole入力からの録音/登録、全文生成・再生、登録音声/キャッシュ削除、WAV保存と全byte一致を確認しています。試験後、OS入力は元のBlackHoleへ戻しました。[確認範囲](VALIDATION.md)を参照してください。
 
 ## 起動する
 
@@ -23,7 +22,7 @@ open Examples/IrodoriSamples.xcodeproj
 | Apple Silicon Mac | `IrodoriMac` | My Mac |
 | iPhone実機 | `IrodoriiOS` | 接続したiPhone |
 
-対象targetの **Signing & Capabilities** で自分のTeamを選び、Bundle Identifierを自分の一意な値に変更します。iPhoneを開発用に接続し、Xcodeが求める設定を完了してRunします。詳細はAppleの[実機での実行手順](https://developer.apple.com/documentation/xcode/running-your-app-on-simulated-or-physical-devices)にあります。Simulatorでの音質・速度確認はまだ行っていません。
+対象targetの **Signing & Capabilities** で自分のTeamを選び、Bundle Identifierを自分の一意な値に変更します。iPhoneを開発用に接続し、Xcodeが求める設定を完了してRunします。詳細はAppleの[実機での実行手順](https://developer.apple.com/documentation/xcode/running-your-app-on-simulated-or-physical-devices)にあります。速度や音声出力の確認には実機を使用してください。
 
 速度比較では **Product → Scheme → Edit Scheme… → Run → Build Configuration** をReleaseにします。同じ端末、モデル、参照音声、文章、電源・熱状態で測定してください。
 
@@ -48,7 +47,7 @@ iPhoneでは画面を縦にスクロールして設定欄へ進みます。Mac�
 2. 「フォルダを選ぶ」（選択後は「モデルを変更」）で `manifest.json` と13個の `.mlpackage` が並ぶ親フォルダを選びます。単体の `.mlpackage` やZIPを選ばないでください。
 3. コピーとハッシュ検証が終わるまで待ちます。外部の元フォルダは残り、アプリ内にコピーされます。
 
-モデルは [Hugging Face](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)、SDK・サンプルは [GitHub](https://github.com/Corvelis/irodori-tts-coreml) の `v0.1.0` タグから取得します。「URLからダウンロード」には[CLIガイドの固定manifest URL](CLI.md#モデル取得)を指定します。サンプルには認証トークンの入力機能がないため、モデルリポジトリがPrivateやアクセス承認制の場合は、Mac等で認証して取得したフォルダを取り込んでください。一般公開後の認証なし取得確認は[最新の公開・検証状態](https://github.com/Corvelis/irodori-tts-coreml/blob/main/docs/RELEASE.md)に記録します。
+モデルは [Hugging Face](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)、SDK・サンプルは [GitHub](https://github.com/Corvelis/irodori-tts-coreml) の `v0.1.0` タグから取得します。直接取得する場合は「URLからダウンロード」に[モデル取得ガイドのmanifest URL](HUGGINGFACE.md#対応モデル)を入力し、「ダウンロードして検証」を押します。
 
 原本約2.90 GBに加え、アプリ内コピーとコンパイルキャッシュが必要です。選び直した過去のモデルコピーも残るため、容量に余裕を持たせてください。現在の画面にはモデルの個別削除機能はありません。
 

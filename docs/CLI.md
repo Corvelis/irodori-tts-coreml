@@ -1,8 +1,8 @@
 # Mac CLIと測定方法
 
-[README](../README.md) · [検証記録](VALIDATION.md) · [トラブル対処](TROUBLESHOOTING.md)
+[README](../README.md) · [性能の測定と制約](VALIDATION.md) · [トラブル対処](TROUBLESHOOTING.md)
 
-リポジトリのルートで実行します。`/path/to/...` は実ファイルに置き換えてください。CLIはWAVを生成し、再生はafplay等で行います。
+リポジトリのルートで実行します。`./reference.wav` は自分で用意した使用許可のある音声ファイルです。参照なしで試す場合は `--reference` を省きます。モデル取得は次の「モデル取得」を参照してください。CLIはWAVを生成し、再生はafplay等で行います。
 
 ```sh
 swift build -c release
@@ -10,10 +10,10 @@ swift build -c release
 .build/release/irodori verify --models ../Irodori-TTS-v4.1-Small-MF-CoreML
 .build/release/irodori synthesize \
   --models ../Irodori-TTS-v4.1-Small-MF-CoreML \
-  --reference /path/to/your-authorized-voice.wav \
+  --reference ./reference.wav \
   --text 'こんにちは。今日はいい天気ですね。' \
-  --output /tmp/irodori-output.wav --report /tmp/irodori-report.json
-afplay /tmp/irodori-output.wav
+  --output ./irodori-output.wav --report ./irodori-report.json
+afplay ./irodori-output.wav
 ```
 
 `--caption '落ち着いた、やさしい話し方。'` で声・話し方を指定できます。captionは本文として読ませず、独立した条件としてモデルへ渡します。日本語の短い説明を使ってください。参照ありなら、その声に合う感情や話し方を指定します。省略または空文字で無効になり、同じengineでは指示の特徴を再利用します。詳細は[Voice Design](API.md#声話し方の指示voice-design)を参照してください。
@@ -22,12 +22,12 @@ afplay /tmp/irodori-output.wav
 
 ## モデル取得
 
-配布先は [AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)です。以下のURLはバージョン0.1.0のモデルcommitに固定しています。SDKのURL取得には認証機能がないため、モデルリポジトリがPrivateの場合はMac等で認証して取得したフォルダを使います。一般公開後の取得確認は[最新の公開・検証状態](https://github.com/Corvelis/irodori-tts-coreml/blob/main/docs/RELEASE.md)を参照してください。
+配布先は [AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)です。次のURLはSDK `0.1.0` に対応するモデルcommitへ固定されています。
 
 ```sh
 .build/release/irodori download \
-  --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/3db2ed296c75196a34f4f40f05dc9f552f79d115/manifest.json' \
-  --destination /path/to/new-model-folder
+  --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b95d39710d9e3ac4435983fe89f9acd6c02658e9/manifest.json' \
+  --destination ../Irodori-TTS-v4.1-Small-MF-CoreML
 ```
 
 出力先は未作成のフォルダを指定します。失敗後は同じURLと出力先で再試行すると検証済みファイルを再利用します。取得済みフォルダはdownloadせず、verifyしてからmodelsに指定します。
@@ -38,9 +38,9 @@ afplay /tmp/irodori-output.wav
 .build/release/irodori benchmark \
   --models ../Irodori-TTS-v4.1-Small-MF-CoreML \
   --cases Benchmarks/cases.json \
-  --reference /path/to/your-authorized-voice.wav \
-  --repeat 3 --report /tmp/irodori-benchmark.json \
-  --output-directory /tmp/irodori-benchmark-audio \
+  --reference ./reference.wav \
+  --repeat 3 --report ./irodori-benchmark.json \
+  --output-directory ./irodori-benchmark-audio \
   --irodori-fixed-seed --irodori-seed 11 --irodori-diagnostics
 ```
 
@@ -64,9 +64,9 @@ afplay /tmp/irodori-output.wav
 ```sh
 swift test -c release
 python3 -m unittest discover -s Scripts/tests
-IRODORI_TEST_MODELS='/path/to/model-bundle' \
-IRODORI_TEST_REFERENCE='/path/to/your-authorized-voice.wav' \
+IRODORI_TEST_MODELS='../Irodori-TTS-v4.1-Small-MF-CoreML' \
+IRODORI_TEST_REFERENCE='./reference.wav' \
   swift test -c release --filter EngineIntegrationTests
 ```
 
-通常のSwiftテストはモデルも参照音声もダウンロードせず、上記環境変数のない実モデルテストをskipします。skipを実モデル検証成功と扱わないでください。新しい端末での機能・音質確認は[検証記録](VALIDATION.md)の残項目に沿って実施します。
+通常のSwiftテストはモデルも参照音声もダウンロードせず、上記環境変数のない実モデルテストをskipします。skipを実モデル検証成功と扱わないでください。機能・音質・速度の比較条件は[性能の測定と制約](VALIDATION.md)を参照してください。

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Japanese speech formatting ported from Local AI. Formatting never rewrites kanji readings.
+/// Prepares Japanese text for speech without rewriting kanji readings.
 public enum SpeechText {
     private static func replace(_ text: String, _ pattern: String, _ replacement: String = " ") -> String {
         text.replacingOccurrences(of: pattern, with: replacement, options: .regularExpression)

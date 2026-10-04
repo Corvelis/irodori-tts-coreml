@@ -1,20 +1,13 @@
 {
   "format": "irodori-license-review-v1",
-  "checkedAt": "2026-10-01T23:47:27.443247+00:00",
-  "scope": "Existing pinned Irodori MF / ModernBERT / Japanese DACVAE Core ML components, source runtime, samples and conversion scripts",
-  "conclusion": "component-licenses-reviewed; preserve MIT, Apache-2.0, attribution and model-card usage conditions",
   "dacvaeClarification": {
     "discussionUrl": "https://huggingface.co/facebook/dacvae-watermarked/discussions/1",
     "author": "lematt1991",
     "name": "Matt Le",
-    "facebookOrgMember": true,
-    "eventId": "69458aa9682b3352e8a576e3",
-    "publishedAt": "2025-12-19T17:26:01.000Z",
     "statement": "Yes, also apache-2.0. Updated the model card",
     "appliesTo": "model weights, in response to an explicit weights-license question",
     "baseWeightsRevision": "8680102d141858a21bd533543966a2eb2e569f92",
-    "readmeSamSentenceStillPresent": true,
-    "readmeCorrectionPr": "https://huggingface.co/facebook/dacvae-watermarked/discussions/2"
+    "readmeSamSentenceStillPresent": true
   },
   "sources": [
     {
@@ -65,11 +58,5 @@
       "sha256": "d1096fc481e432c2b565dc29ccc720282db0c818af37608eac8ab515e03a8d3f",
       "bytes": 4028
     }
-  ],
-  "excludedFromScope": [
-    "Rights to individual recordings",
-    "Subjective audio quality",
-    "All-device compatibility",
-    "Clean full conversion rerun"
   ]
 }

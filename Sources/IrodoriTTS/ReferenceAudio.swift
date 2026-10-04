@@ -2,7 +2,7 @@ import Foundation
 import AVFoundation
 
 public enum ReferenceAudio {
-    /// Same AVAudioConverter path as the validated Local AI app.
+    /// Decodes reference audio to 48 kHz mono Float32 with AVAudioConverter.
     public static func read(_ url: URL) throws -> Data {
         let file = try AVAudioFile(forReading: url)
         let format = file.processingFormat

@@ -1,6 +1,6 @@
-# 再変換手順
+# 変換コードの参考実装
 
-[README](../README.md) · [CLIでの比較](CLI.md) · [検証記録](VALIDATION.md)
+[README](../README.md) · [CLIでの比較](CLI.md) · [性能の測定と制約](VALIDATION.md)
 
 通常の利用は変換済みモデルから始めてください。変換にはApple Silicon Mac、Python 3.11、Xcode/Command Line Tools、gitと多めのディスク空き容量が必要です。元チェックポイントとONNXだけで約6 GBあり、中間モデルと複製も作成します。
 
@@ -13,7 +13,7 @@ python Conversion/convert_all.py --sources artifacts/sources --output artifacts/
 python Conversion/convert_all.py --sources artifacts/sources --output artifacts/conversion
 ```
 
-`requirements.txt` は既存の変換に使用した主要依存のバージョンを固定しています。すべての推移依存を固定したlockではありません。今回整理した一括手順のクリーン環境での全再実行は未完了です。PyTorch 2.11 / coremltools 9.0 の組み合わせはcoremltools側の公式検証範囲を超える警告が出るため、出力の数値検証を省かないでください。
+`requirements.txt` は既存の変換に使用した主要依存のバージョンを固定しています。すべての推移依存を固定したlockではありません。変換コードは参考実装です。再変換の成功や任意の環境での互換性を保証するものではありません。PyTorch 2.11 / coremltools 9.0 の組み合わせはcoremltools側の公式検証範囲を超える警告が出るため、出力の数値検証を省かないでください。
 
 `fetch_sources.py` はHF revisionとSHA-256を固定して入力を取得します。検証済みファイルは再利用し、不一致ファイルは上書きせず停止します。公式実装も指定commitの未変更checkoutを要求します。
 
@@ -23,7 +23,7 @@ python Conversion/convert_all.py --sources artifacts/sources --output artifacts/
 
 ## 配布候補の作成
 
-既に検証した現在のモデルには `Distribution/artifacts.lock.json` が対応しています。
+`Distribution/artifacts.lock.json` は配布版モデルのファイルサイズとSHA-256を定義します。
 
 ```sh
 python Scripts/stage_model.py stage \
@@ -44,8 +44,8 @@ python Scripts/stage_model.py stage \
   --lock artifacts/candidate.lock.json --destination artifacts/candidate-model
 ```
 
-lockはbyte列の記録です。作成できたことは品質・速度・再配布条件の承認ではありません。
+lockはファイルの同一性を検査するmetadataです。再変換したモデルの音質・速度と利用条件は別途確認してください。
 短文、通常文、短文反復後の長文、参照切り替え、参照なし、停止後の再生成を確認してください。
 他の推論・変換プロセスを同時実行すると速度比較が変わるため、順番に測定します。
 
-[公開前の条件](RELEASE.md)を確認してから公開先へ進んでください。このリポジトリに自動アップロード処理はありません。
+再配布する場合は[部品別ライセンス](../THIRD_PARTY_NOTICES.md)を保持してください。
