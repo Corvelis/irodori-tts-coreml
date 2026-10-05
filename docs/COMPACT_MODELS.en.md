@@ -18,3 +18,7 @@ python Scripts/stage_model.py verify artifacts/model-int8
 ```
 
 The converter checks identical decoder weight bytes, quantizes the text encoder and compares FP32/INT8 features on natural and maximum-length/masked inputs. The report is bound to exact model and tokenizer hashes. Original Torch/ONNX validation is not attributed to the quantized model. Generated-speech and target-device tests are also required; see [quality measurements](QUALITY.en.md).
+
+## Distribution directory
+
+The Hub keeps standard files at the repository root and light files under `int8/`. `ModelVariant.lightINT8.manifestURL` points to `int8/manifest.json` at a version tag. The SDK, CLI and sample download only the chosen bundle's files directly into its destination. Pass that destination to prepare. See [download and directory guidance](HUGGINGFACE.en.md).

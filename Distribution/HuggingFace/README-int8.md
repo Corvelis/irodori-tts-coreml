@@ -23,12 +23,14 @@ tags:
 
 [Swift SDK / iPhone・Macサンプル](https://github.com/Corvelis/irodori-tts-coreml) · [English](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.2.0/docs/README.en.md) · [音質測定](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.2.0/docs/QUALITY.md)
 
+この軽量版はリポジトリの `int8/` にあります。手動で取り込む場合はこのフォルダを選びます。CLI・SDKでは選択した軽量版の中身だけを保存先へ直接配置します。
+
 ## モデルを選ぶ
 
 | 版 | 容量 | 必要なOS | manifest |
 |---|---:|---|---|
 | 現行版 | 約2.99 GB | iOS 17 / macOS 14以降 | [現行版](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b02a670f0cb41c382844672fa8f0f03b3b9b8082/manifest.json) |
-| 軽量INT8版 | 約1.96 GB | iOS 18 / macOS 15以降 | [軽量版](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/v0.2.0-int8/manifest.json) |
+| 軽量INT8版 | 約1.96 GB | iOS 18 / macOS 15以降 | [軽量版](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/v0.2.0-int8/int8/manifest.json) |
 
 この一式はbundleVersion `0.2.0-int8`、14個のCore MLパッケージ、tokenizer/config、補助metadata、数値検証レポートとSHA-256 manifestを含みます。フォルダ一式を保持し、異なる版のファイルを混ぜないでください。
 
@@ -68,4 +70,4 @@ AratakoやAppleの公式提供ではありません。モデルと上流部分�
 
 ## English
 
-A community light INT8 Core ML bundle (~1.96 GB) for Japanese Irodori TTS v4.1 Small MF. Requires SDK 0.2.0+, iOS 18+ / macOS 15+. Supports on-device Voice Cloning, Japanese Voice Design captions and AudioSeal watermarking. INT8 applies to text-encoder weight storage; FP32 text computations and other model precision remain unchanged. Download the complete bundle using `irodori download --variant light-int8 --destination NEW_DIRECTORY`. Standard ~2.99 GB models remain available via `--variant standard`. Preserve MIT / Apache-2.0 terms and authorized voice-use conditions. See [English quality measurements](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.2.0/docs/QUALITY.en.md).
+A community light INT8 Core ML bundle (~1.96 GB) for Japanese Irodori TTS v4.1 Small MF. Requires SDK 0.2.0+, iOS 18+ / macOS 15+. Supports on-device Voice Cloning, Japanese Voice Design captions and AudioSeal watermarking. INT8 applies to text-encoder weight storage; FP32 text computations and other model precision remain unchanged. Download the complete bundle using `irodori download --variant light-int8 --destination NEW_DIRECTORY`. The standard model stays at the repository root; this light bundle lives under `int8/`. Downloads place its contents directly in the chosen local destination. Standard ~2.99 GB models remain available via `--variant standard`. Preserve MIT / Apache-2.0 terms and authorized voice-use conditions. See [English quality measurements](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.2.0/docs/QUALITY.en.md).

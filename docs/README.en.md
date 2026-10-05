@@ -1,6 +1,6 @@
 # Irodori TTS Core ML — getting started
 
-[日本語](../README.md) · [API reference (Japanese)](API.md) · [Performance](VALIDATION.md)
+[日本語](../README.md) · [Model downloads](HUGGINGFACE.en.md) · [API reference (Japanese)](API.md) · [Performance](VALIDATION.md)
 
 This community runtime runs Irodori TTS v4.1 Small MF on iPhone and Apple Silicon Mac. It includes a Swift package, shared SwiftUI samples, a macOS CLI and conversion tools. Runtime dependencies are Apple frameworks only; Python and ONNX Runtime are not required for inference.
 
@@ -14,6 +14,8 @@ This community runtime runs Irodori TTS v4.1 Small MF on iPhone and Apple Silico
 | Separate model bundle | Standard: ~2.99 GB / light INT8: ~1.96 GB, including tokenizer/config, sidecars and SHA-256 manifest |
 
 The SDK deployment targets remain iOS 17+ / macOS 14+, with Swift tools 5.9+. The light INT8 bundle requires iOS 18+ / macOS 15+ and SDK 0.2.0+. Standard bundles remain compatible. INT8 applies to text-encoder weight storage; text computation and outputs remain FP32. The iPhone-compatible layout shares fixed-width decoder weights and retains the separate flexible decoder. See [quality measurements](QUALITY.en.md). Use an Apple Silicon Mac with Xcode and Command Line Tools. Performance and memory use vary with the device and input. Allow extra disk space for app-owned model copies and Core ML compilation caches.
+
+The Hugging Face repository keeps standard files at its root and light files under `int8/`. The SDK/sample downloads only the selected bundle. See [download URLs and directory layout](HUGGINGFACE.en.md).
 
 ## Run on Mac
 

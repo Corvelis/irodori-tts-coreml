@@ -132,3 +132,5 @@ manifestは署名ではなく整合性情報です。信頼する公開者のHTT
 ## モデルの種類（SDK 0.2.0）
 
 `ModelVariant.standard` と `.lightINT8` は同じ合成・参照登録APIを使います。`minimumOS`、`isSupported`、`manifestURL` を提供します。`ModelBundle.information(at:)` はmanifestとテキストmetadataから種類・bundleVersion・ファイル容量を読みます。これはハッシュ検証ではありません。新規取得・取り込みには `ModelBundle.validate(at:verifyHashes: true)` を使用してください。
+
+`ModelVariant.standard.manifestURL` は元の固定commitにあるルートmanifest、`.lightINT8.manifestURL` はバージョンタグの `int8/manifest.json` を指定します。Downloaderはmanifestの親URLを基準に各ファイルを取得し、選択した版だけを保存先へ直接配置します。配布先の `int8/` をローカル保存先に追加する必要はありません。[配置と取得URL](HUGGINGFACE.md)を参照してください。

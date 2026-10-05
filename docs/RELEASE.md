@@ -18,6 +18,8 @@ shasum -a 256 -c irodori-tts-coreml-source-0.2.0.zip.sha256
 
 [Hugging Faceのモデル一式](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)は、選択した版のCore MLパッケージ、tokenizer、config、補助metadata、manifestと部品別ライセンスを含みます。現行版は約2.99 GB / bundleVersion `0.1.0`、軽量INT8版は約1.96 GB / bundleVersion `0.2.0-int8`です。
 
+Hugging Faceリポジトリのルートに現行版、`int8/` に軽量版を配置します。各manifestは自身のモデルだけを対象とし、SDK/CLIは選択した一式だけを取得します。モデルの種類はフォルダで分け、取得する版はタグ・固定commitで指定します。
+
 SDK `0.2.0`は両方の一式を読み込めます。軽量版にはiOS 18 / macOS 15以降が必要です。取得URLと固定commitは[モデル取得ガイド](https://github.com/Corvelis/irodori-tts-coreml/blob/v0.2.0/docs/HUGGINGFACE.md)にあります。manifestの各ファイルサイズ・SHA-256はCLIの `verify` またはSDKの `ModelBundle.validate(at:verifyHashes: true)` で照合できます。
 
 ## 音声の透かし

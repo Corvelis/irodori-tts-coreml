@@ -8,6 +8,18 @@ final class ModelManifestTests: XCTestCase {
         return try JSONSerialization.data(withJSONObject: ["format": "irodori-coreml-distribution-v1", "bundleVersion": "test", "files": rows])
     }
     func testCompleteManifest() throws { XCTAssertEqual(try ModelBundle.manifest(from: data()).files.count, ModelBundle.requiredPaths.count) }
+    func testPublishedURLsKeepStandardAndNestedINT8Separate() {
+        let standard = ModelVariant.standard.manifestURL
+        let light = ModelVariant.lightINT8.manifestURL
+        XCTAssertEqual(standard.absoluteString,
+            "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b02a670f0cb41c382844672fa8f0f03b3b9b8082/manifest.json")
+        XCTAssertEqual(light.absoluteString,
+            "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/v0.2.0-int8/int8/manifest.json")
+        let relative = "tokenizer/tokenizer.json"
+        XCTAssertEqual(light.deletingLastPathComponent().appendingPathComponent(relative).path,
+            "/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/v0.2.0-int8/int8/tokenizer/tokenizer.json")
+        XCTAssertFalse(standard.deletingLastPathComponent().appendingPathComponent(relative).path.contains("/int8/"))
+    }
     func testVariantInformationUsesManifestBytesAndTextStorage() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)

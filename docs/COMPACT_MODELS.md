@@ -31,3 +31,7 @@ python Scripts/stage_model.py verify artifacts/model-int8
 変換ツールはデコーダー重みの同一性を確認し、テキストエンコーダーを圧縮した後、自然文と最大長・mask付き入力でFP32版との差を測定します。数値検証レポートはモデルハッシュとtokenizerハッシュに紐づきます。元FP32モデルのTorch検証結果を量子化モデルの結果として扱いません。
 
 再変換後は[音声比較ツール](QUALITY.md#再測定する)で生成音声と速度も比較してください。数値検証の合格やハッシュ一致だけでは、音質と端末上の動作を確認できません。
+
+## 配布先と取得するフォルダ
+
+Hugging Faceでは現行版をルート、軽量版を `int8/` に配置します。SDKの `ModelVariant.lightINT8.manifestURL` はバージョンタグ配下の `int8/manifest.json` を指定します。CLI・SDK・サンプルのダウンロードは軽量版のファイルだけを保存先へ直接配置します。合成にはその保存先を渡してください。[配置と取得URL](HUGGINGFACE.md)を参照してください。

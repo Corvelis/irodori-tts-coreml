@@ -15,10 +15,12 @@ public enum ModelVariant: String, CaseIterable, Identifiable, Codable, Sendable 
         return false
     }
 
-    /// Versioned release URL; applications may supply their own immutable manifest URL.
+    /// Standard remains pinned to its original commit. INT8 lives in the int8 subdirectory.
+    /// Applications may supply their own immutable manifest URL.
     public var manifestURL: URL {
         let revision = self == .standard ? "b02a670f0cb41c382844672fa8f0f03b3b9b8082" : "v0.2.0-int8"
-        return URL(string: "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/\(revision)/manifest.json")!
+        let path = self == .standard ? "manifest.json" : "int8/manifest.json"
+        return URL(string: "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/\(revision)/\(path)")!
     }
 }
 

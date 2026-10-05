@@ -57,3 +57,17 @@ lockはファイルの同一性を検査するmetadataです。再変換した�
 ## INT8の軽量版
 
 `Conversion/make_light_bundle.py` は重み共有とINT8テキスト重みを組み合わせたiPhone / Mac共通構成を作成します。[軽量モデルの変換](COMPACT_MODELS.md)を参照してください。`quantize_text_encoder.py` と `validate_quantized_text.py` は個別にも実行できます。量子化モデルには専用の数値検証レポートが必要で、配布ツールは元FP32の検証済みフラグだけでは受け入れません。
+
+## Hugging Face用のディレクトリ構成を作る
+
+`Scripts/stage_huggingface.py` は元の現行版と検証済みINT8版から、ルートの現行モデルを保持して `int8/` を追加するためのファイル一式を作ります。現行版には[元の固定commit](HUGGINGFACE.md)から取得した一式を使用します。
+
+```sh
+python Scripts/stage_huggingface.py stage \
+  --standard artifacts/model-standard --int8 artifacts/model-int8 \
+  --destination artifacts/hub-update
+python Scripts/stage_huggingface.py verify artifacts/hub-update \
+  --standard artifacts/model-standard
+```
+
+出力は既存リポジトリへ追加・更新するファイルだけで、現行モデル単独のフォルダではありません。ルートのREADMEとmanifestは一緒に更新し、既存の他のルートファイルは保持します。現行版のモデル・tokenizer・ライセンスのハッシュは変更せず、READMEの新しいハッシュをルートmanifestに反映します。軽量版のmanifestは `int8/` を基準とした相対パスのまま保持します。スクリプトはアップロードを行いません。
