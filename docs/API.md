@@ -2,7 +2,7 @@
 
 [導入](GETTING_STARTED.md) · [音声登録](VOICE_REGISTRATION.md) · [再生と停止](STREAMING.md)
 
-対象は `0.1.0` のSwift APIです。[実装](../Sources/IrodoriTTS)に対応しています。
+対象は `0.2.0` のSwift APIです。[実装](../Sources/IrodoriTTS)に対応しています。
 
 ## IrodoriEngine
 
@@ -128,3 +128,9 @@ manifestは署名ではなく整合性情報です。信頼する公開者のHTT
 入力・モデルの検証エラーは `IrodoriError.invalid(String)`、キャンセルは `CancellationError`、ファイル・Core ML等の失敗は元のErrorとして伝わります。`error.localizedDescription` を表示し、[トラブル対処](TROUBLESHOOTING.md)で切り分けます。
 
 合成Taskのキャンセルは以後のチャンクを破棄しますが、すでにアプリへ渡したPCMや進行中のCore ML予測は取り消しません。再生の停止、古いチャンクの除外、次のリクエストの管理は[再生例](STREAMING.md)を参照してください。
+
+## モデルの種類（SDK 0.2.0）
+
+`ModelVariant.standard` と `.lightINT8` は同じ合成・参照登録APIを使います。`minimumOS`、`isSupported`、`manifestURL` を提供します。`ModelBundle.information(at:)` はmanifestとテキストmetadataから種類・bundleVersion・ファイル容量を読みます。これはハッシュ検証ではありません。新規取得・取り込みには `ModelBundle.validate(at:verifyHashes: true)` を使用してください。
+
+`ModelVariant.standard.manifestURL` は元の固定commitにあるルートmanifest、`.lightINT8.manifestURL` はバージョンタグの `int8/manifest.json` を指定します。Downloaderはmanifestの親URLを基準に各ファイルを取得し、選択した版だけを保存先へ直接配置します。配布先の `int8/` をローカル保存先に追加する必要はありません。[配置と取得URL](HUGGINGFACE.md)を参照してください。

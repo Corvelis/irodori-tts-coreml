@@ -11,6 +11,14 @@ import IrodoriTTS
     @Published var modelPath = UserDefaults.standard.string(forKey: "modelPath") ?? ""
     @Published var referencePath = UserDefaults.standard.string(forKey: "referencePath") ?? ""
     @Published var manifestURL = ""
+    @Published var downloadVariant: ModelVariant = .standard
+    struct InstalledModel: Identifiable {
+        let url: URL
+        let information: ModelBundleInformation
+        var id: String { url.path }
+    }
+    @Published var installedModels: [InstalledModel] = []
+    @Published var modelDetail = "現行版 約2.99 GB / 軽量INT8版 約1.96 GB"
     @Published var status = "モデルフォルダを選んでください。"
     @Published var statistics = ""
     @Published var busy = false
@@ -46,12 +54,65 @@ import IrodoriTTS
         if !modelPath.isEmpty && !FileManager.default.fileExists(atPath: modelPath) {
             let replacement = store.appendingPathComponent("Models/\(URL(fileURLWithPath: modelPath).lastPathComponent)")
             if FileManager.default.fileExists(atPath: replacement.path) { modelPath = replacement.path }
+            else {
+                let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                let moved = documents.appendingPathComponent(URL(fileURLWithPath: modelPath).lastPathComponent)
+                if FileManager.default.fileExists(atPath: moved.path) { modelPath = moved.path }
+            }
         }
+        refreshInstalledModels()
         if !modelPath.isEmpty {
             status = referencePath.isEmpty
                 ? "文章を入力して、音声を生成できます。"
                 : "登録音声の利用許可を確認して、音声を生成してください。"
         }
+    }
+
+    func refreshInstalledModels() {
+        let files = FileManager.default
+        let documents = files.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        var roots = [URL]()
+        for parent in [store.appendingPathComponent("Models"), documents] {
+            roots += (try? files.contentsOfDirectory(at: parent, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles])) ?? []
+        }
+        if !modelPath.isEmpty { roots.append(URL(fileURLWithPath: modelPath)) }
+        var seen = Set<String>()
+        installedModels = roots.compactMap { root in
+            guard seen.insert(root.path).inserted, let info = try? ModelBundle.information(at: root) else { return nil }
+            return InstalledModel(url: root, information: info)
+        }.sorted { $0.information.variant.rawValue < $1.information.variant.rawValue }
+        if let current = installedModels.first(where: { $0.id == modelPath }) { modelDetail = current.information.description }
+    }
+
+    func selectModel(_ path: String) {
+        guard path != modelPath else { return }
+        work {
+            self.status = "モデルを検証しています…"
+            let url = URL(fileURLWithPath: path)
+            try await Task.detached { try ModelBundle.validate(at: url, verifyHashes: true) }.value
+            try Task.checkCancellation()
+            await self.activateModel(url)
+            self.status = "モデルを切り替えました。"
+        }
+    }
+
+    private func activateModel(_ url: URL) async {
+        stopPlayback()
+        await engine.release()
+        ready = false
+        modelPreparationMilliseconds = nil
+        referencePreparationMilliseconds = nil
+        referenceCacheHit = false
+        result = nil; waveform = []; statistics = ""; outputURL = nil
+        modelPath = url.path
+        UserDefaults.standard.set(url.path, forKey: "modelPath")
+        refreshInstalledModels()
+    }
+
+    func downloadSelectedVariant() {
+        guard downloadVariant.isSupported else { status = "軽量INT8版には \(downloadVariant.minimumOS) 以降が必要です。"; return }
+        manifestURL = downloadVariant.manifestURL.absoluteString
+        download()
     }
 
     private func work(_ body: @escaping @MainActor () async throws -> Void) {
@@ -79,13 +140,7 @@ import IrodoriTTS
                 do { try FileManager.default.copyItem(at: source, to: destination) }
                 catch { try? FileManager.default.removeItem(at: destination); throw error }
             }.value
-            self.stopPlayback()
-            await self.engine.release()
-            self.ready = false
-            self.modelPreparationMilliseconds = nil
-            self.referencePreparationMilliseconds = nil
-            self.modelPath = destination.path
-            UserDefaults.standard.set(destination.path, forKey: "modelPath")
+            await self.activateModel(destination)
             self.status = "モデルを取り込みました。音声の準備を実行してください。"
         }
     }
@@ -96,16 +151,15 @@ import IrodoriTTS
             self.status = "モデルを取得しています…"
             let suffix = SHA256.hash(data: Data(url.absoluteString.utf8)).map { String(format: "%02x", $0) }.joined().prefix(24)
             let destination = self.store.appendingPathComponent("Models/download-\(suffix)")
-            try await ModelDownloader().download(manifestURL: url, to: destination) { done, total, file in
-                Task { @MainActor in self.status = "取得 \(done)/\(total): \(file)" }
+            if FileManager.default.fileExists(atPath: destination.path) {
+                try await Task.detached { try ModelBundle.validate(at: destination, verifyHashes: true) }.value
+            } else {
+                try await ModelDownloader().download(manifestURL: url, to: destination) { done, total, file in
+                    Task { @MainActor in self.status = "取得 \(done)/\(total): \(file)" }
+                }
             }
-            self.stopPlayback()
-            await self.engine.release()
-            self.ready = false
-            self.modelPreparationMilliseconds = nil
-            self.referencePreparationMilliseconds = nil
-            self.modelPath = destination.path
-            UserDefaults.standard.set(destination.path, forKey: "modelPath")
+            try Task.checkCancellation()
+            await self.activateModel(destination)
             self.status = "取得と検証が完了しました。"
         }
     }

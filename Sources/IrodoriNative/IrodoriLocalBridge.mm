@@ -87,7 +87,8 @@ bool hasValidatedSplitContext(NSString *root) {
     [root stringByAppendingPathComponent:@"coreml-only.json"]];
   NSDictionary *manifest = data ? [NSJSONSerialization JSONObjectWithData:data options:0 error:nil] : nil;
   return [manifest isKindOfClass:NSDictionary.class] &&
-    [manifest[@"format"] isEqual:@"irodori-coreml-only-v1"];
+    ([manifest[@"format"] isEqual:@"irodori-coreml-only-v1"] ||
+     [manifest[@"format"] isEqual:@"irodori-coreml-only-v2"]);
 #else
   if ([[[NSProcessInfo processInfo] arguments] containsObject:@"--irodori-context-unsplit"]) {
     return false;
@@ -286,9 +287,19 @@ class Engine {
 #else
           [rootPath stringByAppendingPathComponent:@"decoder_stage_0.onnx"]];
 #endif
+        NSString *sharedStage1 = @"decoder_stage_1_multifunction.mlpackage";
+        const bool useSharedStage1 = [[NSFileManager defaultManager] fileExistsAtPath:
+          [rootPath stringByAppendingPathComponent:sharedStage1]] &&
+          ![[NSFileManager defaultManager] fileExistsAtPath:
+            [rootPath stringByAppendingPathComponent:@"decoder_stage_1_2d_fixed_w64.mlpackage"]];
+        if (useSharedStage1) {
+          if (@available(iOS 18.0, macOS 15.0, *)) {} else {
+            throw std::runtime_error("Shared decoder models require iOS 18 or macOS 15");
+          }
+        }
         for (int stage = 1; stage <= 3; ++stage) {
           NSString *standard = [NSString stringWithFormat:@"decoder_stage_%d_2d.mlpackage", stage];
-          NSString *optimized = stage == 1 ? @"decoder_stage_1_2d_fixed_w64.mlpackage" :
+          NSString *optimized = stage == 1 ? (useSharedStage1 ? sharedStage1 : @"decoder_stage_1_2d_fixed_w64.mlpackage") :
             (stage == 2 ? @"decoder_stage_2_2d_fixed_w256.mlpackage" :
              @"decoder_stage_3_2d_w511.mlpackage");
           allStagesPresent &= [[NSFileManager defaultManager] fileExistsAtPath:
@@ -304,7 +315,7 @@ class Engine {
             // Fixed-shape stages 1 and 2 accept Neural Engine execution.
             // Their flexible-shape variants use CPU/GPU after preparation
             // failed on the iPhone 17 Pro test device.
-            NSString *fixedStage1 = @"decoder_stage_1_2d_fixed_w64.mlpackage";
+            NSString *fixedStage1 = useSharedStage1 ? sharedStage1 : @"decoder_stage_1_2d_fixed_w64.mlpackage";
             const bool useFixedStage1 = stage == 1 &&
               [[NSFileManager defaultManager] fileExistsAtPath:
                [rootPath stringByAppendingPathComponent:fixedStage1]];
@@ -320,6 +331,9 @@ class Engine {
             NSString *filename = [NSString stringWithFormat:@"decoder_stage_%d_2d.mlpackage", stage];
             if (useFixedStage1) {
               filename = fixedStage1;
+              if (useSharedStage1) {
+                if (@available(iOS 18.0, macOS 15.0, *)) configuration.functionName = @"w64";
+              }
               stagedDecoderFixed_[stage - 1] = true;
               stagedDecoderWidths_[stage - 1] = 64;
             } else if (stage == 1 && [[NSFileManager defaultManager] fileExistsAtPath:
@@ -372,13 +386,17 @@ class Engine {
           }
           if (stagedDecoder_ && stagedDecoderFixed_[0]) {
             NSString *fixed57Path = [rootPath stringByAppendingPathComponent:
-              @"decoder_stage_1_2d_fixed_w57.mlpackage"];
+              useSharedStage1 ? sharedStage1 : @"decoder_stage_1_2d_fixed_w57.mlpackage"];
             if ([[NSFileManager defaultManager] fileExistsAtPath:fixed57Path]) {
               NSError *fixed57Error = nil;
-              NSURL *compiled = compiledCoreMLModel(fixed57Path, &fixed57Error);
+              NSURL *compiled = useSharedStage1 ? stagedDecoderCompiledUrls_[0] :
+                compiledCoreMLModel(fixed57Path, &fixed57Error);
               if (compiled) {
                 MLModelConfiguration *configuration = [[MLModelConfiguration alloc] init];
                 configuration.computeUnits = MLComputeUnitsAll;
+                if (useSharedStage1) {
+                  if (@available(iOS 18.0, macOS 15.0, *)) configuration.functionName = @"w57";
+                }
                 stagedDecoderStage1Fixed57_ = [MLModel modelWithContentsOfURL:compiled
                   configuration:configuration error:&fixed57Error];
               }
@@ -386,15 +404,28 @@ class Engine {
                 NSLog(@"Irodori fixed-57 decoder stage 1 unavailable: %@", fixed57Error);
               }
             }
-            for (NSString *flexibleName in @[@"decoder_stage_1_2d_w128.mlpackage",
-                                              @"decoder_stage_1_2d.mlpackage"]) {
+            // Some iOS runtimes cannot prepare a flexible function inside a
+            // multifunction program. A separately packaged flexible function
+            // can retain the original GPU plan while fixed functions share weights.
+            NSString *standaloneFlexibleStage1 = @"decoder_stage_1_2d_w128.mlpackage";
+            const bool hasStandaloneFlexibleStage1 = [[NSFileManager defaultManager] fileExistsAtPath:
+              [rootPath stringByAppendingPathComponent:standaloneFlexibleStage1]];
+            NSArray<NSString *> *flexibleStage1Names = useSharedStage1 ?
+              (hasStandaloneFlexibleStage1 ? @[standaloneFlexibleStage1, sharedStage1] : @[sharedStage1]) :
+              @[standaloneFlexibleStage1, @"decoder_stage_1_2d.mlpackage"];
+            for (NSString *flexibleName in flexibleStage1Names) {
               NSString *flexiblePath = [rootPath stringByAppendingPathComponent:flexibleName];
               if (![[NSFileManager defaultManager] fileExistsAtPath:flexiblePath]) continue;
               NSError *flexibleError = nil;
-              NSURL *compiled = compiledCoreMLModel(flexiblePath, &flexibleError);
+              const bool sharedFlexibleFunction = useSharedStage1 && [flexibleName isEqualToString:sharedStage1];
+              NSURL *compiled = sharedFlexibleFunction ? stagedDecoderCompiledUrls_[0] :
+                compiledCoreMLModel(flexiblePath, &flexibleError);
               if (compiled) {
                 MLModelConfiguration *configuration = [[MLModelConfiguration alloc] init];
                 configuration.computeUnits = MLComputeUnitsCPUAndGPU;
+                if (sharedFlexibleFunction) {
+                  if (@available(iOS 18.0, macOS 15.0, *)) configuration.functionName = @"w128";
+                }
                 stagedDecoderStage1Flexible_ = [MLModel modelWithContentsOfURL:compiled
                   configuration:configuration error:&flexibleError];
               }

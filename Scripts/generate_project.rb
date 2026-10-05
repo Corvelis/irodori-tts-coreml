@@ -31,8 +31,8 @@ project.root_object.package_references << package
     s['INFOPLIST_KEY_NSMicrophoneUsageDescription'] = '参照音声として自分の声を録音します。'
     s['INFOPLIST_KEY_CFBundleDisplayName'] = 'Irodori Core ML'
     s['CODE_SIGN_STYLE'] = 'Automatic'
-    s['MARKETING_VERSION'] = '0.1.0'
-    s['CURRENT_PROJECT_VERSION'] = '1'
+    s['MARKETING_VERSION'] = '0.2.0'
+    s['CURRENT_PROJECT_VERSION'] = '2'
     if platform == :ios
       s['TARGETED_DEVICE_FAMILY'] = '1,2'
       s['INFOPLIST_FILE'] = 'iOS/Info.plist'

@@ -1,8 +1,24 @@
 import Foundation
 import CryptoKit
 import IrodoriTTS
+import Darwin
 
-private struct BenchmarkCase: Decodable { let name: String; let text: String }
+private func runtimeSnapshot() -> [String: Any] {
+    var info = task_vm_info_data_t()
+    var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<integer_t>.size)
+    let status = withUnsafeMutablePointer(to: &info) { pointer in
+        pointer.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+            task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), $0, &count)
+        }
+    }
+    var load = [Double](repeating: 0, count: 3)
+    let loadCount = getloadavg(&load, 3)
+    return ["physicalFootprintMiB": status == KERN_SUCCESS ? Double(info.phys_footprint) / 1048576 : -1,
+            "thermalState": ProcessInfo.processInfo.thermalState.rawValue,
+            "hostLoadAverage1m": loadCount > 0 ? load[0] : -1]
+}
+
+private struct BenchmarkCase: Decodable { let name: String; let text: String; var caption: String? = nil }
 private final class CollectedPCM: @unchecked Sendable {
     private let lock = NSLock()
     private var data = Data()
@@ -26,19 +42,33 @@ private final class CollectedPCM: @unchecked Sendable {
             irodori benchmark --models DIR --cases FILE.json --output-directory DIR --report FILE.json [--reference FILE.wav] [--repeat N]
             irodori verify --models DIR
             irodori download --manifest HTTPS_URL_PINNED_TO_COMMIT --destination DIR
+            irodori download --variant standard|light-int8 --destination DIR
+            irodori info --models DIR
             irodori detect-watermark --models DIR --input FILE.wav
             Diagnostic native flags: --irodori-fixed-seed --irodori-seed 11 --irodori-diagnostics
             --raw bypasses document formatting/splitting for exact engine comparisons. Benchmark always uses raw text.
             """)
             return
         }
-        if args[0] == "download", let url = value("--manifest").flatMap(URL.init(string:)), let path = value("--destination") {
+        if args[0] == "download", let path = value("--destination") {
+            let variant = value("--variant").flatMap(ModelVariant.init(rawValue:))
+            guard value("--variant") == nil || variant != nil else { throw IrodoriError.invalid("Unknown model variant") }
+            guard value("--variant") == nil || value("--manifest") == nil else { throw IrodoriError.invalid("Choose --variant or --manifest") }
+            guard variant?.isSupported != false else { throw IrodoriError.invalid("This model requires \(variant!.minimumOS)") }
+            guard let url = value("--manifest").flatMap(URL.init(string:)) ?? variant?.manifestURL else {
+                throw IrodoriError.invalid("--manifest or --variant is required")
+            }
             try await ModelDownloader().download(manifestURL: url, to: URL(fileURLWithPath: path)) {
                 done, total, name in print("[\(done)/\(total)] \(name)")
             }; return
         }
         guard let model = value("--models") else { throw IrodoriError.invalid("--models DIR is required") }
         let modelURL = URL(fileURLWithPath: model)
+        if args[0] == "info" {
+            let info = try ModelBundle.information(at: modelURL)
+            print("\(info.description) / bundle \(info.bundleVersion) / \(info.variant.minimumOS)")
+            return
+        }
         if args[0] == "detect-watermark", let input = value("--input") {
             let floats = try ReferenceAudio.read(URL(fileURLWithPath: input))
             var pcm = Data(count: floats.count / 2)
@@ -79,13 +109,17 @@ private final class CollectedPCM: @unchecked Sendable {
             identifier = parsed
         } else { identifier = 0x4952 }
         let watermark = args.contains("--no-watermark") ? nil : WatermarkOptions(identifier: identifier)
+        let beforeLoad = runtimeSnapshot()
         let loadMs = try await engine.prepare(modelDirectory: modelURL)
+        let afterLoad = runtimeSnapshot()
         let registration = try await engine.registerReference(value("--reference").map { URL(fileURLWithPath: $0) })
         var runs: [[String: Any]] = []
         for pass in 0..<repeats {
             for (index, item) in cases.enumerated() {
                 let collected = CollectedPCM()
-                let result = try await engine.synthesize(item.text, caption: value("--caption") ?? "", rawText: benchmark || args.contains("--raw"), watermark: watermark) { collected.append($0.pcm16) }
+                let beforeSynthesis = runtimeSnapshot()
+                let result = try await engine.synthesize(item.text, caption: item.caption ?? value("--caption") ?? "", rawText: benchmark || args.contains("--raw"), watermark: watermark) { collected.append($0.pcm16) }
+                let afterSynthesis = runtimeSnapshot()
                 let matches = collected.equals(result.pcm16)
                 guard matches else { throw IrodoriError.invalid("Stream differs from completed PCM") }
                 if benchmark {
@@ -96,7 +130,8 @@ private final class CollectedPCM: @unchecked Sendable {
                     "watermark": result.watermark.map { ["algorithm": $0.algorithm, "identifier": $0.identifier, "processingMs": $0.processingMilliseconds] } ?? [:],
                     "firstPcmMs": result.firstPCMMilliseconds, "audioSeconds": result.audioSeconds, "rtf": result.rtf,
                     "pcmSha256": SHA256.hash(data: result.pcm16).map { String(format: "%02x", $0) }.joined(),
-                    "streamMatchesCompletedPcm": matches, "metrics": result.metrics, "diagnostics": result.diagnostics])
+                    "streamMatchesCompletedPcm": matches, "metrics": result.metrics, "diagnostics": result.diagnostics,
+                    "runtimeBefore": beforeSynthesis, "runtimeAfter": afterSynthesis])
                 print(String(format: "pass=%d %@ audio=%.2fs synth=%.1fms firstPCM=%.1fms RTF=%.4f", pass, item.name,
                      result.audioSeconds, result.synthesisMilliseconds, result.firstPCMMilliseconds, result.rtf))
             }
@@ -105,7 +140,8 @@ private final class CollectedPCM: @unchecked Sendable {
             let data = try JSONSerialization.data(withJSONObject: ["modelLoadMs": loadMs,
                 "referenceMs": registration.milliseconds, "referenceCacheHit": registration.cacheHit,
                 "timingScope": "TTS only; first PCM callback, not physical speaker onset; model/reference preparation excluded from RTF",
-                "os": ProcessInfo.processInfo.operatingSystemVersionString, "runs": runs], options: [.prettyPrinted, .sortedKeys])
+                "os": ProcessInfo.processInfo.operatingSystemVersionString, "runtimeBeforeLoad": beforeLoad,
+                "runtimeAfterLoad": afterLoad, "runs": runs], options: [.prettyPrinted, .sortedKeys])
             try data.write(to: URL(fileURLWithPath: report), options: .atomic)
         }
         await engine.release()

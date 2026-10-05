@@ -1,0 +1,27 @@
+{
+  "format": "irodori-coreml-release-v2",
+  "version": "0.2.0",
+  "codeTag": "v0.2.0",
+  "codeRepository": "https://github.com/Corvelis/irodori-tts-coreml",
+  "modelRepository": "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML",
+  "variants": [
+    {
+      "variant": "standard",
+      "repositoryDirectory": ".",
+      "bundleVersion": "0.1.0",
+      "revision": "b02a670f0cb41c382844672fa8f0f03b3b9b8082",
+      "manifestURL": "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b02a670f0cb41c382844672fa8f0f03b3b9b8082/manifest.json",
+      "manifestSha256": "f98e77d857c20e977358ec9c9d513721b37e1af0d7e12359c05de26c90ae7186",
+      "modelBundleBytesIncludingManifest": 2991687169
+    },
+    {
+      "variant": "light-int8",
+      "repositoryDirectory": "int8",
+      "bundleVersion": "0.2.0-int8",
+      "revision": "v0.2.0-int8",
+      "manifestURL": "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/v0.2.0-int8/int8/manifest.json",
+      "manifestSha256": "2ab7d2ba87e817ae9b7bd39f6dcc0ad6a3c7077c5bdc8e8db1b7c83be969d7d7",
+      "modelBundleBytesIncludingManifest": 1962787623
+    }
+  ]
+}

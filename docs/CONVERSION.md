@@ -23,6 +23,8 @@ python Conversion/convert_all.py --sources artifacts/sources --output artifacts/
 
 実行時はCore MLだけですが、変換工程では元のONNXとPyTorchチェックポイントを使用します。全段を公式PyTorchから直接変換するツールではありません。
 
+既存のstage 1デコーダー3モデルの同一重みを共有する場合は、[重み共有形式のガイド](COMPACT_MODELS.md)に従って `share_decoder_weights.py` を実行してください。重みの精度は変えず、iOS 18 / macOS 15以降のmultifunctionモデルを作成します。
+
 ## 配布候補の作成
 
 `Distribution/artifacts.lock.json` は配布版モデルのファイルサイズとSHA-256を定義します。
@@ -51,3 +53,21 @@ lockはファイルの同一性を検査するmetadataです。再変換した�
 他の推論・変換プロセスを同時実行すると速度比較が変わるため、順番に測定します。
 
 再配布する場合は[部品別ライセンス](../THIRD_PARTY_NOTICES.md)を保持してください。
+
+## INT8の軽量版
+
+`Conversion/make_light_bundle.py` は重み共有とINT8テキスト重みを組み合わせたiPhone / Mac共通構成を作成します。[軽量モデルの変換](COMPACT_MODELS.md)を参照してください。`quantize_text_encoder.py` と `validate_quantized_text.py` は個別にも実行できます。量子化モデルには専用の数値検証レポートが必要で、配布ツールは元FP32の検証済みフラグだけでは受け入れません。
+
+## Hugging Face用のディレクトリ構成を作る
+
+`Scripts/stage_huggingface.py` は元の現行版と検証済みINT8版から、ルートの現行モデルを保持して `int8/` を追加するためのファイル一式を作ります。現行版には[元の固定commit](HUGGINGFACE.md)から取得した一式を使用します。
+
+```sh
+python Scripts/stage_huggingface.py stage \
+  --standard artifacts/model-standard --int8 artifacts/model-int8 \
+  --destination artifacts/hub-update
+python Scripts/stage_huggingface.py verify artifacts/hub-update \
+  --standard artifacts/model-standard
+```
+
+出力は既存リポジトリへ追加・更新するファイルだけで、現行モデル単独のフォルダではありません。ルートのREADMEとmanifestは一緒に更新し、既存の他のルートファイルは保持します。現行版のモデル・tokenizer・ライセンスのハッシュは変更せず、READMEの新しいハッシュをルートmanifestに反映します。軽量版のmanifestは `int8/` を基準とした相対パスのまま保持します。スクリプトはアップロードを行いません。

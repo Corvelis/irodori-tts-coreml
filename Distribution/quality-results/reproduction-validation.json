@@ -1,0 +1,25 @@
+{
+  "format": "irodori-int8-conversion-v1",
+  "coremltoolsVersion": "9.0",
+  "scope": "text_encoder weights only",
+  "dtype": "int8",
+  "mode": "linear_symmetric",
+  "granularity": "per_block",
+  "blockSize": 128,
+  "weightThreshold": 4096,
+  "computePrecision": "float32",
+  "activationQuantization": false,
+  "sourcePackageSha256": "0d33578a554ce7fcd197e54891777a9d05897f4701bd7b7bb910124c4f6fa9ec",
+  "targetPackageSha256": "f36cccfdd91c768bf97c8dad099002588e9cf2659681fd47f158ef2be51f0162",
+  "modelSha256": "d9c6c808a0c535bc8d54a51952105916bc1b0aad1facd91f08fcb5ae86c0d34e",
+  "weightsSha256": "e8495984511d491e0c5aa04a2aaba3cb0222707a7df5889accf30c6632b61ee2",
+  "sourceBytes": 1272460558,
+  "targetBytes": 328477140,
+  "conversionSeconds": 45.97283633297775,
+  "minimumOS": {
+    "iOS": "18.0",
+    "macOS": "15.0"
+  },
+  "graphSemanticallyIdenticalToDeviceCandidate": true,
+  "weightsIdenticalToDeviceCandidate": true
+}

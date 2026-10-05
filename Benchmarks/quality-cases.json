@@ -1,0 +1,127 @@
+[
+  {
+    "name": "short-yes",
+    "text": "はい。",
+    "reference": false
+  },
+  {
+    "name": "short-hello",
+    "text": "こんにちは。",
+    "reference": false
+  },
+  {
+    "name": "short-thanks",
+    "text": "ありがとうございます。",
+    "reference": false
+  },
+  {
+    "name": "normal-park",
+    "text": "今日はいい天気なので、近くの公園まで散歩に行きましょう。",
+    "reference": false
+  },
+  {
+    "name": "normal-various",
+    "text": "今日は公園で様々な花を見つけました。",
+    "reference": false
+  },
+  {
+    "name": "normal-time",
+    "text": "時間があるときに、ゆっくり話を聞かせてください。",
+    "reference": false
+  },
+  {
+    "name": "normal-books",
+    "text": "図書館で新しい本を借りて、家で読みました。",
+    "reference": false
+  },
+  {
+    "name": "normal-travel",
+    "text": "来週は友達と旅行に行くので、準備を進めています。",
+    "reference": false
+  },
+  {
+    "name": "numbers-time",
+    "text": "明日の午前九時三十分に駅前で会いましょう。",
+    "reference": false
+  },
+  {
+    "name": "numbers-money",
+    "text": "参加者は十二人で、予算は一人二千五百円です。",
+    "reference": false
+  },
+  {
+    "name": "numbers-arabic",
+    "text": "明日は9時30分に出発し、12人で集まります。",
+    "reference": false
+  },
+  {
+    "name": "names",
+    "text": "東京から大阪へ移動し、京都にも立ち寄りました。",
+    "reference": false
+  },
+  {
+    "name": "long-single",
+    "text": "音声合成の技術を活用することで、スマートフォンだけでも様々な文章を自然な声で読み上げられるようになり、日々の生活や仕事の中で必要な情報を耳から受け取ることができるようになりました。",
+    "reference": false
+  },
+  {
+    "name": "long-multiple",
+    "text": "今日は公園へ出かけました。色とりどりの花が咲いていて、風が吹くたびに木々の葉が優しく揺れています。ベンチに座って景色を眺めながら、ゆっくりと過ごしました。",
+    "reference": false
+  },
+  {
+    "name": "long-after-short",
+    "text": "昨日は図書館で様々な本を読んでから、駅前のお店で買い物をして、家に帰って夕食の準備をしましたが、今日は天気がよいので、友達と一緒に公園をゆっくり散歩しながら、来週の旅行について詳しく話し合いたいと思っています。",
+    "reference": false
+  },
+  {
+    "name": "questions",
+    "text": "今日はどんな一日でしたか。何か楽しいことはありましたか。",
+    "reference": false
+  },
+  {
+    "name": "caption-calm",
+    "text": "お疲れさまでした。少し休んでから、次の作業を始めましょう。",
+    "caption": "落ち着いた自然な声で、丁寧に話してください。",
+    "reference": false
+  },
+  {
+    "name": "caption-bright",
+    "text": "おはようございます。今日も楽しい一日になりそうですね。",
+    "caption": "明るく元気な声で話してください。",
+    "reference": false
+  },
+  {
+    "name": "caption-polite",
+    "text": "ご利用いただきありがとうございます。どうぞよろしくお願いいたします。",
+    "caption": "聞き取りやすい丁寧な声で話してください。",
+    "reference": false
+  },
+  {
+    "name": "caption-soft",
+    "text": "大丈夫です。焦らず、ゆっくり進めていきましょう。",
+    "caption": "やさしく穏やかな声で話してください。",
+    "reference": false
+  },
+  {
+    "name": "reference-normal",
+    "text": "近くのお店で、おいしいパンと飲み物を買いました。",
+    "reference": true
+  },
+  {
+    "name": "reference-numbers",
+    "text": "集合は午前十時で、帰りは午後三時を予定しています。",
+    "reference": true
+  },
+  {
+    "name": "reference-long",
+    "text": "休日は家族と一緒に料理を作り、窓の外の景色を眺めながら、穏やかな時間を過ごしました。午後には近所を散歩して、気持ちを切り替えることができました。",
+    "reference": true
+  },
+  {
+    "name": "reference-caption",
+    "text": "また明日、お会いできるのを楽しみにしています。",
+    "caption": "落ち着いた自然な声で、丁寧に話してください。",
+    "reference": true
+  }
+]

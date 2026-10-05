@@ -74,3 +74,14 @@ IRODORI_TEST_REFERENCE='./reference.wav' \
 ## 音声の透かし
 
 生成音声にはAudioSealの透かしを標準で付与します。再生音声と保存WAVは同じPCMです。RTFには透かしの処理時間も含みます。[付与・検出の使い方](WATERMARK.md)を参照してください。
+
+## モデルの選択と情報
+
+```sh
+.build/release/irodori download --variant light-int8 --destination ../Irodori-CoreML-INT8
+.build/release/irodori info --models ../Irodori-CoreML-INT8
+```
+
+`--variant standard` は現行版を取得します。`--variant` と `--manifest` は同時指定できません。軽量版にはmacOS 15以降が必要です。各版の保存先を分けてください。benchmarkのcaseには任意の `caption` を設定できます。固定seedによる音質比較は[測定ガイド](QUALITY.md)を参照してください。
+
+Hugging Face上では現行版はルート、軽量版は `int8/` にあります。`--variant` で選択したモデルのファイルだけを取得し、保存先へ直接配置します。リポジトリ全体を取得した場合、軽量版の `--models` は `int8` フォルダを指定します。[配置と固定URL](HUGGINGFACE.md)を参照してください。
