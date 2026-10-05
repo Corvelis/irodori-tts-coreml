@@ -2,7 +2,7 @@
 
 [README](../README.md) · [サンプル操作](SAMPLES.md) · [API一覧](API.md)
 
-この手順はSwift SDK `0.1.0`（GitHub tag `v0.1.0`）向けです。コード用リポジトリは [Corvelis/irodori-tts-coreml](https://github.com/Corvelis/irodori-tts-coreml) です。GitHubのタグ指定またはソースを取得してローカルSwift Packageとして追加します。SDKはモデルを内蔵せず、ダウンロードも自動では行いません。
+この手順はSwift SDK `0.2.0`（GitHub tag `v0.2.0`）向けです。コード用リポジトリは [Corvelis/irodori-tts-coreml](https://github.com/Corvelis/irodori-tts-coreml) です。GitHubのタグ指定またはソースを取得してローカルSwift Packageとして追加します。SDKはモデルを内蔵せず、ダウンロードも自動では行いません。
 
 ## 1. 用意するもの
 
@@ -11,7 +11,7 @@
 | 開発環境 | Apple Silicon Mac、XcodeとCommand Line Tools |
 | Deployment Target | iOS 17以降、またはmacOS 14以降 |
 | ソース | このリポジトリ全体。ルートに `Package.swift` がある状態 |
-| モデル | 対応するCore ML配布フォルダ一式、約2.99 GB |
+| モデル | 現行版 約2.99 GB / 軽量INT8版 約1.96 GBの一式 |
 | 参照音声 | 任意。自分の声または使用許可のある音声 |
 
 実行にPythonやONNX Runtimeは不要です。速度・使用メモリは端末と入力条件によって変わります。[性能の測定と制約](VALIDATION.md)を参照してください。
@@ -21,10 +21,10 @@
 サンプルやローカルSwift Packageを使う場合は、リポジトリ全体を取得します。
 
 ```sh
-git clone --branch v0.1.0 --depth 1 https://github.com/Corvelis/irodori-tts-coreml.git
+git clone --branch v0.2.0 --depth 1 https://github.com/Corvelis/irodori-tts-coreml.git
 ```
 
-GitHubから直接組み込む場合は、Xcodeの **File → Add Package Dependencies…** に `https://github.com/Corvelis/irodori-tts-coreml.git` を入力し、Dependency Ruleを **Exact Version `0.1.0`** にします。product **IrodoriTTS** をアプリtargetへ追加してください。
+GitHubから直接組み込む場合は、Xcodeの **File → Add Package Dependencies…** に `https://github.com/Corvelis/irodori-tts-coreml.git` を入力し、Dependency Ruleを **Exact Version `0.2.0`** にします。product **IrodoriTTS** をアプリtargetへ追加してください。
 
 取得したソースやソースZIPを使う場合は、次のローカル追加手順を使います。
 
@@ -33,7 +33,7 @@ GitHubから直接組み込む場合は、Xcodeの **File → Add Package Depend
 3. ライブラリproduct **IrodoriTTS** をアプリのtargetに追加します。CLI product `irodori` をアプリへ追加する必要はありません。
 4. Swiftファイルで `import IrodoriTTS` が解決することを確認します。
 
-`Sources/IrodoriNative` を別途コピーしたり、モデルからSwiftクラスを生成したりする必要はありません。GitHubの `v0.1.0` タグとローカル追加は同じSDKソースを使います。
+`Sources/IrodoriNative` を別途コピーしたり、モデルからSwiftクラスを生成したりする必要はありません。GitHubの `v0.2.0` タグとローカル追加は同じSDKソースを使います。
 
 Xcodeの説明はAppleの[パッケージ依存の追加](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app)と[ローカルパッケージでの開発](https://developer.apple.com/documentation/xcode/editing-a-package-dependency-as-a-local-package)も参照してください。
 
@@ -48,14 +48,14 @@ Irodori-TTS-v4.1-Small-MF-CoreML/
   config.json
   tokenizer/
   text_encoder.json                  # 補助モデルのsidecar、計7個
-  text_encoder.mlpackage/            # Core MLパッケージ、計15個
+  text_encoder.mlpackage/            # 選択した版のCore MLパッケージ一式
   dit_step_cached_mixed_linear_768.mlpackage/
   ...                               # 一式を保持。省略・名前変更はしない
 ```
 
 アプリからアクセス可能なApplication Support配下などへ一式をコピーします。Filesから選んだURLは、セキュリティスコープを開いている間に検証・コピーし、以後はアプリ内URLを使うのがサンプルの方式です。[実装](../Examples/Shared/SampleModel.swift)を参照してください。
 
-新規取得時は `ModelBundle.validate(at:verifyHashes: true)` で全ファイルを検証します。これは同期I/Oなので、UIのMainActorで実行せずバックグラウンドへ渡します。毎回の発話で約2.99 GBをハッシュし直す必要はありません。
+新規取得時は `ModelBundle.validate(at:verifyHashes: true)` で全ファイルを検証します。これは同期I/Oなので、UIのMainActorで実行せずバックグラウンドへ渡します。毎回の発話でモデル全体をハッシュし直す必要はありません。
 
 ## 4. 音声を生成する
 
@@ -92,3 +92,5 @@ func makeWAV(engine: IrodoriEngine, modelURL: URL,
 ## 音声の透かし
 
 生成音声にはAudioSealの透かしを標準で付与します。再生音声と保存WAVは同じPCMです。RTFには透かしの処理時間も含みます。[付与・検出の使い方](WATERMARK.md)を参照してください。
+
+軽量INT8版にはSDK 0.2.0以降とiOS 18 / macOS 15以降が必要です。SDKのDeployment Targetは現行版に合わせたiOS 17 / macOS 14のままです。合成と参照登録APIは共通です。[モデル選択](COMPACT_MODELS.md)を参照してください。

@@ -1,0 +1,809 @@
+{
+  "format": "irodori-quantized-text-validation-v1",
+  "computeUnits": "CPU_ONLY",
+  "baselinePackageSha256": "0d33578a554ce7fcd197e54891777a9d05897f4701bd7b7bb910124c4f6fa9ec",
+  "candidatePackageSha256": "ea25ac8b5275f5d33170465c30db588fff4cb2f4994171640e79fe8c26128fbb",
+  "sourceOnnxSha256": "961efbf4b01e47114e75b62210f29db1568acf244308c7b8657c245061fc2f39",
+  "corpusSha256": "96da4afbdfa04c7006807bb86efb367ac650169bbd6a6ddbbb3798cfcf15146c",
+  "tokenizerSha256": "6a0734cf21c802169defaffe719bc2ef12bb9d0be37e54b61ed27aa89394723d",
+  "coremltoolsVersion": "9.0",
+  "scope": "FP32 Core ML versus INT8 weight storage; not ONNX/Torch equality or perceptual audio quality",
+  "acceptanceLimits": {
+    "maxRelativeL2Percent": 3.0,
+    "minSnrDb": 30.0,
+    "minCosine": 0.9995,
+    "minimumNaturalInputs": 24
+  },
+  "passed": true,
+  "summary": {
+    "naturalInputCount": 28,
+    "inputCount": 30,
+    "outputCount": 60,
+    "maxRelativeL2Percent": 2.004486229855651,
+    "maxAbs": 0.07896792888641357,
+    "minSnrDb": 33.95993845719658,
+    "minCosine": 0.9997991053695531
+  },
+  "outputs": [
+    {
+      "case": "text-0",
+      "output": "out_1",
+      "shape": [
+        1,
+        3,
+        512
+      ],
+      "relativeL2Percent": 0.5980282041562033,
+      "maxAbs": 0.021076470613479614,
+      "snrDb": 44.46556666737024,
+      "cosine": 0.9999821191039789
+    },
+    {
+      "case": "text-0",
+      "output": "out_0",
+      "shape": [
+        1,
+        3,
+        512
+      ],
+      "relativeL2Percent": 0.6823539572242043,
+      "maxAbs": 0.02597901225090027,
+      "snrDb": 43.31980570943897,
+      "cosine": 0.9999767202036455
+    },
+    {
+      "case": "text-1",
+      "output": "out_1",
+      "shape": [
+        1,
+        3,
+        512
+      ],
+      "relativeL2Percent": 0.6692296400029627,
+      "maxAbs": 0.025846004486083984,
+      "snrDb": 43.48849664992906,
+      "cosine": 0.9999776067551579
+    },
+    {
+      "case": "text-1",
+      "output": "out_0",
+      "shape": [
+        1,
+        3,
+        512
+      ],
+      "relativeL2Percent": 0.7621945858271607,
+      "maxAbs": 0.0266573429107666,
+      "snrDb": 42.35868281040428,
+      "cosine": 0.9999709533473438
+    },
+    {
+      "case": "text-2",
+      "output": "out_1",
+      "shape": [
+        1,
+        4,
+        512
+      ],
+      "relativeL2Percent": 0.6565390796459036,
+      "maxAbs": 0.02447471022605896,
+      "snrDb": 43.6547883596716,
+      "cosine": 0.9999784480311606
+    },
+    {
+      "case": "text-2",
+      "output": "out_0",
+      "shape": [
+        1,
+        4,
+        512
+      ],
+      "relativeL2Percent": 0.6761234404202165,
+      "maxAbs": 0.0238475501537323,
+      "snrDb": 43.399480146277305,
+      "cosine": 0.9999771428973162
+    },
+    {
+      "case": "text-3",
+      "output": "out_1",
+      "shape": [
+        1,
+        12,
+        512
+      ],
+      "relativeL2Percent": 0.8388399368078536,
+      "maxAbs": 0.031044065952301025,
+      "snrDb": 41.52641802282746,
+      "cosine": 0.9999648190649661
+    },
+    {
+      "case": "text-3",
+      "output": "out_0",
+      "shape": [
+        1,
+        12,
+        512
+      ],
+      "relativeL2Percent": 0.8646509071650648,
+      "maxAbs": 0.03157882206141949,
+      "snrDb": 41.263183970772566,
+      "cosine": 0.9999626191006876
+    },
+    {
+      "case": "text-4",
+      "output": "out_1",
+      "shape": [
+        1,
+        7,
+        512
+      ],
+      "relativeL2Percent": 0.8536148015319026,
+      "maxAbs": 0.03186377137899399,
+      "snrDb": 41.37476125855326,
+      "cosine": 0.9999635665379315
+    },
+    {
+      "case": "text-4",
+      "output": "out_0",
+      "shape": [
+        1,
+        7,
+        512
+      ],
+      "relativeL2Percent": 0.8399854981655774,
+      "maxAbs": 0.025696277618408203,
+      "snrDb": 41.51456423402506,
+      "cosine": 0.9999647217265414
+    },
+    {
+      "case": "text-5",
+      "output": "out_1",
+      "shape": [
+        1,
+        9,
+        512
+      ],
+      "relativeL2Percent": 0.7145209729963087,
+      "maxAbs": 0.03255295753479004,
+      "snrDb": 42.91970038090636,
+      "cosine": 0.9999744727788514
+    },
+    {
+      "case": "text-5",
+      "output": "out_0",
+      "shape": [
+        1,
+        9,
+        512
+      ],
+      "relativeL2Percent": 0.7657946614526482,
+      "maxAbs": 0.02689361572265625,
+      "snrDb": 42.317753311078654,
+      "cosine": 0.9999706779514841
+    },
+    {
+      "case": "text-6",
+      "output": "out_1",
+      "shape": [
+        1,
+        10,
+        512
+      ],
+      "relativeL2Percent": 0.8731717975463806,
+      "maxAbs": 0.03360816463828087,
+      "snrDb": 41.178005999060574,
+      "cosine": 0.9999618832295314
+    },
+    {
+      "case": "text-6",
+      "output": "out_0",
+      "shape": [
+        1,
+        10,
+        512
+      ],
+      "relativeL2Percent": 0.9162132443970674,
+      "maxAbs": 0.03309333324432373,
+      "snrDb": 40.76006869068816,
+      "cosine": 0.9999580278025965
+    },
+    {
+      "case": "text-7",
+      "output": "out_1",
+      "shape": [
+        1,
+        9,
+        512
+      ],
+      "relativeL2Percent": 0.8466118024892378,
+      "maxAbs": 0.03866732120513916,
+      "snrDb": 41.44631362770036,
+      "cosine": 0.999964163370581
+    },
+    {
+      "case": "text-7",
+      "output": "out_0",
+      "shape": [
+        1,
+        9,
+        512
+      ],
+      "relativeL2Percent": 0.9422922486494965,
+      "maxAbs": 0.03547966480255127,
+      "snrDb": 40.516287627973,
+      "cosine": 0.9999556037477648
+    },
+    {
+      "case": "text-8",
+      "output": "out_1",
+      "shape": [
+        1,
+        12,
+        512
+      ],
+      "relativeL2Percent": 0.9146800854622255,
+      "maxAbs": 0.03989988565444946,
+      "snrDb": 40.77461552659728,
+      "cosine": 0.9999581692057593
+    },
+    {
+      "case": "text-8",
+      "output": "out_0",
+      "shape": [
+        1,
+        12,
+        512
+      ],
+      "relativeL2Percent": 0.8621278288882573,
+      "maxAbs": 0.028980255126953125,
+      "snrDb": 41.28856671912237,
+      "cosine": 0.9999628371532682
+    },
+    {
+      "case": "text-9",
+      "output": "out_1",
+      "shape": [
+        1,
+        12,
+        512
+      ],
+      "relativeL2Percent": 0.89813940695189,
+      "maxAbs": 0.03576439619064331,
+      "snrDb": 40.933124959950504,
+      "cosine": 0.9999596686471813
+    },
+    {
+      "case": "text-9",
+      "output": "out_0",
+      "shape": [
+        1,
+        12,
+        512
+      ],
+      "relativeL2Percent": 0.8687327502069757,
+      "maxAbs": 0.03143474459648132,
+      "snrDb": 41.22227611570394,
+      "cosine": 0.9999622656888911
+    },
+    {
+      "case": "text-10",
+      "output": "out_1",
+      "shape": [
+        1,
+        16,
+        512
+      ],
+      "relativeL2Percent": 0.8631192869616569,
+      "maxAbs": 0.032784879207611084,
+      "snrDb": 41.278583573780224,
+      "cosine": 0.9999627550849626
+    },
+    {
+      "case": "text-10",
+      "output": "out_0",
+      "shape": [
+        1,
+        16,
+        512
+      ],
+      "relativeL2Percent": 0.8788108205896795,
+      "maxAbs": 0.03688156604766846,
+      "snrDb": 41.122092087068374,
+      "cosine": 0.9999613845174948
+    },
+    {
+      "case": "text-11",
+      "output": "out_1",
+      "shape": [
+        1,
+        11,
+        512
+      ],
+      "relativeL2Percent": 0.7643983800641615,
+      "maxAbs": 0.029176265001296997,
+      "snrDb": 42.333604839717296,
+      "cosine": 0.9999707856868328
+    },
+    {
+      "case": "text-11",
+      "output": "out_0",
+      "shape": [
+        1,
+        11,
+        512
+      ],
+      "relativeL2Percent": 0.8152638577528388,
+      "maxAbs": 0.02986466884613037,
+      "snrDb": 41.77403620752224,
+      "cosine": 0.999966767305802
+    },
+    {
+      "case": "text-12",
+      "output": "out_1",
+      "shape": [
+        1,
+        28,
+        512
+      ],
+      "relativeL2Percent": 0.8284776987898754,
+      "maxAbs": 0.035975754261016846,
+      "snrDb": 41.63438355111743,
+      "cosine": 0.9999656840090543
+    },
+    {
+      "case": "text-12",
+      "output": "out_0",
+      "shape": [
+        1,
+        28,
+        512
+      ],
+      "relativeL2Percent": 0.8218344521951991,
+      "maxAbs": 0.033938705921173096,
+      "snrDb": 41.70431313189813,
+      "cosine": 0.9999662292308258
+    },
+    {
+      "case": "text-13",
+      "output": "out_1",
+      "shape": [
+        1,
+        28,
+        512
+      ],
+      "relativeL2Percent": 0.8164945019792322,
+      "maxAbs": 0.03156840801239014,
+      "snrDb": 41.76093470643653,
+      "cosine": 0.9999666679161159
+    },
+    {
+      "case": "text-13",
+      "output": "out_0",
+      "shape": [
+        1,
+        28,
+        512
+      ],
+      "relativeL2Percent": 0.8052952271758491,
+      "maxAbs": 0.030623018741607666,
+      "snrDb": 41.88089749753391,
+      "cosine": 0.9999675748296302
+    },
+    {
+      "case": "text-14",
+      "output": "out_1",
+      "shape": [
+        1,
+        38,
+        512
+      ],
+      "relativeL2Percent": 0.8448581293775129,
+      "maxAbs": 0.04217786621302366,
+      "snrDb": 41.464324254174336,
+      "cosine": 0.9999643122108807
+    },
+    {
+      "case": "text-14",
+      "output": "out_0",
+      "shape": [
+        1,
+        38,
+        512
+      ],
+      "relativeL2Percent": 0.8267357725225611,
+      "maxAbs": 0.031133413314819336,
+      "snrDb": 41.65266540438098,
+      "cosine": 0.999965825078835
+    },
+    {
+      "case": "text-15",
+      "output": "out_1",
+      "shape": [
+        1,
+        12,
+        512
+      ],
+      "relativeL2Percent": 0.7874608302757127,
+      "maxAbs": 0.0392308235168457,
+      "snrDb": 42.07542079186419,
+      "cosine": 0.999968994802424
+    },
+    {
+      "case": "text-15",
+      "output": "out_0",
+      "shape": [
+        1,
+        12,
+        512
+      ],
+      "relativeL2Percent": 0.7979810251900399,
+      "maxAbs": 0.029831111431121826,
+      "snrDb": 41.960148708154215,
+      "cosine": 0.9999681611058061
+    },
+    {
+      "case": "text-16",
+      "output": "out_1",
+      "shape": [
+        1,
+        12,
+        512
+      ],
+      "relativeL2Percent": 0.7481778588479571,
+      "maxAbs": 0.032630205154418945,
+      "snrDb": 42.51990296425416,
+      "cosine": 0.9999720118464874
+    },
+    {
+      "case": "text-16",
+      "output": "out_0",
+      "shape": [
+        1,
+        12,
+        512
+      ],
+      "relativeL2Percent": 0.7783017401853348,
+      "maxAbs": 0.027882516384124756,
+      "snrDb": 42.177039970440134,
+      "cosine": 0.9999697118743527
+    },
+    {
+      "case": "text-17",
+      "output": "out_1",
+      "shape": [
+        1,
+        9,
+        512
+      ],
+      "relativeL2Percent": 0.8282976855753935,
+      "maxAbs": 0.032822489738464355,
+      "snrDb": 41.63627104285021,
+      "cosine": 0.9999656959532018
+    },
+    {
+      "case": "text-17",
+      "output": "out_0",
+      "shape": [
+        1,
+        9,
+        512
+      ],
+      "relativeL2Percent": 0.7744683454758899,
+      "maxAbs": 0.026877641677856445,
+      "snrDb": 42.219926565612354,
+      "cosine": 0.999970009837649
+    },
+    {
+      "case": "text-18",
+      "output": "out_1",
+      "shape": [
+        1,
+        8,
+        512
+      ],
+      "relativeL2Percent": 0.8694400000496911,
+      "maxAbs": 0.03681612014770508,
+      "snrDb": 41.21520766474764,
+      "cosine": 0.9999622032352403
+    },
+    {
+      "case": "text-18",
+      "output": "out_0",
+      "shape": [
+        1,
+        8,
+        512
+      ],
+      "relativeL2Percent": 0.9048188236796093,
+      "maxAbs": 0.030763626098632812,
+      "snrDb": 40.86876746016778,
+      "cosine": 0.9999590650349988
+    },
+    {
+      "case": "text-19",
+      "output": "out_1",
+      "shape": [
+        1,
+        9,
+        512
+      ],
+      "relativeL2Percent": 0.7200790291575219,
+      "maxAbs": 0.03184247016906738,
+      "snrDb": 42.852396736832276,
+      "cosine": 0.9999740747416477
+    },
+    {
+      "case": "text-19",
+      "output": "out_0",
+      "shape": [
+        1,
+        9,
+        512
+      ],
+      "relativeL2Percent": 0.7663411845263517,
+      "maxAbs": 0.03073294460773468,
+      "snrDb": 42.311556681299855,
+      "cosine": 0.9999706358539731
+    },
+    {
+      "case": "text-20",
+      "output": "out_1",
+      "shape": [
+        1,
+        10,
+        512
+      ],
+      "relativeL2Percent": 0.831014691878383,
+      "maxAbs": 0.029188334941864014,
+      "snrDb": 41.60782596125382,
+      "cosine": 0.9999654730910799
+    },
+    {
+      "case": "text-20",
+      "output": "out_0",
+      "shape": [
+        1,
+        10,
+        512
+      ],
+      "relativeL2Percent": 0.8275275237717652,
+      "maxAbs": 0.029159128665924072,
+      "snrDb": 41.64435105138543,
+      "cosine": 0.9999657596950801
+    },
+    {
+      "case": "text-21",
+      "output": "out_1",
+      "shape": [
+        1,
+        14,
+        512
+      ],
+      "relativeL2Percent": 0.8580440701005159,
+      "maxAbs": 0.035084664821624756,
+      "snrDb": 41.32980811458878,
+      "cosine": 0.9999631874942714
+    },
+    {
+      "case": "text-21",
+      "output": "out_0",
+      "shape": [
+        1,
+        14,
+        512
+      ],
+      "relativeL2Percent": 0.8432095117165963,
+      "maxAbs": 0.036333441734313965,
+      "snrDb": 41.48129006201549,
+      "cosine": 0.9999644502379934
+    },
+    {
+      "case": "text-22",
+      "output": "out_1",
+      "shape": [
+        1,
+        26,
+        512
+      ],
+      "relativeL2Percent": 0.8504831765782496,
+      "maxAbs": 0.03495633602142334,
+      "snrDb": 41.40668545505519,
+      "cosine": 0.9999638354773274
+    },
+    {
+      "case": "text-22",
+      "output": "out_0",
+      "shape": [
+        1,
+        26,
+        512
+      ],
+      "relativeL2Percent": 0.8931666732399992,
+      "maxAbs": 0.049142710864543915,
+      "snrDb": 40.981349802876124,
+      "cosine": 0.9999601122309714
+    },
+    {
+      "case": "text-23",
+      "output": "out_1",
+      "shape": [
+        1,
+        9,
+        512
+      ],
+      "relativeL2Percent": 0.8110626635469336,
+      "maxAbs": 0.03554200381040573,
+      "snrDb": 41.818911808962696,
+      "cosine": 0.9999671083480414
+    },
+    {
+      "case": "text-23",
+      "output": "out_0",
+      "shape": [
+        1,
+        9,
+        512
+      ],
+      "relativeL2Percent": 0.808409799129451,
+      "maxAbs": 0.027878642082214355,
+      "snrDb": 41.84736861659199,
+      "cosine": 0.9999673242192983
+    },
+    {
+      "case": "text-24",
+      "output": "out_1",
+      "shape": [
+        1,
+        9,
+        512
+      ],
+      "relativeL2Percent": 0.4761594410913285,
+      "maxAbs": 0.020738720893859863,
+      "snrDb": 46.444952004763145,
+      "cosine": 0.9999886650616125
+    },
+    {
+      "case": "text-24",
+      "output": "out_0",
+      "shape": [
+        1,
+        9,
+        512
+      ],
+      "relativeL2Percent": 1.0035484944175104,
+      "maxAbs": 0.03620278835296631,
+      "snrDb": 39.969232725631386,
+      "cosine": 0.9999496462727142
+    },
+    {
+      "case": "text-25",
+      "output": "out_1",
+      "shape": [
+        1,
+        7,
+        512
+      ],
+      "relativeL2Percent": 0.5021962027898593,
+      "maxAbs": 0.028348326683044434,
+      "snrDb": 45.98253150803522,
+      "cosine": 0.9999873925022442
+    },
+    {
+      "case": "text-25",
+      "output": "out_0",
+      "shape": [
+        1,
+        7,
+        512
+      ],
+      "relativeL2Percent": 0.9778181747676753,
+      "maxAbs": 0.03111577033996582,
+      "snrDb": 40.19483789476837,
+      "cosine": 0.9999521940929383
+    },
+    {
+      "case": "text-26",
+      "output": "out_1",
+      "shape": [
+        1,
+        8,
+        512
+      ],
+      "relativeL2Percent": 0.5738600812479446,
+      "maxAbs": 0.027990534901618958,
+      "snrDb": 44.823879690344235,
+      "cosine": 0.9999835342977971
+    },
+    {
+      "case": "text-26",
+      "output": "out_0",
+      "shape": [
+        1,
+        8,
+        512
+      ],
+      "relativeL2Percent": 1.1347429100247193,
+      "maxAbs": 0.04078340530395508,
+      "snrDb": 38.90205044174871,
+      "cosine": 0.9999356175332501
+    },
+    {
+      "case": "text-27",
+      "output": "out_1",
+      "shape": [
+        1,
+        7,
+        512
+      ],
+      "relativeL2Percent": 0.5080053461784867,
+      "maxAbs": 0.026183754205703735,
+      "snrDb": 45.882634344731116,
+      "cosine": 0.9999870973800669
+    },
+    {
+      "case": "text-27",
+      "output": "out_0",
+      "shape": [
+        1,
+        7,
+        512
+      ],
+      "relativeL2Percent": 1.0481982785967148,
+      "maxAbs": 0.039839982986450195,
+      "snrDb": 39.59113115705625,
+      "cosine": 0.9999450647087523
+    },
+    {
+      "case": "max-length-random",
+      "output": "out_1",
+      "shape": [
+        1,
+        256,
+        512
+      ],
+      "relativeL2Percent": 1.688035012797372,
+      "maxAbs": 0.07203340530395508,
+      "snrDb": 35.45237099180211,
+      "cosine": 0.9998575219306707
+    },
+    {
+      "case": "max-length-random",
+      "output": "out_0",
+      "shape": [
+        1,
+        256,
+        512
+      ],
+      "relativeL2Percent": 2.004486229855651,
+      "maxAbs": 0.07896792888641357,
+      "snrDb": 33.95993845719658,
+      "cosine": 0.9997991053695531
+    },
+    {
+      "case": "masked-padding",
+      "output": "out_1",
+      "shape": [
+        1,
+        256,
+        512
+      ],
+      "relativeL2Percent": 0.5980231240460545,
+      "maxAbs": 0.021076351404190063,
+      "snrDb": 44.46564045229077,
+      "cosine": 0.9999821194090742
+    },
+    {
+      "case": "masked-padding",
+      "output": "out_0",
+      "shape": [
+        1,
+        256,
+        512
+      ],
+      "relativeL2Percent": 0.6823557523235396,
+      "maxAbs": 0.02597804367542267,
+      "snrDb": 43.319782859107335,
+      "cosine": 0.9999767200812606
+    }
+  ]
+}

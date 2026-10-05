@@ -1,0 +1,89 @@
+{
+  "format": "irodori-quality-summary-v1",
+  "sdkVersion": "0.2.0",
+  "modelVersion": "0.2.0-int8",
+  "corpusSha256": "96da4afbdfa04c7006807bb86efb367ac650169bbd6a6ddbbb3798cfcf15146c",
+  "scope": "Japanese, 24 conditions, 3 seeds, one synthetic reference voice, AudioSeal enabled.",
+  "audio": {
+    "caseCount": 24,
+    "seedCount": 3,
+    "pairedComparisons": 72,
+    "expectedCharacters": 2760,
+    "baselineCerPercent": 6.521739130434782,
+    "int8CerPercent": 5.579710144927536,
+    "cerDeltaPercentagePoints": -0.9420289855072461,
+    "cerDeltaClusterBootstrap95CI": [
+      -3.0146425495262705,
+      0.0
+    ],
+    "matchingRecognizedReadings": 68,
+    "pairsWithIncreasedCer": 0,
+    "pairsWithDecreasedCer": 4,
+    "allFinite": true,
+    "clippedSamples": {
+      "baseline": 29,
+      "int8": 32
+    },
+    "allStreamPcmMatches": true,
+    "absoluteDurationChangePercentMedian": 0.0,
+    "absoluteDurationChangePercentMax": 3.2258064516129004,
+    "logMelRmseDbMedian": 1.085895339758867,
+    "absoluteRmsLevelChangeDbMedian": 0.010692575891287992
+  },
+  "dnsmos": {
+    "SIG": {
+      "baselineMean": 3.299271150164423,
+      "int8Mean": 3.291741957583562,
+      "deltaMean": -0.007529192580861753,
+      "deltaClusterBootstrap95CI": [
+        -0.021072435266461385,
+        0.0048078841230213675
+      ],
+      "worstPairDelta": -0.18020059762874974
+    },
+    "BAK": {
+      "baselineMean": 4.002418513787369,
+      "int8Mean": 4.000900421799971,
+      "deltaMean": -0.0015180919873992048,
+      "deltaClusterBootstrap95CI": [
+        -0.011137863626762643,
+        0.008773089349161132
+      ],
+      "worstPairDelta": -0.10893576817809603
+    },
+    "OVRL": {
+      "baselineMean": 3.036527145217322,
+      "int8Mean": 3.0310775392595497,
+      "deltaMean": -0.00544960595777216,
+      "deltaClusterBootstrap95CI": [
+        -0.018901033898669095,
+        0.007574619931768989
+      ],
+      "worstPairDelta": -0.15620227675044518
+    },
+    "P808_MOS": {
+      "baselineMean": 3.633757713768217,
+      "int8Mean": 3.633109324508243,
+      "deltaMean": -0.0006483892599741617,
+      "deltaClusterBootstrap95CI": [
+        -0.017677486108409034,
+        0.016936031149493325
+      ],
+      "worstPairDelta": -0.27222275733947754
+    }
+  },
+  "encoder": {
+    "naturalInputCount": 28,
+    "inputCount": 30,
+    "outputCount": 60,
+    "maxRelativeL2Percent": 2.004486229855651,
+    "maxAbs": 0.07896792888641357,
+    "minSnrDb": 33.95993845719658,
+    "minCosine": 0.9997991053695531
+  },
+  "limitations": [
+    "Proxy measurements do not establish an overall perceptual degradation percentage.",
+    "One synthetic reference voice; not a multi-speaker voice identity test.",
+    "Condition-specific differences remain; worst OVRL pair delta -0.1562."
+  ]
+}

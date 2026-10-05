@@ -115,7 +115,15 @@ public enum ModelBundle {
             }
         default: throw IrodoriError.invalid("This is not an Irodori Core ML bundle")
         }
-        for path in paths(sharedDecoder: sharedDecoder) {
+        var required = paths(sharedDecoder: sharedDecoder)
+        if let standalone = core?["flexible_decoder_stage_1_package"] {
+            guard sharedDecoder, standalone as? String == "decoder_stage_1_2d_w128.mlpackage" else {
+                throw IrodoriError.invalid("Invalid standalone flexible decoder package")
+            }
+            required += ["Manifest.json", "Data/com.apple.CoreML/model.mlmodel", "Data/com.apple.CoreML/weights/weight.bin"]
+                .map { "decoder_stage_1_2d_w128.mlpackage/\($0)" }
+        }
+        for path in required {
             let file = try safeURL(path, under: root)
             let attrs = try FileManager.default.attributesOfItem(atPath: file.path)
             guard attrs[.type] as? FileAttributeType == .typeRegular,
@@ -135,6 +143,9 @@ public enum ModelBundle {
             let manifest = try manifest(from: Data(contentsOf: root.appendingPathComponent("manifest.json")))
             guard manifest.format == (sharedDecoder ? "irodori-coreml-distribution-v2" : "irodori-coreml-distribution-v1") else {
                 throw IrodoriError.invalid("Model layout and manifest format differ")
+            }
+            guard Set(required).isSubset(of: Set(manifest.files.map(\.path))) else {
+                throw IrodoriError.invalid("Manifest does not cover every required model file")
             }
             for entry in manifest.files {
                 let url = try safeURL(entry.path, under: root)

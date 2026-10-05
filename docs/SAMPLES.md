@@ -2,7 +2,7 @@
 
 [README](../README.md) · [音声登録の詳細](VOICE_REGISTRATION.md) · [困ったとき](TROUBLESHOOTING.md)
 
-対象: `0.1.0` のiPhone / Mac共通SwiftUIサンプル。
+対象: `0.2.0` のiPhone / Mac共通SwiftUIサンプル。
 
 同じSwiftUI画面をiPhoneとMacで使います。文章入力を中心に、モデル・声の設定と生成結果を分けた画面です。Macは広いウィンドウで2列、iPhoneは縦に並びます。ライト・ダークモードに対応します。
 
@@ -26,7 +26,7 @@ open Examples/IrodoriSamples.xcodeproj
 
 速度比較では **Product → Scheme → Edit Scheme… → Run → Build Configuration** をReleaseにします。同じ端末、モデル、参照音声、文章、電源・熱状態で測定してください。
 
-ソースとモデルは別配布です。サンプルアプリをビルドしただけでは、約2.99 GBのモデルはアプリに入りません。生成にPython、ONNX Runtime、ASR、LLMは不要です。
+ソースとモデルは別配布です。サンプルアプリをビルドしただけでは、別配布のモデルはアプリに入りません。生成にPython、ONNX Runtime、ASR、LLMは不要です。
 
 ## アプリアイコン
 
@@ -44,12 +44,18 @@ iPhoneでは画面を縦にスクロールして設定欄へ進みます。Mac�
 ## 1. モデルを取り込む
 
 1. モデル配布フォルダをMacまたはiPhoneのFilesから選べる場所へ用意します。圧縮ファイルなら先に展開します。iPhoneではFinderのファイル共有でサンプルへコピーすると、「ファイル」→「このiPhone内」→「Irodori Core ML」から選択できます。
-2. 「フォルダを選ぶ」（選択後は「モデルを変更」）で `manifest.json` と15個の `.mlpackage` が並ぶ親フォルダを選びます。単体の `.mlpackage` やZIPを選ばないでください。
+2. 「フォルダを選ぶ」（選択後は「モデルを変更」）で `manifest.json` と各モデルのすべての `.mlpackage` が並ぶ親フォルダを選びます。単体の `.mlpackage` やZIPを選ばないでください。
 3. コピーとハッシュ検証が終わるまで待ちます。外部の元フォルダは残り、アプリ内にコピーされます。
 
-モデルは [Hugging Face](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)、SDK・サンプルは [GitHub](https://github.com/Corvelis/irodori-tts-coreml) の `v0.1.0` タグから取得します。直接取得する場合は「URLからダウンロード」に[モデル取得ガイドのmanifest URL](HUGGINGFACE.md#対応モデル)を入力し、「ダウンロードして検証」を押します。
+モデルは [Hugging Face](https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML)、SDK・サンプルは [GitHub](https://github.com/Corvelis/irodori-tts-coreml) の `v0.2.0` タグから取得します。直接取得する場合は「取得するモデル」で現行版または軽量INT8版を選び、「モデルをダウンロード」を押します。独自の配布先は「URLからダウンロード」にmanifest URLを指定できます。
 
-原本約2.99 GBに加え、アプリ内コピーとコンパイルキャッシュが必要です。選び直した過去のモデルコピーも残るため、容量に余裕を持たせてください。現在の画面にはモデルの個別削除機能はありません。
+現行版約2.99 GB / 軽量INT8版約1.96 GBに加え、アプリ内コピーとコンパイルキャッシュが必要です。選び直した過去のモデルコピーも残るため、容量に余裕を持たせてください。現在の画面にはモデルの個別削除機能はありません。
+
+## モデルを切り替える
+
+「保存済みモデル」で取り込み済み・取得済みのモデルを選びます。モデル名とmanifestに記載された容量を表示します。切り替え時にはファイルを検証し、以前のCore MLセッションを解放します。登録音声と話し方の指示は保持し、次の生成時に選択したモデルを準備します。過去の生成結果の表示はクリアされます。
+
+軽量INT8版にはiOS 18 / macOS 15以降が必要です。旧OSでは現行版を使用してください。初回コンパイルの影響を避けて速度を比較するには、それぞれ2回以上生成します。
 
 ## 2. 声を登録する
 

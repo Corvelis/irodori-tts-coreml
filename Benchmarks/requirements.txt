@@ -1,0 +1,12 @@
+# Optional comparison tooling, not SDK/runtime dependencies.
+numpy==2.2.6
+scipy==1.14.1
+soundfile==0.13.1
+sherpa-onnx==1.12.23
+pyopenjtalk-plus==0.4.1.post8
+# Official external DNSMOS evaluator additionally uses these modules:
+librosa==0.11.0
+onnxruntime==1.20.1
+pandas==2.2.3
+requests==2.32.3
+tqdm==4.67.1

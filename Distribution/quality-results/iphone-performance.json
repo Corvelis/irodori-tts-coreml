@@ -1,0 +1,218 @@
+{
+  "device": "iPhone 17 Pro",
+  "os": "iOS 27.0.1",
+  "configuration": "Release",
+  "modelLayout": "v2 with separate flexible stage1 decoder",
+  "modelOrder": [
+    "int8",
+    "baseline-a"
+  ],
+  "scope": "TTS only; first watermarked PCM callback, not physical speaker onset. One engine resident at a time. AudioSeal on for every request. Fixed seed. Normal steady passes 2 through 6; long passes 1 through 4; reference passes 1 through 3.",
+  "thermalState": "fair",
+  "steady": [
+    {
+      "variant": "baseline-a",
+      "phase": "normal",
+      "count": 5,
+      "rtf": {
+        "median": 0.12534008890869697,
+        "mean": 0.12542050906479413,
+        "min": 0.12372085076555119,
+        "max": 0.12757552301298794
+      },
+      "firstPcmMs": {
+        "median": 460.3515833441634,
+        "mean": 461.84098332887515,
+        "min": 455.8322916564066,
+        "max": 468.16029166802764
+      }
+    },
+    {
+      "variant": "baseline-a",
+      "phase": "long-single",
+      "count": 4,
+      "rtf": {
+        "median": 0.12477922963916988,
+        "mean": 0.1242822149194789,
+        "min": 0.11997876521839199,
+        "max": 0.12759163518118383
+      },
+      "firstPcmMs": {
+        "median": 1351.5490208374104,
+        "mean": 1357.9836458302452,
+        "min": 1344.6565000049304,
+        "max": 1384.1800416412298
+      }
+    },
+    {
+      "variant": "baseline-a",
+      "phase": "reference-caption",
+      "count": 3,
+      "rtf": {
+        "median": 0.12916125868287054,
+        "mean": 0.1313553327539315,
+        "min": 0.12864661458176369,
+        "max": 0.13625812499716025
+      },
+      "firstPcmMs": {
+        "median": 482.71899999235757,
+        "mean": 482.734986115247,
+        "min": 479.6970416791737,
+        "max": 485.78891667420976
+      }
+    },
+    {
+      "variant": "baseline-a",
+      "phase": "short",
+      "count": 1,
+      "rtf": {
+        "median": 0.42042350000701845,
+        "mean": 0.42042350000701845,
+        "min": 0.42042350000701845,
+        "max": 0.42042350000701845
+      },
+      "firstPcmMs": {
+        "median": 420.37762500694953,
+        "mean": 420.37762500694953,
+        "min": 420.37762500694953,
+        "max": 420.37762500694953
+      }
+    },
+    {
+      "variant": "baseline-a",
+      "phase": "numbers",
+      "count": 1,
+      "rtf": {
+        "median": 0.12792691241478973,
+        "mean": 0.12792691241478973,
+        "min": 0.12792691241478973,
+        "max": 0.12792691241478973
+      },
+      "firstPcmMs": {
+        "median": 824.4462916627526,
+        "mean": 824.4462916627526,
+        "min": 824.4462916627526,
+        "max": 824.4462916627526
+      }
+    },
+    {
+      "variant": "baseline-a",
+      "phase": "long-multiple",
+      "count": 1,
+      "rtf": {
+        "median": 0.11999066788449655,
+        "mean": 0.11999066788449655,
+        "min": 0.11999066788449655,
+        "max": 0.11999066788449655
+      },
+      "firstPcmMs": {
+        "median": 1277.0952499995474,
+        "mean": 1277.0952499995474,
+        "min": 1277.0952499995474,
+        "max": 1277.0952499995474
+      }
+    },
+    {
+      "variant": "int8",
+      "phase": "normal",
+      "count": 5,
+      "rtf": {
+        "median": 0.12857182706154835,
+        "mean": 0.1348324721057073,
+        "min": 0.12689761157565513,
+        "max": 0.14890324267501276
+      },
+      "firstPcmMs": {
+        "median": 479.84641668153927,
+        "mean": 497.49512500711717,
+        "min": 474.2591250105761,
+        "max": 573.1612916861195
+      }
+    },
+    {
+      "variant": "int8",
+      "phase": "long-single",
+      "count": 4,
+      "rtf": {
+        "median": 0.1231797208279997,
+        "mean": 0.1254226408934142,
+        "min": 0.12247397532508975,
+        "max": 0.1328571465925677
+      },
+      "firstPcmMs": {
+        "median": 1420.9896458196454,
+        "mean": 1453.588979151391,
+        "min": 1406.2076666450594,
+        "max": 1566.1689583212137
+      }
+    },
+    {
+      "variant": "int8",
+      "phase": "reference-caption",
+      "count": 3,
+      "rtf": {
+        "median": 0.13615703993006417,
+        "mean": 0.13641110243245042,
+        "min": 0.13599475694718421,
+        "max": 0.13708151042010286
+      },
+      "firstPcmMs": {
+        "median": 508.7472499872092,
+        "mean": 508.0764444331483,
+        "min": 506.641291663982,
+        "max": 508.8407916482538
+      }
+    },
+    {
+      "variant": "int8",
+      "phase": "short",
+      "count": 1,
+      "rtf": {
+        "median": 0.43646920833270997,
+        "mean": 0.43646920833270997,
+        "min": 0.43646920833270997,
+        "max": 0.43646920833270997
+      },
+      "firstPcmMs": {
+        "median": 436.4379583275877,
+        "mean": 436.4379583275877,
+        "min": 436.4379583275877,
+        "max": 436.4379583275877
+      }
+    },
+    {
+      "variant": "int8",
+      "phase": "numbers",
+      "count": 1,
+      "rtf": {
+        "median": 0.13178965659200592,
+        "mean": 0.13178965659200592,
+        "min": 0.13178965659200592,
+        "max": 0.13178965659200592
+      },
+      "firstPcmMs": {
+        "median": 887.0604999829084,
+        "mean": 887.0604999829084,
+        "min": 887.0604999829084,
+        "max": 887.0604999829084
+      }
+    },
+    {
+      "variant": "int8",
+      "phase": "long-multiple",
+      "count": 1,
+      "rtf": {
+        "median": 0.12956510900824664,
+        "mean": 0.12956510900824664,
+        "min": 0.12956510900824664,
+        "max": 0.12956510900824664
+      },
+      "firstPcmMs": {
+        "median": 1417.479291674681,
+        "mean": 1417.479291674681,
+        "min": 1417.479291674681,
+        "max": 1417.479291674681
+      }
+    }
+  ]
+}

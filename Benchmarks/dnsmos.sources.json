@@ -1,0 +1,26 @@
+{
+  "repository": "https://github.com/microsoft/DNS-Challenge",
+  "revision": "591184a9fcb2cbdec02520fed81a32bbbf9d73ff",
+  "files": [
+    {
+      "path": "DNSMOS/dnsmos_local.py",
+      "bytes": 6491,
+      "sha256": "1ab566afe006daab32ac7073296a5d0ef99f8b82f91c7266f3ccf26113d7a28b"
+    },
+    {
+      "path": "DNSMOS/DNSMOS/sig_bak_ovr.onnx",
+      "bytes": 1157965,
+      "sha256": "269fbebdb513aa23cddfbb593542ecc540284a91849ac50516870e1ac78f6edd"
+    },
+    {
+      "path": "DNSMOS/DNSMOS/model_v8.onnx",
+      "bytes": 224860,
+      "sha256": "9246480c58567bc6affd4200938e77eef49468c8bc7ed3776d109c07456f6e91"
+    },
+    {
+      "path": "LICENSE",
+      "bytes": 19047,
+      "sha256": "d6239afa918961b465b07bf7411cbe34ff6685854f58553db7966f4881a0211f"
+    }
+  ]
+}

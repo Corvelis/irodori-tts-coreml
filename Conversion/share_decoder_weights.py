@@ -54,7 +54,7 @@ def combine(source, destination):
             "minimumOS": {"iOS": "18.0", "macOS": "15.0"}}
 
 
-def assemble(source, destination):
+def assemble(source, destination, keep_flexible=True):
     """Create runtime artifacts; stage_model.py supplies notices and a manifest."""
     if destination.exists():
         raise FileExistsError(destination)
@@ -64,7 +64,7 @@ def assemble(source, destination):
     if core.get("format") != "irodori-coreml-only-v1":
         raise ValueError("Use an original v1 runtime bundle as input")
     rows = stage_model.inventory(source)
-    excluded = {name + ".mlpackage" for name, _ in VARIANTS} | {"coreml-only.json"}
+    excluded = {name + ".mlpackage" for name, _ in VARIANTS if not (keep_flexible and name.endswith("w128"))} | {"coreml-only.json"}
     destination.mkdir(parents=True)
     for row in rows:
         relative = row["path"]
@@ -77,6 +77,11 @@ def assemble(source, destination):
     core.update(format="irodori-coreml-only-v2", experimental=True,
                 decoder_stage_1_functions={"fixed64": "w64", "fixed57": "w57", "flexible128": "w128"},
                 minimum_os=report["minimumOS"])
+    if keep_flexible:
+        core["flexible_decoder_stage_1_package"] = "decoder_stage_1_2d_w128.mlpackage"
+        kept_bytes = package_bytes(source / "decoder_stage_1_2d_w128.mlpackage")
+        report["savedBytes"] -= kept_bytes
+        report["separateFlexibleDecoder"] = True
     core["model_bytes"] = core["model_bytes"] - report["savedBytes"]
     (destination / "coreml-only.json").write_text(json.dumps(core, indent=2) + "\n")
     stage_model.inventory(destination)
@@ -90,9 +95,10 @@ if __name__ == "__main__":
     parser.add_argument("--report", type=Path, required=True)
     parser.add_argument("--runtime-bundle", action="store_true",
                         help="Create a complete runtime folder instead of a single package")
+    parser.add_argument("--all-shared", action="store_true", help="Experimental: omit the standalone flexible decoder; not the iPhone release layout")
     args = parser.parse_args()
     if args.report.exists():
         raise FileExistsError(args.report)
-    report = assemble(args.source, args.destination) if args.runtime_bundle else combine(args.source, args.destination)
+    report = assemble(args.source, args.destination, keep_flexible=not args.all_shared) if args.runtime_bundle else combine(args.source, args.destination)
     args.report.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report, indent=2))

@@ -53,3 +53,7 @@ lockはファイルの同一性を検査するmetadataです。再変換した�
 他の推論・変換プロセスを同時実行すると速度比較が変わるため、順番に測定します。
 
 再配布する場合は[部品別ライセンス](../THIRD_PARTY_NOTICES.md)を保持してください。
+
+## INT8の軽量版
+
+`Conversion/make_light_bundle.py` は重み共有とINT8テキスト重みを組み合わせたiPhone / Mac共通構成を作成します。[軽量モデルの変換](COMPACT_MODELS.md)を参照してください。`quantize_text_encoder.py` と `validate_quantized_text.py` は個別にも実行できます。量子化モデルには専用の数値検証レポートが必要で、配布ツールは元FP32の検証済みフラグだけでは受け入れません。

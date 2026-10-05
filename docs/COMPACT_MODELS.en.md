@@ -1,33 +1,20 @@
-# Models with shared decoder weights
+# Light INT8 model
 
-[日本語](COMPACT_MODELS.md) · [Model download](HUGGINGFACE.md) · [Conversion](CONVERSION.md)
+[日本語](COMPACT_MODELS.md) · [Quality comparison](QUALITY.en.md)
 
-The `irodori-coreml-distribution-v2` layout combines three stage-1 decoder variants into one Core ML multifunction package. Sharing their identical weights saves approximately 170 MB without adding quantization or rounding. Auxiliary FP32 models, mixed-linear DiT, existing decoder precision and AudioSeal are retained.
+The light bundle is about 1.96 GB, roughly 34% smaller than the 2.99 GB standard bundle. Large text-encoder weights use symmetric INT8 storage with block size 128; text computation and outputs remain FP32. DiT mixed-linear precision, other auxiliary models, decoder precision and AudioSeal remain unchanged.
 
-| Layout | Core ML packages | Minimum OS | SDK compatibility |
-|---|---:|---|---|
-| v1 | 15 | iOS 17 / macOS 14 | v0.1.0 and later |
-| v2, shared weights | 13 | iOS 18 / macOS 15 | Requires an SDK supporting v2; v0.1.0 does not support it |
+The release layout shares fixed-width stage-1 decoder weights and retains the separate flexible decoder. It contains 14 Core ML packages. It requires iOS 18+ / macOS 15+ and SDK 0.2.0+. The standard 15-package v1 model remains supported on iOS 17+ / macOS 14+.
 
-The Swift API is unchanged. Pass the complete model folder to `prepare(modelDirectory:)`. The SDK detects its layout and continues to support v1. An unsupported OS produces an error explaining the minimum version. Use the matching manifest and complete bundle; do not mix individual v1 and v2 packages.
+Both use the same prepare, reference registration and synthesis APIs, including Voice Cloning, Japanese Voice Design captions and watermarking. Keep each complete bundle in its own directory. File size does not establish a proportional RAM reduction.
 
-Identical stored weights can still produce small numerical differences when Core ML selects different compiled execution paths. Performance, output and memory use vary by device. Initial compilation time and cache storage are separate from download size.
-
-With the [conversion environment](CONVERSION.md) installed, create new runtime artifacts from a validated v1 folder:
+To reproduce the light layout, use the pinned [conversion environment](CONVERSION.md) and a validated v1 bundle:
 
 ```sh
-python Conversion/share_decoder_weights.py \
-  artifacts/runtime-v1 artifacts/runtime-v2 \
-  --runtime-bundle --report artifacts/shared-decoder-report.json
-python Scripts/stage_model.py lock \
-  --source artifacts/runtime-v2 --output artifacts/shared.lock.json \
-  --version 0.2.0-candidate
-python Scripts/stage_model.py stage \
-  --source artifacts/runtime-v2 --lock artifacts/shared.lock.json \
-  --destination artifacts/shared-model
-python Scripts/stage_model.py verify artifacts/shared-model
+python Conversion/make_light_bundle.py artifacts/runtime-v1 artifacts/runtime-int8
+python Scripts/stage_model.py lock --source artifacts/runtime-int8 --output artifacts/int8.lock.json --version 0.2.0-int8
+python Scripts/stage_model.py stage --source artifacts/runtime-int8 --lock artifacts/int8.lock.json --destination artifacts/model-int8
+python Scripts/stage_model.py verify artifacts/model-int8
 ```
 
-The converter requires identical SHA-256 hashes for all three original weight files and the combined weight file. It rejects existing destinations and mismatched inputs. The packager also checks the validated auxiliary and AudioSeal package hashes.
-
-Compare short, normal and long speech, Voice Cloning, voice instructions and watermarked output with a fixed seed. See [validation](VALIDATION.md) for WAV and RTF comparison. Hash equality and an artifact lock do not replace quality and performance testing on target devices.
+The converter checks identical decoder weight bytes, quantizes the text encoder and compares FP32/INT8 features on natural and maximum-length/masked inputs. The report is bound to exact model and tokenizer hashes. Original Torch/ONNX validation is not attributed to the quantized model. Generated-speech and target-device tests are also required; see [quality measurements](QUALITY.en.md).

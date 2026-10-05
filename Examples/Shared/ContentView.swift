@@ -270,8 +270,24 @@ struct ContentView: View {
             }
             VStack(alignment: .leading, spacing: 5) {
                 Text("Irodori v4.1 Small MF").font(.subheadline.weight(.medium))
-                Text("Core ML · 約3.0 GB").font(.caption).foregroundStyle(.secondary)
+                Text(model.modelDetail).font(.caption).foregroundStyle(.secondary)
+                    .accessibilityIdentifier("modelDetail")
             }
+            if !model.installedModels.isEmpty {
+                Picker("保存済みモデル", selection: Binding(get: { model.modelPath }, set: { model.selectModel($0) })) {
+                    if model.modelPath.isEmpty { Text("選択してください").tag("") }
+                    ForEach(model.installedModels) { installed in
+                        Text(installed.information.description).tag(installed.id)
+                    }
+                }
+                .pickerStyle(.menu).font(.caption)
+                .accessibilityIdentifier("installedModels")
+                .disabled(model.busy || model.recording)
+            }
+            Button(action: model.refreshInstalledModels) {
+                Label("保存済みモデルを更新", systemImage: "arrow.clockwise")
+            }.font(.caption).buttonStyle(.plain)
+                .disabled(model.busy || model.recording)
             HStack {
                 Button {
                     focusedField = nil; importKind = .model; importing = true
@@ -283,6 +299,19 @@ struct ContentView: View {
             }
             .font(.caption.weight(.medium)).buttonStyle(.bordered)
             .disabled(model.busy || model.recording)
+            VStack(alignment: .leading, spacing: 10) {
+                Picker("取得するモデル", selection: $model.downloadVariant) {
+                    ForEach(ModelVariant.allCases) { variant in
+                        Text(String(format: "%@ · %.2f GB", variant.title, Double(variant.approximateBytes) / 1_000_000_000)).tag(variant)
+                    }
+                }
+                .pickerStyle(.menu).accessibilityIdentifier("downloadVariant")
+                Text("\(model.downloadVariant.minimumOS)以降")
+                    .font(.caption2).foregroundStyle(.secondary)
+                Button("モデルをダウンロード", action: model.downloadSelectedVariant)
+                    .buttonStyle(.bordered).accessibilityIdentifier("downloadModel")
+                    .disabled(!model.downloadVariant.isSupported)
+            }.font(.caption).disabled(model.busy || model.recording)
             DisclosureGroup("URLからダウンロード", isExpanded: $downloadExpanded) {
                 VStack(alignment: .leading, spacing: 10) {
                     TextField("manifest.json のHTTPS URL", text: $model.manifestURL)

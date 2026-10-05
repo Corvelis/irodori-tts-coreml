@@ -69,6 +69,31 @@ class DistributionTests(unittest.TestCase):
         (self.source / 'speaker_encoder.mlpackage/Data/com.apple.CoreML/weights/weight.bin').write_bytes(b'changed weights')
         with self.assertRaises(ValueError): s.inventory(self.source)
 
+    def test_quantized_text_needs_its_own_bound_numerical_evidence(self):
+        core=json.loads((self.source/'coreml-only.json').read_text())
+        for file in s.PACKAGE_FILES:
+            p=self.source/('decoder_stage_1_multifunction.mlpackage/'+file)
+            p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(b'shared')
+        core.update(format='irodori-coreml-only-v2',decoder_stage_1_functions={'fixed64':'w64','fixed57':'w57','flexible128':'w128'})
+        s.write_json(self.source/'coreml-only.json',core)
+        meta=json.loads((self.source/'text_encoder.json').read_text())
+        meta.update(validated_coreml=False,weight_storage='int8-symmetric-block128-float32-compute',
+            source_sha256='source',quantization_validation='text_encoder-int8-validation.json',source_validation={'package_sha256':'baseline'})
+        s.write_json(self.source/'text_encoder.json',meta)
+        with self.assertRaises(FileNotFoundError):s.inventory(self.source)
+        evidence={'format':'irodori-quantized-text-validation-v1','candidatePackageSha256':meta['validated_package_sha256'],
+            'baselinePackageSha256':'baseline','passed':True,'sourceOnnxSha256':'source',
+            'tokenizerSha256':s.checksum(self.source/'tokenizer/tokenizer.json'),'summary':{'naturalInputCount':24},
+            'outputs':[{'case':str(i),'output':key,'relativeL2Percent':1.0,'snrDb':40.0,'cosine':.9999} for i in range(26) for key in ['out_0','out_1']]}
+        report=self.source/'text_encoder-int8-validation.json'
+        s.write_json(report,evidence)
+        self.assertIn(report.name,{row['path'] for row in s.inventory(self.source)})
+        for field,value in [('candidatePackageSha256','wrong'),('passed',False)]:
+            bad=dict(evidence);bad[field]=value;s.write_json(report,bad)
+            with self.assertRaises(ValueError):s.inventory(self.source)
+        evidence['outputs'][0]['relativeL2Percent']=10;s.write_json(report,evidence)
+        with self.assertRaises(ValueError):s.inventory(self.source)
+
     def test_unvalidated_watermark_is_rejected(self):
         (self.source / 'audioseal_generator.mlpackage/Data/com.apple.CoreML/weights/weight.bin').write_bytes(b'changed weights')
         with self.assertRaises(ValueError): s.inventory(self.source)
@@ -105,6 +130,30 @@ class DistributionTests(unittest.TestCase):
         (self.source / 'escape').symlink_to(self.root)
         for name in ['../lock.json', '/etc/passwd', 'a//b', 'escape/lock.json']:
             with self.assertRaises((ValueError,FileNotFoundError)): s.safe_file(self.source, name)
+
+    def test_shared_decoder_standalone_flexible_is_kept_and_required(self):
+        for file in s.PACKAGE_FILES:
+            target = self.source / ('decoder_stage_1_multifunction.mlpackage/' + file)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(b'shared-decoder')
+        core = json.loads((self.source / 'coreml-only.json').read_text())
+        core.update(format='irodori-coreml-only-v2', decoder_stage_1_functions={
+            'fixed64':'w64', 'fixed57':'w57', 'flexible128':'w128'},
+            flexible_decoder_stage_1_package='decoder_stage_1_2d_w128.mlpackage')
+        s.write_json(self.source / 'coreml-only.json', core)
+        s.write_json(self.lock, {'format':'irodori-reviewed-artifacts-v1', 'bundleVersion':'test',
+                                'files':s.inventory(self.source)})
+        destination = self.root / 'compatible-bundle'
+        s.stage(self.source, destination, self.lock)
+        s.verify(destination)
+        flexible = 'decoder_stage_1_2d_w128.mlpackage/Data/com.apple.CoreML/weights/weight.bin'
+        self.assertTrue((destination / flexible).is_file())
+        manifest = json.loads((destination / 'manifest.json').read_text())
+        manifest['files'] = [r for r in manifest['files'] if r['path'] != flexible]
+        s.write_json(destination / 'manifest.json', manifest)
+        with self.assertRaisesRegex(ValueError, 'Incomplete manifest'): s.verify(destination)
+        (self.source / flexible).unlink()
+        with self.assertRaises(FileNotFoundError): s.inventory(self.source)
 
     def test_existing_destination_and_unlisted_files_are_rejected(self):
         destination = self.root / 'bundle'

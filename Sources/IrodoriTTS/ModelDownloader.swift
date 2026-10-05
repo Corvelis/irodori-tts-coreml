@@ -2,7 +2,7 @@ import Foundation
 import CryptoKit
 
 /// Downloads to disk, retaining completed verified files for a subsequent retry.
-/// Use a manifest URL pinned to a Hugging Face commit SHA, never a moving main branch.
+/// Prefer an immutable commit SHA or a versioned release tag over a moving main branch.
 public actor ModelDownloader {
     public init() {}
 
@@ -20,6 +20,11 @@ public actor ModelDownloader {
         let (data, response) = try await URLSession.shared.data(from: manifestURL)
         guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw IrodoriError.invalid("Manifest download failed") }
         let manifest = try ModelBundle.manifest(from: data)
+        if manifest.format == "irodori-coreml-distribution-v2" {
+            if #available(iOS 18, macOS 15, *) {} else {
+                throw IrodoriError.invalid("This model requires iOS 18 or macOS 15")
+            }
+        }
         let base = manifestURL.deletingLastPathComponent()
         for (index, entry) in manifest.files.enumerated() {
             try Task.checkCancellation()

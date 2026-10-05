@@ -1,0 +1,281 @@
+{
+  "format": "irodori-reviewed-artifacts-v1",
+  "bundleVersion": "0.2.0-int8",
+  "files": [
+    {
+      "path": "audioseal.json",
+      "bytes": 4707,
+      "sha256": "b51c3ce234918e4b3f02dbdfd85580b17d8e182a99a8333316c5f2242f28987a"
+    },
+    {
+      "path": "audioseal_detector.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 34313,
+      "sha256": "ff280a1ab9ad485ffaedb57af1df626dc5dd08d14d2e93661734f914c45af834"
+    },
+    {
+      "path": "audioseal_detector.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 34577472,
+      "sha256": "792bc6b01a558d7a6c69554e9f9aa19b327ef0ce0833ae56c30a42b3e65921d3"
+    },
+    {
+      "path": "audioseal_detector.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "12e032346f0d184985c6a39e5bd10c28bfdac1f38e222189686e497b0f0b07fa"
+    },
+    {
+      "path": "audioseal_generator.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 61709,
+      "sha256": "7939251c4b571b8b2478d24eb539b5cc5b91ae70f4608819922286c56f9451d7"
+    },
+    {
+      "path": "audioseal_generator.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 58677248,
+      "sha256": "8d43322ebc8e3550f759ab4d2803e7a97341fdc3e61c688cd0ffca6234fe4000"
+    },
+    {
+      "path": "audioseal_generator.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "b4c73528f36565053259feeae1299682f9ff4eb6c6935c6969bc25b84c19417f"
+    },
+    {
+      "path": "config.json",
+      "bytes": 2178,
+      "sha256": "d892d41544af570725846443c091cebb8bf7cfd687153d376128e05e58e665ee"
+    },
+    {
+      "path": "context_kv_speaker.json",
+      "bytes": 8044,
+      "sha256": "d7740eae90f44dbd3f780355ee22f885dc7b8a212d86cebdeed2249fe139c232"
+    },
+    {
+      "path": "context_kv_speaker.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 32887,
+      "sha256": "91458710a905eb23ed80b2e8e72e0cca3db12da1bd206bd99ece99eabb283905"
+    },
+    {
+      "path": "context_kv_speaker.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 94440832,
+      "sha256": "19cc4682e17937e4a34eb4d3233d06a6180c977dce5a1b7c5177e4765f7e7187"
+    },
+    {
+      "path": "context_kv_speaker.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "9c5db7543d3de2e7c55472a12f37eef0d4db2d1e8b7f86fdb812d65c9c766227"
+    },
+    {
+      "path": "context_kv_text.json",
+      "bytes": 15517,
+      "sha256": "468f861adaed59f50aaaffa61d0b9a29de5771d76dafd50bfab45a819b517d5a"
+    },
+    {
+      "path": "context_kv_text.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 62457,
+      "sha256": "d0e3c18bb0995dd36f2118f9f3999366d9bb5d54ebffdabbe46a390022dfe17e"
+    },
+    {
+      "path": "context_kv_text.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 125899648,
+      "sha256": "b079dfcfe188284a64d94ee965446e647edf0b4449f706ac7698da752263971f"
+    },
+    {
+      "path": "context_kv_text.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "5e363d11c6db4be528b3fb8cb58bae7c62995f46c7f74b26de22b25787791e9c"
+    },
+    {
+      "path": "coreml-only.json",
+      "bytes": 2009,
+      "sha256": "5b703089ea042271d10c6308d429f6f976f42e4284cef1ab3a2917782cdb1152"
+    },
+    {
+      "path": "dacvae_encode_stats.json",
+      "bytes": 1083,
+      "sha256": "8fdfb4730e2d2c55b0007a452a65466d529c183ebfec029d414e90505365f0f4"
+    },
+    {
+      "path": "dacvae_encode_stats.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 89422,
+      "sha256": "1d5b75d855ee6404e2e5703792e7e7ef13ab4a31f128e31cb0501825dc5594cd"
+    },
+    {
+      "path": "dacvae_encode_stats.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 109420864,
+      "sha256": "78753a0bdb619916a74676ae9ceb7a4aae8f0f03c3a73969eeb649bdf4c4a484"
+    },
+    {
+      "path": "dacvae_encode_stats.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "a74605c72b10950f0a70aa866fd36080c5057dfa4b63f82c67423ea9e766e9a2"
+    },
+    {
+      "path": "decoder_stage_0.json",
+      "bytes": 771,
+      "sha256": "f4b33dc8eceb467a5e61ba8c7a9d1ba2db15a1e2c1c3db6b61b81654d05457e1"
+    },
+    {
+      "path": "decoder_stage_0.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 3229,
+      "sha256": "cbb5e4e2b0cf52931d5dcb044ae2cb71306af5590d25d3c9325f70a1a782cd7f"
+    },
+    {
+      "path": "decoder_stage_0.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 44181824,
+      "sha256": "1e591f086e0fd3c685430a3cca658431c22ece27588f80e144c7c674b420f28f"
+    },
+    {
+      "path": "decoder_stage_0.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "701b93af732b72f71611309b1b9ce94c181c736253ef262dd120aee99c06ff10"
+    },
+    {
+      "path": "decoder_stage_1_2d_w128.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 21971,
+      "sha256": "f791f3d0f92937cc00c8450442facf073a1cad8d8dce3c5bdc5330f914998845"
+    },
+    {
+      "path": "decoder_stage_1_2d_w128.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 84971840,
+      "sha256": "d447d33d328a89a3f263e4c8a16bab1e15e71ce03225167890806465e418085e"
+    },
+    {
+      "path": "decoder_stage_1_2d_w128.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "b70093e8c00437257704e9077b709375243aecfd99d8e319d7d39e4da6325c12"
+    },
+    {
+      "path": "decoder_stage_1_multifunction.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 65390,
+      "sha256": "358eeb0891b74b6a560f1b911921ac54b1d2b83c9feaee8a5f264e37f49ab09a"
+    },
+    {
+      "path": "decoder_stage_1_multifunction.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 84971840,
+      "sha256": "d447d33d328a89a3f263e4c8a16bab1e15e71ce03225167890806465e418085e"
+    },
+    {
+      "path": "decoder_stage_1_multifunction.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "d65ed2206da49df8a74f8c54702533338ee442af35203aaa848cbf292cd30f30"
+    },
+    {
+      "path": "decoder_stage_2_2d_fixed_w256.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 22401,
+      "sha256": "29cd3f5a3487c7182615e7a97911a06441ebf889ee5a3d91cee873f18ddd5207"
+    },
+    {
+      "path": "decoder_stage_2_2d_fixed_w256.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 18893888,
+      "sha256": "c112d32d1ce5471a87dcf5ac43f5c650534e7d262e4b5e8e5cc6e6bee72c2e46"
+    },
+    {
+      "path": "decoder_stage_2_2d_fixed_w256.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "95e35bf38c5d3231d7c9206d8fd40c693d9b87d98f06935f0d27144ad9e272c8"
+    },
+    {
+      "path": "decoder_stage_3_2d_w511.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 46426,
+      "sha256": "cf1c81fcca49715f2e396dead2257e8799268f73dd24a4e37675ad70d8c50bd6"
+    },
+    {
+      "path": "decoder_stage_3_2d_w511.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 4737408,
+      "sha256": "db491104d6bc430470d8b7d5bf1ed80bbe38a0e595067e3da92500f8cd180650"
+    },
+    {
+      "path": "decoder_stage_3_2d_w511.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "5a8349e9fc7dcc274e14b53e2cb4e413cbc0c1aaa0f7710efdefa33d0dc60e04"
+    },
+    {
+      "path": "dit_step_cached_mixed_linear_768.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 560359,
+      "sha256": "89e6b5f57de705a561fc5b14f51a5972a51ae433e6a20aa200194c6961b55e14"
+    },
+    {
+      "path": "dit_step_cached_mixed_linear_768.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 636088576,
+      "sha256": "779f8a6960bf67595fd44caf89aad32b1d4cb74c962a1d398993c29cd860acbf"
+    },
+    {
+      "path": "dit_step_cached_mixed_linear_768.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "b5303bd9c0357db894e0e622397400113357b913328870087cfd109daa468b05"
+    },
+    {
+      "path": "duration.json",
+      "bytes": 837,
+      "sha256": "203ea89201cc891751ef27ee989d4bc50b6aedb0bdcf09e478474724d03b5cca"
+    },
+    {
+      "path": "duration.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 31340,
+      "sha256": "07d18b544e6d90a246f2c52131954f20c59ce1414cc268ee29e357dff4cdbbdf"
+    },
+    {
+      "path": "duration.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 87116672,
+      "sha256": "9b22c3b8c04241a605026cb328a6fe41c41b63a69d3c8928662bb78e4acb1101"
+    },
+    {
+      "path": "duration.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "c96af5eb842a702521c5271c14dbe5ad63f067f189772631d8517ec96f732817"
+    },
+    {
+      "path": "speaker_encoder.json",
+      "bytes": 1028,
+      "sha256": "10a6b15ab76e80908649c6e6cd9881358eaa96d152b6d37cdbac98d3151096ef"
+    },
+    {
+      "path": "speaker_encoder.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 198535,
+      "sha256": "67956d04254a6a6aeb814745b8e3adada6235a479bf2b9cb016da4b2ad779f46"
+    },
+    {
+      "path": "speaker_encoder.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 242240496,
+      "sha256": "93178199f40e4eace672d1a7512b839177930f7fce46aa191f5a544c5eaf82a3"
+    },
+    {
+      "path": "speaker_encoder.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "24068f698da0e0a0770369a25bdd13f455c18e6a0772b8269d4d35f3942609a4"
+    },
+    {
+      "path": "text_encoder-int8-validation.json",
+      "bytes": 17746,
+      "sha256": "51a98ca5d122be2a6e80119bffed657c8dbb74bdbe8fe84ffdef3dc037e89889"
+    },
+    {
+      "path": "text_encoder.json",
+      "bytes": 705,
+      "sha256": "d82b05265fbdebeb546a44ece69c0acc5a745a2b725d3ba282af18f31406e4a9"
+    },
+    {
+      "path": "text_encoder.mlpackage/Data/com.apple.CoreML/model.mlmodel",
+      "bytes": 324779,
+      "sha256": "5bb1bd46e649bfa248c917179e7554c1f076d481aaac498b08e173654131fe35"
+    },
+    {
+      "path": "text_encoder.mlpackage/Data/com.apple.CoreML/weights/weight.bin",
+      "bytes": 328151744,
+      "sha256": "e8495984511d491e0c5aa04a2aaba3cb0222707a7df5889accf30c6632b61ee2"
+    },
+    {
+      "path": "text_encoder.mlpackage/Manifest.json",
+      "bytes": 617,
+      "sha256": "4afde8abe70c843a78718209aeca080ab8e610f3a559b367ec74c00c93ea983b"
+    },
+    {
+      "path": "tokenizer/tokenizer.json",
+      "bytes": 6718495,
+      "sha256": "6a0734cf21c802169defaffe719bc2ef12bb9d0be37e54b61ed27aa89394723d"
+    },
+    {
+      "path": "tokenizer/tokenizer_config.json",
+      "bytes": 668,
+      "sha256": "d229a271c64de1a7939d20d3665498e873fa91d5ee2edf135d73ec752cb9c9d3"
+    }
+  ]
+}

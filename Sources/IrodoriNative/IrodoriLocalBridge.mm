@@ -404,18 +404,26 @@ class Engine {
                 NSLog(@"Irodori fixed-57 decoder stage 1 unavailable: %@", fixed57Error);
               }
             }
-            NSArray<NSString *> *flexibleStage1Names = useSharedStage1 ? @[sharedStage1] :
-              @[@"decoder_stage_1_2d_w128.mlpackage", @"decoder_stage_1_2d.mlpackage"];
+            // Some iOS runtimes cannot prepare a flexible function inside a
+            // multifunction program. A separately packaged flexible function
+            // can retain the original GPU plan while fixed functions share weights.
+            NSString *standaloneFlexibleStage1 = @"decoder_stage_1_2d_w128.mlpackage";
+            const bool hasStandaloneFlexibleStage1 = [[NSFileManager defaultManager] fileExistsAtPath:
+              [rootPath stringByAppendingPathComponent:standaloneFlexibleStage1]];
+            NSArray<NSString *> *flexibleStage1Names = useSharedStage1 ?
+              (hasStandaloneFlexibleStage1 ? @[standaloneFlexibleStage1, sharedStage1] : @[sharedStage1]) :
+              @[standaloneFlexibleStage1, @"decoder_stage_1_2d.mlpackage"];
             for (NSString *flexibleName in flexibleStage1Names) {
               NSString *flexiblePath = [rootPath stringByAppendingPathComponent:flexibleName];
               if (![[NSFileManager defaultManager] fileExistsAtPath:flexiblePath]) continue;
               NSError *flexibleError = nil;
-              NSURL *compiled = useSharedStage1 ? stagedDecoderCompiledUrls_[0] :
+              const bool sharedFlexibleFunction = useSharedStage1 && [flexibleName isEqualToString:sharedStage1];
+              NSURL *compiled = sharedFlexibleFunction ? stagedDecoderCompiledUrls_[0] :
                 compiledCoreMLModel(flexiblePath, &flexibleError);
               if (compiled) {
                 MLModelConfiguration *configuration = [[MLModelConfiguration alloc] init];
                 configuration.computeUnits = MLComputeUnitsCPUAndGPU;
-                if (useSharedStage1) {
+                if (sharedFlexibleFunction) {
                   if (@available(iOS 18.0, macOS 15.0, *)) configuration.functionName = @"w128";
                 }
                 stagedDecoderStage1Flexible_ = [MLModel modelWithContentsOfURL:compiled
