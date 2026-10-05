@@ -40,16 +40,23 @@ public enum ModelBundle {
         return paths
     }
 
-    public static func safeURL(_ path: String, under root: URL) throws -> URL {
+    private static func components(of path: String) throws -> [Substring] {
         let pieces = path.split(separator: "/", omittingEmptySubsequences: false)
         guard !path.isEmpty, !path.contains("\\"), !path.contains(":"),
               pieces.allSatisfy({ !$0.isEmpty && $0 != "." && $0 != ".." }) else {
             throw IrodoriError.invalid("Unsafe model path: \(path)")
         }
-        let target = root.appendingPathComponent(path)
-        // URL.resolvingSymlinksInPath may leave a path unresolved when its final
-        // file does not exist yet (the downloader case). Check each ancestor.
-        var current = root
+        return pieces
+    }
+
+    public static func safeURL(_ path: String, under root: URL) throws -> URL {
+        let pieces = try components(of: path)
+        // Resolve the existing root once. Foundation can resolve /private/tmp
+        // to /tmp for an existing directory but leave a missing child unresolved.
+        // Appending validated components to the same root avoids that mismatch.
+        let resolvedRoot = root.resolvingSymlinksInPath().standardizedFileURL
+        let target = resolvedRoot.appendingPathComponent(path)
+        var current = resolvedRoot
         for piece in pieces {
             current.appendPathComponent(String(piece))
             let attributes = try? FileManager.default.attributesOfItem(atPath: current.path)
@@ -57,8 +64,8 @@ public enum ModelBundle {
                 throw IrodoriError.invalid("Model files must not be symbolic links: \(path)")
             }
         }
-        let resolvedRoot = root.resolvingSymlinksInPath().standardizedFileURL.path + "/"
-        guard target.resolvingSymlinksInPath().standardizedFileURL.path.hasPrefix(resolvedRoot) else {
+        let prefix = resolvedRoot.path.hasSuffix("/") ? resolvedRoot.path : resolvedRoot.path + "/"
+        guard target.path.hasPrefix(prefix) else {
             throw IrodoriError.invalid("Model path leaves its directory: \(path)")
         }
         return target
@@ -93,7 +100,8 @@ public enum ModelBundle {
                   $0.sha256.allSatisfy { "0123456789abcdef".contains($0) } }) else {
             throw IrodoriError.invalid("Invalid or incomplete model manifest")
         }
-        for file in value.files { _ = try safeURL(file.path, under: URL(fileURLWithPath: "/model")) }
+        // Manifest paths are data; filesystem checks belong to the actual bundle root.
+        for file in value.files { _ = try components(of: file.path) }
         return value
     }
 

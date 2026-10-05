@@ -62,6 +62,28 @@ final class ModelManifestTests: XCTestCase {
         try FileManager.default.createSymbolicLink(at: root.appendingPathComponent("escape"), withDestinationURL: root.deletingLastPathComponent())
         XCTAssertThrowsError(try ModelBundle.safeURL("escape/outside", under: root))
     }
+    func testNewNestedFileIsAllowedAcrossFilesystemAliases() throws {
+        let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: root) }
+        var roots = [root]
+        let alternatePath = root.path.hasPrefix("/private/") ? String(root.path.dropFirst(8)) : "/private" + root.path
+        let alternate = URL(fileURLWithPath: alternatePath, isDirectory: true)
+        if FileManager.default.fileExists(atPath: alternate.path) { roots.append(alternate) }
+        for candidate in roots {
+            let target = try ModelBundle.safeURL("LICENSES/Apache-2.0.txt", under: candidate)
+            XCTAssertFalse(FileManager.default.fileExists(atPath: target.path))
+            try FileManager.default.createDirectory(at: target.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try Data("license".utf8).write(to: target)
+            XCTAssertEqual(try Data(contentsOf: root.appendingPathComponent("LICENSES/Apache-2.0.txt")), Data("license".utf8))
+            try FileManager.default.removeItem(at: root.appendingPathComponent("LICENSES"))
+        }
+        for path in ["../outside", "/outside", "a//b", "a/../b", "a\\b", "a:b", "a/"] {
+            XCTAssertThrowsError(try ModelBundle.safeURL(path, under: root))
+        }
+        try FileManager.default.createSymbolicLink(at: root.appendingPathComponent("LICENSES"), withDestinationURL: root.deletingLastPathComponent())
+        XCTAssertThrowsError(try ModelBundle.safeURL("LICENSES/Apache-2.0.txt", under: root))
+    }
     func testStandaloneFlexibleDecoderMustBePresentAndAllowed() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
