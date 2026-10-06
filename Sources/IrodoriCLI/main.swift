@@ -38,8 +38,8 @@ private final class CollectedPCM: @unchecked Sendable {
         }
         if args.isEmpty || args.contains("--help") {
             print("""
-            irodori synthesize --models DIR --text TEXT --output FILE.wav [--reference FILE.wav] [--caption TEXT] [--repeat N] [--report FILE.json] [--raw] [--no-watermark] [--watermark-id N]
-            irodori benchmark --models DIR --cases FILE.json --output-directory DIR --report FILE.json [--reference FILE.wav] [--repeat N]
+            irodori synthesize --models DIR --text TEXT --output FILE.wav [--reference FILE.wav] [--caption TEXT] [--seed N] [--repeat N] [--report FILE.json] [--raw] [--no-watermark] [--watermark-id N]
+            irodori benchmark --models DIR --cases FILE.json --output-directory DIR --report FILE.json [--reference FILE.wav] [--seed N] [--repeat N]
             irodori verify --models DIR
             irodori download --manifest HTTPS_URL_PINNED_TO_COMMIT --destination DIR
             irodori download --variant standard|light-int8 --destination DIR
@@ -58,9 +58,9 @@ private final class CollectedPCM: @unchecked Sendable {
             guard let url = value("--manifest").flatMap(URL.init(string:)) ?? variant?.manifestURL else {
                 throw IrodoriError.invalid("--manifest or --variant is required")
             }
-            try await ModelDownloader().download(manifestURL: url, to: URL(fileURLWithPath: path)) {
+            try await ModelDownloader().download(manifestURL: url, to: URL(fileURLWithPath: path), progress: {
                 done, total, name in print("[\(done)/\(total)] \(name)")
-            }; return
+            }); return
         }
         guard let model = value("--models") else { throw IrodoriError.invalid("--models DIR is required") }
         let modelURL = URL(fileURLWithPath: model)
@@ -109,6 +109,14 @@ private final class CollectedPCM: @unchecked Sendable {
             identifier = parsed
         } else { identifier = 0x4952 }
         let watermark = args.contains("--no-watermark") ? nil : WatermarkOptions(identifier: identifier)
+        let seed: UInt32?
+        if args.contains("--seed") {
+            guard let value = value("--seed"), !value.isEmpty,
+                  value.utf8.allSatisfy({ $0 >= 48 && $0 <= 57 }), let parsed = UInt32(value) else {
+                throw IrodoriError.invalid("--seed must be an integer from 0 through 4294967295")
+            }
+            seed = parsed
+        } else { seed = nil }
         let beforeLoad = runtimeSnapshot()
         let loadMs = try await engine.prepare(modelDirectory: modelURL)
         let afterLoad = runtimeSnapshot()
@@ -118,7 +126,7 @@ private final class CollectedPCM: @unchecked Sendable {
             for (index, item) in cases.enumerated() {
                 let collected = CollectedPCM()
                 let beforeSynthesis = runtimeSnapshot()
-                let result = try await engine.synthesize(item.text, caption: item.caption ?? value("--caption") ?? "", rawText: benchmark || args.contains("--raw"), watermark: watermark) { collected.append($0.pcm16) }
+                let result = try await engine.synthesize(item.text, caption: item.caption ?? value("--caption") ?? "", seed: seed, rawText: benchmark || args.contains("--raw"), watermark: watermark) { collected.append($0.pcm16) }
                 let afterSynthesis = runtimeSnapshot()
                 let matches = collected.equals(result.pcm16)
                 guard matches else { throw IrodoriError.invalid("Stream differs from completed PCM") }
@@ -130,7 +138,8 @@ private final class CollectedPCM: @unchecked Sendable {
                     "watermark": result.watermark.map { ["algorithm": $0.algorithm, "identifier": $0.identifier, "processingMs": $0.processingMilliseconds] } ?? [:],
                     "firstPcmMs": result.firstPCMMilliseconds, "audioSeconds": result.audioSeconds, "rtf": result.rtf,
                     "pcmSha256": SHA256.hash(data: result.pcm16).map { String(format: "%02x", $0) }.joined(),
-                    "streamMatchesCompletedPcm": matches, "metrics": result.metrics, "diagnostics": result.diagnostics,
+                    "streamMatchesCompletedPcm": matches, "generationSeeds": result.generationSeeds,
+                    "metrics": result.metrics, "diagnostics": result.diagnostics,
                     "runtimeBefore": beforeSynthesis, "runtimeAfter": afterSynthesis])
                 print(String(format: "pass=%d %@ audio=%.2fs synth=%.1fms firstPCM=%.1fms RTF=%.4f", pass, item.name,
                      result.audioSeconds, result.synthesisMilliseconds, result.firstPCMMilliseconds, result.rtf))

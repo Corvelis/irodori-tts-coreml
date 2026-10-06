@@ -1,10 +1,140 @@
 import XCTest
 import Foundation
 import CryptoKit
-import IrodoriTTS
+@testable import IrodoriTTS
 
 final class SampleModelTests: XCTestCase {
-    private func fixture(at root: URL) throws {
+    @MainActor func testGeneratedReferenceRequiresConsentAndPreservesOutput() async throws {
+        let files = FileManager.default
+        let root = files.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let suite = "IrodoriSampleTests.\(UUID().uuidString)", settings = UserDefaults(suiteName: suite)!
+        defer { try? files.removeItem(at: root); settings.removePersistentDomain(forName: suite) }
+        let store = root.appendingPathComponent("AppSupport")
+        let model = SampleModel(storeDirectory: store, settings: settings, documentsDirectory: root.appendingPathComponent("Documents"))
+        let pcm = Data(repeating: 1, count: 48_000)
+        model.result = SynthesisResult(pcm16: pcm, preparedText: "こんにちは。", synthesisMilliseconds: 1,
+            firstPCMMilliseconds: 1, sentenceCount: 1, metrics: [["generationSeed": 42]], diagnostics: [], watermark: nil)
+        model.seedMode = .fixed; model.seedText = "42"; model.caption = "やさしい声。"
+        model.useGeneratedAudioAsReference()
+        XCTAssertFalse(model.busy); XCTAssertEqual(model.referencePath, "")
+        XCTAssertFalse(files.fileExists(atPath: store.appendingPathComponent("References").path))
+        model.consent = true; model.useGeneratedAudioAsReference(); try await wait(model)
+        XCTAssertNil(model.errorMessage)
+        let reference = URL(fileURLWithPath: model.referencePath)
+        XCTAssertEqual(reference.deletingLastPathComponent(), store.appendingPathComponent("References"))
+        XCTAssertEqual(try Data(contentsOf: reference).dropFirst(44), pcm)
+        XCTAssertEqual(model.result?.pcm16, pcm); XCTAssertEqual(model.fixedSeed, 42)
+        XCTAssertEqual(model.caption, "やさしい声。")
+        let reopened = SampleModel(storeDirectory: store, settings: settings, documentsDirectory: root.appendingPathComponent("Documents"))
+        XCTAssertEqual(reopened.referencePath, reference.path); XCTAssertFalse(reopened.consent)
+    }
+
+    @MainActor func testSeedValidationAndKeepingActualGeneratedSettings() async throws {
+        let files = FileManager.default
+        let root = files.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let store = root.appendingPathComponent("AppSupport"), documents = root.appendingPathComponent("Documents")
+        let suite = "IrodoriSampleTests.\(UUID().uuidString)", settings = UserDefaults(suiteName: suite)!
+        defer { try? files.removeItem(at: root); settings.removePersistentDomain(forName: suite) }
+        let modelRoot = store.appendingPathComponent("Models/model"); try fixture(at: modelRoot)
+        let model = SampleModel(storeDirectory: store, settings: settings, documentsDirectory: documents)
+        XCTAssertEqual(model.seedMode, .random); XCTAssertNil(try model.requestedSeed())
+        model.seedMode = .fixed
+        for value in ["", "-1", "1.2", "+3", "4294967296"] {
+            model.seedText = value; XCTAssertFalse(model.seedIsValid); XCTAssertThrowsError(try model.requestedSeed())
+        }
+        model.seedText = "0"; XCTAssertEqual(try model.requestedSeed(), 0)
+        model.seedText = "4294967295"; XCTAssertEqual(try model.requestedSeed(), UInt32.max)
+        model.rememberGeneratedVoice(modelPath: model.modelPath, referencePath: "", caption: "落ち着いた声。", seed: 123)
+        model.caption = "あとで変更した指示"; model.seedText = "456"; model.seedMode = .random
+        model.keepGeneratedVoice(); try await wait(model)
+        XCTAssertNil(model.errorMessage); XCTAssertEqual(model.caption, "落ち着いた声。")
+        XCTAssertEqual(model.seedMode, .fixed); XCTAssertEqual(try model.requestedSeed(), 123)
+        model.saveVoicePreset(named: "元のモデル"); try await wait(model)
+        let saved = try XCTUnwrap(model.voicePresets.first)
+        let otherRoot = store.appendingPathComponent("Models/other-version")
+        try fixture(at: otherRoot, bundleVersion: "another-version")
+        model.refreshInstalledModels(); model.selectModel(otherRoot.path); try await wait(model)
+        XCTAssertEqual(model.modelPath, otherRoot.resolvingSymlinksInPath().path)
+        model.applyVoicePreset(saved); try await wait(model)
+        XCTAssertNil(model.errorMessage)
+        XCTAssertEqual(model.modelPath, modelRoot.resolvingSymlinksInPath().path)
+        XCTAssertEqual(model.selectedVoicePresetID, saved.id)
+        let reopened = SampleModel(storeDirectory: store, settings: settings, documentsDirectory: documents)
+        XCTAssertEqual(reopened.seedMode, .fixed); XCTAssertEqual(reopened.fixedSeed, 123)
+        model.rerollSeed(); XCTAssertEqual(model.seedMode, .fixed); XCTAssertNotEqual(model.fixedSeed, 123)
+    }
+
+    @MainActor func testSavedVoiceSnapshotsRestoreAndDeleteWithoutTouchingOriginal() async throws {
+        let files = FileManager.default
+        let root = files.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let store = root.appendingPathComponent("AppSupport"), documents = root.appendingPathComponent("Documents")
+        let suite = "IrodoriSampleTests.\(UUID().uuidString)", settings = UserDefaults(suiteName: suite)!
+        defer { try? files.removeItem(at: root); settings.removePersistentDomain(forName: suite) }
+        let modelRoot = store.appendingPathComponent("Models/model"); try fixture(at: modelRoot)
+        let source = store.appendingPathComponent("References/source.wav")
+        try files.createDirectory(at: source.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try ReferenceAudio.writeWAV(pcm16: Data(repeating: 1, count: 48_000), to: source)
+        let original = try Data(contentsOf: source)
+        let model = SampleModel(storeDirectory: store, settings: settings, documentsDirectory: documents)
+        model.consent = true; model.referencePath = source.path; model.caption = "やさしい声。"
+        model.seedMode = .fixed; model.seedText = "4294967295"
+        model.saveVoicePreset(named: "お気に入り"); try await wait(model)
+        XCTAssertNil(model.errorMessage); XCTAssertEqual(model.voicePresets.count, 1)
+        let preset = try XCTUnwrap(model.voicePresets.first)
+        let snapshot = source.deletingLastPathComponent().appendingPathComponent(try XCTUnwrap(preset.referenceFileName))
+        XCTAssertNotEqual(snapshot, source); XCTAssertEqual(try Data(contentsOf: snapshot), original)
+        let reopened = SampleModel(storeDirectory: store, settings: settings, documentsDirectory: documents)
+        XCTAssertEqual(reopened.voicePresets.first?.id, preset.id); XCTAssertFalse(reopened.consent)
+        reopened.caption = "変更"; reopened.seedText = "9"
+        reopened.applyVoicePreset(preset); try await wait(reopened)
+        XCTAssertNil(reopened.errorMessage); XCTAssertEqual(reopened.caption, "やさしい声。")
+        XCTAssertEqual(reopened.fixedSeed, UInt32.max); XCTAssertEqual(URL(fileURLWithPath: reopened.referencePath).lastPathComponent, snapshot.lastPathComponent)
+        XCTAssertFalse(reopened.consent, "Restoring a voice must not grant consent automatically")
+        reopened.deleteVoicePreset(preset); try await wait(reopened)
+        XCTAssertNil(reopened.errorMessage); XCTAssertTrue(reopened.voicePresets.isEmpty)
+        XCTAssertFalse(files.fileExists(atPath: snapshot.path)); XCTAssertEqual(try Data(contentsOf: source), original)
+        XCTAssertTrue(files.fileExists(atPath: modelRoot.path))
+        reopened.consent = true; reopened.referencePath = source.path
+        reopened.saveVoicePreset(named: "別の参照付き"); try await wait(reopened)
+        reopened.referencePath = ""; reopened.saveVoicePreset(named: "参照なし"); try await wait(reopened)
+        XCTAssertEqual(reopened.voicePresets.count, 2)
+        reopened.deleteReference(); try await wait(reopened)
+        XCTAssertNil(reopened.errorMessage); XCTAssertEqual(reopened.voicePresets.map(\.name), ["参照なし"])
+        XCTAssertFalse(files.fileExists(atPath: source.path)); XCTAssertTrue(files.fileExists(atPath: modelRoot.path))
+    }
+
+    @MainActor func testPresetNeverSilentlyUsesAnotherModelAndMissingReferenceCanBeDeleted() async throws {
+        let files = FileManager.default
+        let root = files.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        let store = root.appendingPathComponent("AppSupport")
+        let suite = "IrodoriSampleTests.\(UUID().uuidString)", settings = UserDefaults(suiteName: suite)!
+        defer { try? files.removeItem(at: root); settings.removePersistentDomain(forName: suite) }
+        let modelRoot = store.appendingPathComponent("Models/model"); try fixture(at: modelRoot)
+        let model = SampleModel(storeDirectory: store, settings: settings, documentsDirectory: root.appendingPathComponent("Documents"))
+        model.seedMode = .fixed; model.seedText = "0"; model.saveVoicePreset(named: "固定"); try await wait(model)
+        let saved = try XCTUnwrap(model.voicePresets.first)
+        let missing = SampleModel.VoicePreset(id: UUID(), name: "別モデル", caption: "", seed: 1,
+            modelDigest: "unknown", modelTitle: "別の版", referenceFileName: nil)
+        model.applyVoicePreset(missing); try await wait(model)
+        XCTAssertNotNil(model.errorMessage); XCTAssertEqual(model.fixedSeed, 0)
+        let escape = SampleModel.VoicePreset(id: UUID(), name: "不正な参照", caption: "", seed: 1,
+            modelDigest: saved.modelDigest, modelTitle: saved.modelTitle, referenceFileName: "../outside.wav")
+        model.applyVoicePreset(escape); try await wait(model)
+        XCTAssertNotNil(model.errorMessage); XCTAssertEqual(model.referencePath, "")
+        let source = store.appendingPathComponent("References/source.wav")
+        try files.createDirectory(at: source.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try ReferenceAudio.writeWAV(pcm16: Data(repeating: 1, count: 48_000), to: source)
+        model.consent = true; model.referencePath = source.path
+        model.saveVoicePreset(named: "参照付き"); try await wait(model)
+        let withReference = try XCTUnwrap(model.voicePresets.last)
+        let reference = source.deletingLastPathComponent().appendingPathComponent(try XCTUnwrap(withReference.referenceFileName))
+        try files.removeItem(at: reference)
+        model.deleteVoicePreset(withReference); try await wait(model)
+        XCTAssertNil(model.errorMessage); XCTAssertEqual(model.voicePresets.count, 1)
+        XCTAssertTrue(files.fileExists(atPath: source.path))
+    }
+
+    private func fixture(at root: URL, bundleVersion: String = "test") throws {
         let files = FileManager.default
         var data = Dictionary(uniqueKeysWithValues: ModelBundle.requiredPaths.map { ($0, Data([1, 2, 3, 4])) })
         data["coreml-only.json"] = Data("{\"format\":\"irodori-coreml-only-v1\"}".utf8)
@@ -23,7 +153,7 @@ final class SampleModelTests: XCTestCase {
                     "sha256":SHA256.hash(data:bytes).map { String(format:"%02x",$0) }.joined()]
         }
         try JSONSerialization.data(withJSONObject:
-            ["format":"irodori-coreml-distribution-v1", "bundleVersion":"test", "files":entries])
+            ["format":"irodori-coreml-distribution-v1", "bundleVersion":bundleVersion, "files":entries])
             .write(to: root.appendingPathComponent("manifest.json"))
     }
     @MainActor private func wait(_ model: SampleModel) async throws {

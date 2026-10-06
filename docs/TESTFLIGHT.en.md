@@ -44,3 +44,12 @@ The app and SDK include privacy manifests declaring file metadata, elapsed-time 
 Use a dedicated test bundle ID to verify a fresh start without deleting existing data. Confirm model download and verification, interruption/relaunch/retry, no-reference synthesis, reference recording/import, style instructions, WAV export, model switching/deletion and downloading again after all models are removed. Deletion must preserve external originals, registered voices and exported WAVs.
 
 After device and Organizer validation, distribute to internal testers and verify installation and the initial download flow. For external testers, submit the first build for TestFlight review, then share invitations or a public link after approval. Builds can be tested for up to 90 days. See [Apple's TestFlight workflow](https://developer.apple.com/help/app-store-connect/test-a-beta-version/testflight-overview/).
+
+## Seed and preset checks
+
+- Generate randomly and press **この声に固定する**; confirm the actual reported seed is selected.
+- Repeat fixed-seed generation, manual entry and shuffle. Seeds 0 and 4294967295 work; out-of-range or fractional input does not start synthesis.
+- Save presets with/without references and restore them after editing settings and after app relaunch.
+- Switch standard/INT8 and verify a preset restores its matching model. Removing that model must produce guidance rather than silently substituting another version.
+- Check individual preset deletion and bulk reference deletion while preserving external sources, models and exported WAVs.
+- Listen across several texts; a seed is not a speaker ID.

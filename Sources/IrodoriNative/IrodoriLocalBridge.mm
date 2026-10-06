@@ -858,6 +858,7 @@ class Engine {
   }
 
   NSDictionary<NSString *, id> *synthesize(NSString *text, NSString *caption,
+                                        NSNumber *requestedSeed,
                                         IrodoriPcmCallback onPcm = nil) {
     const auto synthesisStarted = Clock::now();
     // Also cover callers that synthesize with the default voice without ever
@@ -1021,12 +1022,20 @@ class Engine {
       containsObject:@"--irodori-benchmark"];
     const bool benchmarkRandom = [[[NSProcessInfo processInfo] arguments]
       containsObject:@"--irodori-benchmark-random-seed"];
-    uint32_t seed = (benchmark && !benchmarkRandom) || fixedSeed_ ?
-      12345u : std::random_device{}();
+    uint32_t seed;
+    if (requestedSeed) {
+      const double value = requestedSeed.doubleValue;
+      if (!std::isfinite(value) || value < 0 || value > UINT32_MAX || std::floor(value) != value) {
+        throw std::runtime_error("Irodori seed must be an integer from 0 through 4294967295");
+      }
+      seed = static_cast<uint32_t>(value);
+    } else {
+      seed = (benchmark && !benchmarkRandom) || fixedSeed_ ? 12345u : std::random_device{}();
+    }
     // Reproduce a failing sample without changing the normal random policy.
     NSArray<NSString *> *processArguments = [[NSProcessInfo processInfo] arguments];
     const NSUInteger seedIndex = [processArguments indexOfObject:@"--irodori-seed"];
-    if (seedIndex != NSNotFound && seedIndex + 1 < processArguments.count) {
+    if (!requestedSeed && seedIndex != NSNotFound && seedIndex + 1 < processArguments.count) {
       NSString *value = processArguments[seedIndex + 1];
       NSScanner *scanner = [NSScanner scannerWithString:value];
       unsigned long long parsed = 0;
@@ -1035,10 +1044,8 @@ class Engine {
       }
       seed = static_cast<uint32_t>(parsed);
     }
-    if (benchmark || profileInference_ ||
-        [processArguments containsObject:@"--irodori-audio-health"]) {
-      metrics[@"generationSeed"] = @(seed);
-    }
+    // Expose the seed actually used, so a normal app can keep a liked result.
+    metrics[@"generationSeed"] = @(seed);
     // Preserve four evaluations; eligible long sentences change only the
     // interval allocation. Other step counts are diagnostic overrides.
     int samplingSteps = 4;
@@ -2169,9 +2176,16 @@ class Engine {
 - (nullable NSDictionary<NSString *, id> *)synthesizeText:(NSString *)text
                                                  caption:(NSString *)caption
                                                   onPcm:(IrodoriPcmCallback)onPcm error:(NSError **)error {
+  return [self synthesizeText:text caption:caption seed:nil onPcm:onPcm error:error];
+}
+
+- (nullable NSDictionary<NSString *, id> *)synthesizeText:(NSString *)text
+                                                 caption:(NSString *)caption
+                                                    seed:(NSNumber *)seed
+                                                  onPcm:(IrodoriPcmCallback)onPcm error:(NSError **)error {
   try {
     if (!_engine) throw std::runtime_error("Irodori model is not loaded");
-    return _engine->synthesize(text, caption, onPcm);
+    return _engine->synthesize(text, caption, seed, onPcm);
   } catch (const std::exception &e) {
     if (error) *error = [NSError errorWithDomain:@"IrodoriLocalBridge" code:2
       userInfo:@{NSLocalizedDescriptionKey: [NSString stringWithUTF8String:e.what()]}];

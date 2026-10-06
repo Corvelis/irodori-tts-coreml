@@ -65,6 +65,10 @@ afplay ./irodori-output.wav
 
 サンプルは入力全体を一度に合成し、完成したWAVを再生します。再生・一時停止・再開・停止・WAV保存に対応します。上限を超えた場合は文章を短くしてください。[サンプルの使い方](docs/SAMPLES.md)に詳しい操作があります。
 
+### 気に入った声を保存する（SDK / サンプル0.2.1以降）
+
+サンプルの「生成のseed」でランダム／固定を選べます。気に入った生成結果の「この声に固定する」から実際のseedと声の設定を引き継ぎ、名前付きで保存・選択できます。モデル本体は複製しません。[操作手順](docs/SAMPLES.md#気に入った声に固定する)と[Swift API](docs/API.md#seedと生成の再現性021以降)を参照してください。
+
 ## 自分のアプリへSDKを追加する
 
 Xcodeの **File → Add Package Dependencies…** に `https://github.com/Corvelis/irodori-tts-coreml.git` を入力し、Exact Version **0.2.0** を選びます。アプリtargetへ **IrodoriTTS** productを追加してください。

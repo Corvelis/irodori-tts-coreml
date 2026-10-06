@@ -31,13 +31,18 @@ struct ContentView: View {
     @State private var managingModels = false
     @State private var modelToDelete: SampleModel.InstalledModel?
     @State private var deletingPartial = false
+    @State private var savingVoicePreset = false
+    @State private var voicePresetName = ""
+    @State private var managingVoices = false
+    @State private var voiceToDelete: SampleModel.VoicePreset?
+    @State private var deletingReferences = false
     @Environment(\.scenePhase) private var scenePhase
     #if os(macOS)
     @State private var exportingWAV = false
     @State private var wavDocument: SampleWAVDocument?
     #endif
     @FocusState private var focusedField: Field?
-    private enum Field { case text, caption, url }
+    private enum Field { case text, caption, url, seed }
     private enum ImportKind { case model, reference }
 
     var body: some View {
@@ -73,6 +78,21 @@ struct ContentView: View {
         }
         #endif
         .sheet(isPresented: $managingModels) { modelManager }
+        .sheet(isPresented: $managingVoices) { voiceManager }
+        .alert("声の設定を保存", isPresented: $savingVoicePreset) {
+            TextField("声の名前", text: $voicePresetName)
+            Button("保存") { model.saveVoicePreset(named: voicePresetName) }
+                .disabled(voicePresetName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            Button("キャンセル", role: .cancel) {}
+        } message: {
+            Text("現在のモデル、参照音声、話し方、固定seedをまとめて保存します。")
+        }
+        .confirmationDialog("登録音声を削除しますか？", isPresented: $deletingReferences) {
+            Button("登録音声と声の設定を削除", role: .destructive) { model.deleteReference() }
+            Button("キャンセル", role: .cancel) {}
+        } message: {
+            Text("取り込んだ音声・録音、参照キャッシュ、その音声を含む保存した声の設定を削除します。参照音声のない声の設定と外部の元ファイルは残ります。")
+        }
         .confirmationDialog("中断した取得データを削除しますか？", isPresented: $deletingPartial) {
             Button("取得データを削除", role: .destructive) { model.discardPendingDownload() }
             Button("キャンセル", role: .cancel) {}
@@ -286,7 +306,7 @@ struct ContentView: View {
                 }
                 .buttonStyle(GenerateButtonStyle())
                 .accessibilityIdentifier("speak")
-                .disabled(model.busy || model.recording || model.modelPath.isEmpty || model.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .disabled(model.busy || model.recording || !model.seedIsValid || model.modelPath.isEmpty || model.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 if model.busy || model.isPlaying {
                     Button(action: model.stop) {
                         Image(systemName: "stop.fill").frame(width: 48, height: 48)
@@ -377,6 +397,28 @@ struct ContentView: View {
             }
             Text("AIによる合成音声 · AudioSeal透かし付き · 48 kHz / WAV")
                 .font(.caption2).foregroundStyle(.tertiary)
+            if let voice = model.lastGeneratedVoice {
+                Divider()
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Text("使用したseed: \(String(voice.seed))")
+                            .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                        Spacer()
+                        Button(action: model.keepGeneratedVoice) {
+                            Label("この声に固定する", systemImage: "pin")
+                        }
+                        .font(.caption.weight(.medium)).buttonStyle(.bordered)
+                        .accessibilityIdentifier("keepGeneratedVoice")
+                    }
+                    Button(action: model.useGeneratedAudioAsReference) {
+                        Label("この音声を参照に登録", systemImage: "waveform.badge.plus")
+                    }
+                    .font(.caption).buttonStyle(.plain)
+                    .accessibilityIdentifier("useOutputAsReference").disabled(!model.consent)
+                    Text("別の文章でも声質を保ちたい場合は、生成した音声を参照にも使えます。登録には声の利用許可を確認してください。")
+                        .font(.caption2).foregroundStyle(.secondary)
+                }.disabled(model.busy || model.recording)
+            }
         }
         .studioCard()
     }
@@ -476,6 +518,8 @@ struct ContentView: View {
                 .disabled(model.busy || model.recording)
             Text("声や話し方を短く指定できます。空欄でも生成できます。")
                 .font(.caption2).foregroundStyle(.secondary)
+            seedSettings
+            voicePresetControls
             Divider()
             Toggle(isOn: $model.consent) {
                 VStack(alignment: .leading, spacing: 4) {
@@ -506,13 +550,111 @@ struct ContentView: View {
                     .font(.caption).foregroundStyle(.red)
             }
             if !model.referencePath.isEmpty {
-                Button(role: .destructive, action: model.deleteReference) {
+                Button(role: .destructive) { deletingReferences = true } label: {
                     Label("登録音声とキャッシュを削除", systemImage: "trash")
                 }
                 .font(.caption).buttonStyle(.plain).accessibilityIdentifier("deleteReference")
                 .disabled(model.busy || model.recording)
             }
         }.studioCard()
+    }
+
+    private var seedSettings: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("生成のseed").font(.caption.weight(.medium))
+            Picker("生成のseed", selection: $model.seedMode) {
+                ForEach(SampleModel.SeedMode.allCases) { mode in Text(mode.title).tag(mode) }
+            }.pickerStyle(.segmented).accessibilityIdentifier("seedMode")
+            if model.seedMode == .fixed {
+                HStack {
+                    TextField("0〜4294967295", text: $model.seedText)
+                        .textFieldStyle(.roundedBorder).font(.caption.monospacedDigit())
+                        .focused($focusedField, equals: .seed).accessibilityIdentifier("fixedSeed")
+                        #if os(iOS)
+                        .keyboardType(.numberPad)
+                        #endif
+                    Button(action: model.rerollSeed) {
+                        Image(systemName: "shuffle")
+                    }.buttonStyle(.bordered).accessibilityLabel("別のseedを選ぶ")
+                        .accessibilityIdentifier("rerollSeed")
+                }
+                if !model.seedIsValid {
+                    Text("0〜4294967295の整数を入力してください。")
+                        .font(.caption2).foregroundStyle(.red)
+                }
+            }
+            Text(model.seedMode == .random
+                 ? "生成ごとにseedを選びます。気に入った音声は「この声に固定する」で引き継げます。"
+                 : "同じ条件で再現しやすくなります。文章が変わると、抑揚や声の印象も変わることがあります。")
+                .font(.caption2).foregroundStyle(.secondary)
+        }.disabled(model.busy || model.recording)
+    }
+
+    private var voicePresetControls: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Menu {
+                    ForEach(model.voicePresets) { preset in
+                        Button { model.applyVoicePreset(preset) } label: {
+                            if model.selectedVoicePresetID == preset.id { Label(preset.name, systemImage: "checkmark") }
+                            else { Text(preset.name) }
+                        }
+                    }
+                    Divider()
+                    Button("保存した声を管理", systemImage: "slider.horizontal.3") { managingVoices = true }
+                } label: {
+                    Label(model.selectedVoicePreset?.name ?? "保存した声を選ぶ", systemImage: "person.crop.circle")
+                        .lineLimit(1)
+                }.accessibilityIdentifier("voicePresets").disabled(model.voicePresets.isEmpty)
+                Spacer(minLength: 4)
+                Button {
+                    focusedField = nil; voicePresetName = ""; savingVoicePreset = true
+                } label: { Label("保存", systemImage: "bookmark") }
+                    .accessibilityIdentifier("saveVoicePreset").disabled(!model.canSaveVoicePreset)
+            }.font(.caption.weight(.medium)).buttonStyle(.bordered)
+            Text("固定seedと声の設定を名前付きで保存できます。モデル本体は複製しません。")
+                .font(.caption2).foregroundStyle(.secondary)
+        }.disabled(model.busy || model.recording)
+    }
+
+    private var voiceManager: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack {
+                Text("保存した声").font(.title3.weight(.semibold))
+                Spacer()
+                Button("閉じる") { managingVoices = false }.disabled(model.busy)
+            }
+            ScrollView {
+                VStack(alignment: .leading, spacing: 14) {
+                    ForEach(model.voicePresets) { preset in
+                        HStack(alignment: .top, spacing: 12) {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(preset.name).font(.subheadline.weight(.semibold))
+                                Text("\(preset.modelTitle) · seed \(String(preset.seed))")
+                                    .font(.caption2).foregroundStyle(.secondary)
+                                Text(preset.referenceFileName == nil ? "参照音声なし" : "参照音声あり")
+                                    .font(.caption2).foregroundStyle(.secondary)
+                                if !preset.caption.isEmpty { Text(preset.caption).font(.caption).lineLimit(3) }
+                            }.frame(maxWidth: .infinity, alignment: .leading)
+                            Button("使う") { model.applyVoicePreset(preset); managingVoices = false }
+                                .buttonStyle(.bordered)
+                            Button(role: .destructive) { voiceToDelete = preset } label: { Image(systemName: "trash") }
+                                .accessibilityLabel("\(preset.name)を削除")
+                        }.padding(.vertical, 8)
+                        Divider()
+                    }
+                    if model.voicePresets.isEmpty { Text("保存した声の設定はありません。").foregroundStyle(.secondary) }
+                }
+            }
+        }.padding(24).frame(idealWidth: 520, maxWidth: 680, minHeight: 260, idealHeight: 420)
+            .disabled(model.busy || model.recording)
+            .confirmationDialog("保存した声を削除しますか？", isPresented: Binding(
+                get: { voiceToDelete != nil }, set: { if !$0 { voiceToDelete = nil } }), presenting: voiceToDelete) { preset in
+                Button("声の設定を削除", role: .destructive) { model.deleteVoicePreset(preset); voiceToDelete = nil }
+                Button("キャンセル", role: .cancel) { voiceToDelete = nil }
+            } message: { preset in
+                Text("「\(preset.name)」と、この設定専用の参照音声コピーを削除します。モデル、外部の元音声、書き出したWAVは残ります。")
+            }
     }
 }
 

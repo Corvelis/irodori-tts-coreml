@@ -31,7 +31,20 @@ Open **モデルを管理** to see installed bundles and delete an app-owned cop
 
 Enable **利用できる声を登録** only for your own voice or one you have explicit permission to use. **音声を選ぶ** imports audio. **録音する** starts a recording and **録音を停止** ends it; use a clear 3–10 second clip and allow microphone access when prompted. Then press **準備** or **生成して再生**. A short Japanese description in the style field can guide speaking style, with or without a reference.
 
-**登録音声とキャッシュを削除** removes all reference copies/recordings owned by the sample and its feature cache, while preserving external source files. One reference is selected at a time; there is no named voice library. Selection persists across launches, but the voice-permission toggle resets.
+**登録音声とキャッシュを削除** removes all app-owned reference copies/recordings, preset-specific reference copies and the feature cache. Presets containing references are also removed; reference-free presets and external sources remain. The voice-permission toggle resets on launch.
+
+## Keep a voice and save presets (0.2.1+)
+
+1. Choose **ランダム** under **生成のseed** to explore different generations.
+2. When you like a result, press **この声に固定する** in the output card. This restores the seed actually used, model, reference selection and caption from that generation, even if you edited the fields afterward.
+3. Press **保存** in voice settings and enter a name. The preset stores a fixed seed, caption, model-manifest identity and a private snapshot of the reference, if present. Model weights are not copied.
+4. Use **保存した声を選ぶ** to restore it. The matching installed model is selected automatically. A missing or different model version produces instructions to obtain the matching model; it is not silently substituted.
+
+In **固定** mode, enter a seed from 0 through 4294967295. The shuffle button selects another seed for the next generation. **ランダム** returns to selecting a seed per generation. Mode, seed, voice settings and presets persist across launches. Restoring a preset does not grant voice consent automatically.
+
+A seed controls initial randomness, not speaker identity. Reproducibility also requires matching text/splitting, model version (including standard vs INT8), reference and caption. Exact PCM across different devices/OS versions is not guaranteed. For consistent voice identity across texts, keep the reference and caption aligned. **この音声を参照に登録** uses a completed result as a new reference after you confirm voice permission; listen to the next generation before saving, because the conditioning has changed.
+
+**保存した声を管理** lets you delete individual presets and their private reference snapshots. Original recordings/imported files, models and exported WAVs remain. Bulk reference deletion also removes reference-backed presets.
 
 ## Playback, export and numbers
 

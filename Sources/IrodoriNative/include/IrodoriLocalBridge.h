@@ -18,6 +18,11 @@ typedef void (^IrodoriPcmCallback)(NSData *pcm16);
                                                  caption:(NSString *)caption
                                                   onPcm:(nullable IrodoriPcmCallback)onPcm
                                                   error:(NSError **)error;
+- (nullable NSDictionary<NSString *, id> *)synthesizeText:(NSString *)text
+                                                 caption:(NSString *)caption
+                                                    seed:(nullable NSNumber *)seed
+                                                  onPcm:(nullable IrodoriPcmCallback)onPcm
+                                                  error:(NSError **)error;
 - (void)releaseResources;
 @end
 

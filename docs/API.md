@@ -2,7 +2,7 @@
 
 [導入](GETTING_STARTED.md) · [音声登録](VOICE_REGISTRATION.md) · [再生と停止](STREAMING.md)
 
-対象は `0.2.0` のSwift APIです。[実装](../Sources/IrodoriTTS)に対応しています。
+対象は `0.2.1` のSwift APIです。[実装](../Sources/IrodoriTTS)に対応しています。
 
 ## IrodoriEngine
 
@@ -12,7 +12,7 @@
 |---|---|
 | `prepare(modelDirectory: URL) async throws -> Double` | モデル構造を検証しロード。戻り値はロード時間ms。構造検査の時間はこの値に含まない。同じURLを保持中なら0 |
 | `registerReference(_ url: URL?) async throws -> ReferenceRegistration` | モデル準備後に呼ぶ。参照を読込・変換し特徴を準備。nilで参照なし |
-| `synthesize(_ text: String, caption: String = "", rawText: Bool = false, splitSentences: Bool = true, watermark: WatermarkOptions? = WatermarkOptions(), onChunk: (@Sendable (PCMChunk) -> Void)? = nil) async throws -> SynthesisResult` | 文章から音声を生成。文分割とチャンク通知は任意 |
+| `synthesize(_ text: String, caption: String = "", seed: UInt32? = nil, rawText: Bool = false, splitSentences: Bool = true, watermark: WatermarkOptions? = WatermarkOptions(), onChunk: (@Sendable (PCMChunk) -> Void)? = nil) async throws -> SynthesisResult` | 文章から音声を生成。seed固定、文分割とチャンク通知は任意 |
 | `detectWatermark(in pcm16: Data) async throws -> WatermarkDetection` | 完成PCMのAudioSeal透かしを分析 |
 | `clearReferenceCache() async throws` | 保持中の参照と参照特徴ディスクキャッシュを削除。元音声やモデルは残す |
 | `release() async` | モデル・参照セッションを解放。次の合成には再度prepareが必要。ディスクキャッシュは残す |
@@ -24,6 +24,22 @@
 ## 音声の透かし
 
 `watermark` は標準で有効です。PCMチャンク・完成PCM・WAVへ同じAudioSeal透かしを付け、RTFにも処理時間を含めます。`WatermarkOptions(identifier: UInt16 = 0x4952)` で識別値を指定し、`watermark: nil` で無効化します。`AudioWatermarker` actorはTTSをロードせず単独で付与・検出できます。入力は48 kHz mono PCM16です。[付与・検出・制約](WATERMARK.md)を参照してください。
+
+## seedと生成の再現性（0.2.1以降）
+
+```swift
+let audio = try await engine.synthesize(
+    "今日はいい天気ですね。",
+    caption: "落ち着いた、やさしい話し方。",
+    seed: 12345,
+    splitSentences: false
+)
+let actualSeeds = audio.generationSeeds
+```
+
+`seed: nil` は従来どおり各文でランダムに選びます。`UInt32`（0〜4294967295）を渡すと、その値を各文で使います。`SynthesisResult.generationSeeds` は成功した文ごとの実際のseedを生成順に返し、ランダム生成にも含まれます。`metrics` にも `generationSeed` を返します。気に入った一文の生成を引き継ぐ場合、そのseedとモデル・参照音声・caption・読み上げ用本文を一緒に保持してください。複数文ではseed一覧と分割条件も必要です。
+
+固定seedは初期乱数の指定です。モデルや推論回数を変えず、声IDとしての指定や完全な話者固定を保証するものではありません。文章・分割・モデル版（標準／INT8を含む）・参照・指示が変わると、声や抑揚も変わります。同じ条件でも端末・OS・Core ML実行環境をまたぐPCMの完全一致は保証しません。公開APIでseedを指定した場合は診断用のプロセス引数より優先します。
 
 ## 声・話し方の指示（Voice Design）
 

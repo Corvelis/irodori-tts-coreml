@@ -6,8 +6,37 @@ import IrodoriTTS
 @MainActor final class SampleModel: NSObject, ObservableObject, AVAudioPlayerDelegate {
     @Published var text = "こんにちは。今日はいい天気なので、近くの公園まで散歩に行きましょう。"
     @Published var caption = "" {
-        didSet { self.settings.set(caption, forKey: "caption") }
+        didSet { self.settings.set(caption, forKey: "caption"); selectedVoicePresetID = nil }
     }
+    enum SeedMode: String, CaseIterable, Identifiable {
+        case random, fixed
+        var id: String { rawValue }
+        var title: String { self == .random ? "ランダム" : "固定" }
+    }
+    struct VoicePreset: Codable, Identifiable, Sendable {
+        let id: UUID
+        let name: String
+        let caption: String
+        let seed: UInt32
+        let modelDigest: String
+        let modelTitle: String
+        let referenceFileName: String?
+    }
+    struct GeneratedVoiceSettings: Sendable {
+        let modelPath: String
+        let referencePath: String
+        let caption: String
+        let seed: UInt32
+    }
+    @Published var seedMode: SeedMode = .random {
+        didSet { settings.set(seedMode.rawValue, forKey: "seedMode"); selectedVoicePresetID = nil }
+    }
+    @Published var seedText = "12345" {
+        didSet { settings.set(seedText, forKey: "seedText"); selectedVoicePresetID = nil }
+    }
+    @Published private(set) var voicePresets: [VoicePreset] = []
+    @Published private(set) var selectedVoicePresetID: UUID?
+    @Published private(set) var lastGeneratedVoice: GeneratedVoiceSettings?
     @Published var modelPath = ""
     @Published var referencePath = ""
     @Published var manifestURL = ""
@@ -64,6 +93,11 @@ import IrodoriTTS
         caption = self.settings.string(forKey: "caption") ?? ""
         modelPath = self.settings.string(forKey: "modelPath") ?? ""
         referencePath = self.settings.string(forKey: "referencePath") ?? ""
+        seedMode = SeedMode(rawValue: self.settings.string(forKey: "seedMode") ?? "") ?? .random
+        seedText = self.settings.string(forKey: "seedText") ?? "12345"
+        if let data = self.settings.data(forKey: "voicePresets") {
+            voicePresets = (try? JSONDecoder().decode([VoicePreset].self, from: data)) ?? []
+        }
         pendingDownloadURL = self.settings.string(forKey: "pendingDownloadURL") ?? ""
         try? FileManager.default.createDirectory(at: store, withIntermediateDirectories: true)
         // Recorded files stay inside this app's container; only persist their basename.
@@ -135,6 +169,7 @@ import IrodoriTTS
         referencePreparationMilliseconds = nil
         referenceCacheHit = false
         result = nil; waveform = []; statistics = ""; outputURL = nil
+        lastGeneratedVoice = nil; selectedVoicePresetID = nil
         modelPath = url.resolvingSymlinksInPath().standardizedFileURL.path
         self.settings.set(modelPath, forKey: "modelPath")
         refreshInstalledModels()
@@ -326,6 +361,7 @@ import IrodoriTTS
             try await Task.detached { _ = try ReferenceAudio.read(source); try FileManager.default.copyItem(at: source, to: destination) }.value
             self.ready = false
             self.referencePath = destination.path
+            self.selectedVoicePresetID = nil
             self.settings.set(destination.path, forKey: "referencePath")
             self.status = "参照音声を登録しました。"
         }
@@ -352,20 +388,184 @@ import IrodoriTTS
 
     func speak() {
         work {
+            let input = self.text, instruction = self.caption
+            let seed = try self.requestedSeed()
+            let voiceModel = self.modelPath, voiceReference = self.referencePath
             self.stopPlayback()
             try await self.prepareEngine()
             try Task.checkCancellation()
             self.status = "音声を生成しています…"
             // One sanitized input, one utterance. Playback begins only after the WAV is complete.
-            let result = try await self.engine.synthesize(self.text, caption: self.caption, splitSentences: false)
+            let result = try await self.engine.synthesize(input, caption: instruction, seed: seed, splitSentences: false)
             try Task.checkCancellation()
             let url = self.store.appendingPathComponent("generated.wav")
             try result.writeWAV(to: url); self.outputURL = url
             self.statistics += String(format: "\nRTF %.3f / 最初のPCM %.0f ms / 音声 %.2f 秒", result.rtf, result.firstPCMMilliseconds, result.audioSeconds)
             self.result = result
+            if let actualSeed = result.generationSeeds.first {
+                self.rememberGeneratedVoice(modelPath: voiceModel, referencePath: voiceReference,
+                                            caption: instruction, seed: actualSeed)
+            }
             self.waveform = Self.envelope(result.pcm16)
             self.playbackPosition = 0
             try self.startPlayback()
+        }
+    }
+
+    var fixedSeed: UInt32? {
+        let value = seedText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !value.isEmpty, value.utf8.allSatisfy({ $0 >= 48 && $0 <= 57 }) else { return nil }
+        return UInt32(value)
+    }
+    var seedIsValid: Bool { seedMode == .random || fixedSeed != nil }
+    var canSaveVoicePreset: Bool { !modelPath.isEmpty && seedMode == .fixed && fixedSeed != nil }
+    var selectedVoicePreset: VoicePreset? { voicePresets.first { $0.id == selectedVoicePresetID } }
+    func requestedSeed() throws -> UInt32? {
+        if seedMode == .random { return nil }
+        guard let seed = fixedSeed else { throw IrodoriError.invalid("seedは0〜4294967295の整数を入力してください。") }
+        return seed
+    }
+    func rerollSeed() {
+        guard !busy, !recording else { return }
+        let previous = fixedSeed
+        var value = UInt32.random(in: .min ... .max)
+        while value == previous { value = UInt32.random(in: .min ... .max) }
+        seedText = String(value); seedMode = .fixed
+        status = "別のseedを選びました。「生成して再生」で試せます。"
+    }
+    func rememberGeneratedVoice(modelPath: String, referencePath: String, caption: String, seed: UInt32) {
+        lastGeneratedVoice = GeneratedVoiceSettings(modelPath: modelPath, referencePath: referencePath,
+                                                   caption: caption, seed: seed)
+    }
+    func keepGeneratedVoice() {
+        guard let voice = lastGeneratedVoice else { return }
+        work {
+            guard self.installedModels.contains(where: { $0.id == voice.modelPath }) else {
+                throw IrodoriError.invalid("この音声で使ったモデルが見つかりません。もう一度取り込んでください。")
+            }
+            if !voice.referencePath.isEmpty {
+                _ = try self.ownedReferenceURL(URL(fileURLWithPath: voice.referencePath).lastPathComponent)
+            }
+            if self.modelPath != voice.modelPath { await self.activateModel(URL(fileURLWithPath: voice.modelPath)) }
+            self.caption = voice.caption
+            self.seedText = String(voice.seed); self.seedMode = .fixed
+            self.referencePath = voice.referencePath
+            self.settings.set(voice.referencePath, forKey: "referencePath")
+            self.ready = false; self.selectedVoicePresetID = nil
+            self.status = "この音声のseedと声の設定に固定しました。名前を付けて保存できます。"
+        }
+    }
+    private func modelDigest(_ url: URL) throws -> String {
+        SHA256.hash(data: try Data(contentsOf: url.appendingPathComponent("manifest.json")))
+            .map { String(format: "%02x", $0) }.joined()
+    }
+    private func ownedReferenceURL(_ name: String) throws -> URL {
+        guard !name.isEmpty, URL(fileURLWithPath: name).lastPathComponent == name,
+              name != ".", name != ".." else { throw IrodoriError.invalid("保存した参照音声の情報が不正です。") }
+        let parent = store.appendingPathComponent("References", isDirectory: true).resolvingSymlinksInPath()
+        let url = parent.appendingPathComponent(name)
+        guard (try? url.resourceValues(forKeys: [.isRegularFileKey, .isSymbolicLinkKey]))?.isRegularFile == true,
+              (try? url.resourceValues(forKeys: [.isSymbolicLinkKey]))?.isSymbolicLink == false,
+              url.resolvingSymlinksInPath().deletingLastPathComponent() == parent else {
+            throw IrodoriError.invalid("保存した参照音声が見つかりません。")
+        }
+        return url
+    }
+    private func persistVoicePresets(_ values: [VoicePreset]) throws {
+        let data = try JSONEncoder().encode(values)
+        settings.set(data, forKey: "voicePresets"); voicePresets = values
+    }
+    func saveVoicePreset(named name: String) {
+        work {
+            let name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !name.isEmpty, name.count <= 80 else { throw IrodoriError.invalid("声の名前を1〜80文字で入力してください。") }
+            guard self.seedMode == .fixed, let seed = self.fixedSeed else {
+                throw IrodoriError.invalid("「この声に固定する」か「固定」を選んでから保存してください。")
+            }
+            guard !self.modelPath.isEmpty else { throw IrodoriError.invalid("モデルを選択してください。") }
+            let model = URL(fileURLWithPath: self.modelPath)
+            let information = try ModelBundle.information(at: model)
+            let digest = try self.modelDigest(model)
+            let instruction = self.caption
+            let id = UUID()
+            var snapshot: URL?
+            var committed = false
+            defer { if !committed, let snapshot { try? FileManager.default.removeItem(at: snapshot) } }
+            if !self.referencePath.isEmpty {
+                guard self.consent else { throw IrodoriError.invalid("利用する声の許可を確認してください。") }
+                let source = try self.ownedReferenceURL(URL(fileURLWithPath: self.referencePath).lastPathComponent)
+                let destination = self.store.appendingPathComponent("References/preset-\(id.uuidString).\(source.pathExtension)")
+                snapshot = destination
+                try await Task.detached {
+                    _ = try ReferenceAudio.read(source)
+                    try FileManager.default.copyItem(at: source, to: destination)
+                }.value
+                try Task.checkCancellation()
+            }
+            let preset = VoicePreset(id: id, name: name, caption: instruction, seed: seed,
+                modelDigest: digest, modelTitle: "\(information.variant.title) · \(information.bundleVersion)",
+                referenceFileName: snapshot?.lastPathComponent)
+            try self.persistVoicePresets(self.voicePresets + [preset]); committed = true
+            self.selectedVoicePresetID = id
+            self.status = "「\(name)」の声の設定を保存しました。"
+        }
+    }
+    func applyVoicePreset(_ preset: VoicePreset) {
+        work {
+            // Match the immutable manifest, not just standard/INT8 or a moved container path.
+            let matching = try self.installedModels.first { try self.modelDigest($0.url) == preset.modelDigest }
+            guard let matching else {
+                throw IrodoriError.invalid("「\(preset.name)」で使う\(preset.modelTitle)がありません。同じモデルを取得・取り込みしてください。")
+            }
+            let reference = try preset.referenceFileName.map(self.ownedReferenceURL)
+            if let reference { _ = try await Task.detached { try ReferenceAudio.read(reference) }.value }
+            try Task.checkCancellation()
+            if self.modelPath != matching.id { await self.activateModel(matching.url) }
+            self.caption = preset.caption; self.seedText = String(preset.seed); self.seedMode = .fixed
+            self.referencePath = reference?.path ?? ""
+            self.settings.set(self.referencePath, forKey: "referencePath")
+            self.ready = false; self.selectedVoicePresetID = preset.id
+            self.status = reference != nil && !self.consent
+                ? "「\(preset.name)」を選びました。登録音声の利用許可を確認してください。"
+                : "「\(preset.name)」の声の設定を選びました。"
+        }
+    }
+    func deleteVoicePreset(_ preset: VoicePreset) {
+        work {
+            guard self.voicePresets.contains(where: { $0.id == preset.id }) else { return }
+            if let name = preset.referenceFileName,
+               !self.voicePresets.contains(where: { $0.id != preset.id && $0.referenceFileName == name }) {
+                if URL(fileURLWithPath: self.referencePath).lastPathComponent == name {
+                    try await self.engine.clearReferenceCache()
+                    self.referencePath = ""; self.settings.removeObject(forKey: "referencePath"); self.ready = false
+                }
+                if let reference = try? self.ownedReferenceURL(name) {
+                    try FileManager.default.removeItem(at: reference)
+                }
+            }
+            try self.persistVoicePresets(self.voicePresets.filter { $0.id != preset.id })
+            if self.selectedVoicePresetID == preset.id { self.selectedVoicePresetID = nil }
+            if let name = preset.referenceFileName,
+               URL(fileURLWithPath: self.lastGeneratedVoice?.referencePath ?? "").lastPathComponent == name {
+                self.lastGeneratedVoice = nil
+            }
+            self.status = "「\(preset.name)」の声の設定を削除しました。"
+        }
+    }
+    func useGeneratedAudioAsReference() {
+        guard consent else { status = "参照として使う声の利用許可を確認してください。"; return }
+        guard let pcm = result?.pcm16 else { return }
+        work {
+            let destination = self.store.appendingPathComponent("References/\(UUID().uuidString).wav")
+            var committed = false
+            defer { if !committed { try? FileManager.default.removeItem(at: destination) } }
+            try FileManager.default.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try await Task.detached { try ReferenceAudio.writeWAV(pcm16: pcm, to: destination) }.value
+            try Task.checkCancellation()
+            self.referencePath = destination.path; self.settings.set(destination.path, forKey: "referencePath")
+            committed = true
+            self.ready = false; self.selectedVoicePresetID = nil
+            self.status = "生成した音声を参照として登録しました。次の生成で声を確認してから設定を保存できます。"
         }
     }
 
@@ -490,6 +690,9 @@ import IrodoriTTS
             // Delete only this sample's imported/recorded files, never the selected original.
             let directory = self.store.appendingPathComponent("References")
             if FileManager.default.fileExists(atPath: directory.path) { try FileManager.default.removeItem(at: directory) }
+            try self.persistVoicePresets(self.voicePresets.filter { $0.referenceFileName == nil })
+            self.selectedVoicePresetID = nil
+            if self.lastGeneratedVoice?.referencePath.isEmpty == false { self.lastGeneratedVoice = nil }
             self.ready = false
             self.referencePath = ""; self.settings.removeObject(forKey: "referencePath")
             self.status = "登録音声と参照特徴キャッシュを削除しました。"
@@ -506,6 +709,7 @@ import IrodoriTTS
             do { _ = try ReferenceAudio.read(url)
                 ready = false
                 referencePath = url.path; self.settings.set(url.path, forKey: "referencePath")
+                selectedVoicePresetID = nil
                 status = "録音を登録しました。"
             } catch { try? FileManager.default.removeItem(at: url); report(error) }
             return
