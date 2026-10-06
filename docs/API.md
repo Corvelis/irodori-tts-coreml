@@ -134,3 +134,22 @@ manifestは署名ではなく整合性情報です。信頼する公開者のHTT
 `ModelVariant.standard` と `.lightINT8` は同じ合成・参照登録APIを使います。`minimumOS`、`isSupported`、`manifestURL` を提供します。`ModelBundle.information(at:)` はmanifestとテキストmetadataから種類・bundleVersion・ファイル容量を読みます。これはハッシュ検証ではありません。新規取得・取り込みには `ModelBundle.validate(at:verifyHashes: true)` を使用してください。
 
 `ModelVariant.standard.manifestURL` は元の固定commitにあるルートmanifest、`.lightINT8.manifestURL` はバージョンタグの `int8/manifest.json` を指定します。Downloaderはmanifestの親URLを基準に各ファイルを取得し、選択した版だけを保存先へ直接配置します。配布先の `int8/` をローカル保存先に追加する必要はありません。[配置と取得URL](HUGGINGFACE.md)を参照してください。
+
+## ダウンロード進捗（SDK 0.2.1以降）
+
+既存の `progress: (Int, Int, String) -> Void` はファイル単位の進捗として維持します。容量ベースの表示には任意の `byteProgress` を追加できます。
+
+```swift
+try await ModelDownloader().download(
+    manifestURL: ModelVariant.standard.manifestURL,
+    to: destination,
+    byteProgress: { value in
+        // MainActorの画面更新は呼び出し側でディスパッチする。
+        print(value.phase, value.receivedBytes, value.totalBytes)
+    }
+)
+```
+
+`ModelDownloadProgress` は `phase`（manifest / downloading / verifying / complete）、`receivedBytes`、`totalBytes`、`fractionCompleted`、`completedFiles`、`totalFiles`、`currentFile` を持ちます。受信容量には検証済みファイルと現在のファイルの受信分を含みます。100%表示だけで完了と判断せず、正常returnを待ってからモデルを使用してください。進捗はMainActor上とは限りません。
+
+再試行は同じmanifest URLと保存先を指定します。検証に成功した完全なファイルを再利用し、途中の個別ファイルは再取得します。最終配置は全ファイルとモデル構成の検証後に行います。空き容量不足は取得前にエラーにします。このAPIはバックグラウンドURLSessionではありません。

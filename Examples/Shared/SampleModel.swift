@@ -5,21 +5,29 @@ import IrodoriTTS
 
 @MainActor final class SampleModel: NSObject, ObservableObject, AVAudioPlayerDelegate {
     @Published var text = "こんにちは。今日はいい天気なので、近くの公園まで散歩に行きましょう。"
-    @Published var caption = UserDefaults.standard.string(forKey: "caption") ?? "" {
-        didSet { UserDefaults.standard.set(caption, forKey: "caption") }
+    @Published var caption = "" {
+        didSet { self.settings.set(caption, forKey: "caption") }
     }
-    @Published var modelPath = UserDefaults.standard.string(forKey: "modelPath") ?? ""
-    @Published var referencePath = UserDefaults.standard.string(forKey: "referencePath") ?? ""
+    @Published var modelPath = ""
+    @Published var referencePath = ""
     @Published var manifestURL = ""
     @Published var downloadVariant: ModelVariant = .standard
-    struct InstalledModel: Identifiable {
+    struct InstalledModel: Identifiable, Sendable {
         let url: URL
         let information: ModelBundleInformation
         var id: String { url.path }
     }
     @Published var installedModels: [InstalledModel] = []
+    @Published private(set) var downloading = false
+    @Published private(set) var downloadProgress: ModelDownloadProgress?
+    @Published private(set) var pendingDownloadURL = ""
+    private var activeDownloadID: UUID?
+    private var pausedDownload = false
+    #if os(iOS)
+    private var previousIdleTimerDisabled: Bool?
+    #endif
     @Published var modelDetail = "現行版 約2.99 GB / 軽量INT8版 約1.96 GB"
-    @Published var status = "モデルフォルダを選んでください。"
+    @Published var status = "モデルをダウンロードすると、音声を生成できます。"
     @Published var statistics = ""
     @Published var busy = false
     @Published var recording = false
@@ -41,11 +49,22 @@ import IrodoriTTS
     private var recordingURL: URL?
     private var task: Task<Void, Never>?
     private let store: URL
+    private let settings: UserDefaults
+    private let documents: URL
 
-    override init() {
-        store = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+    override convenience init() {
+        let directory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("IrodoriSample", isDirectory: true)
+        self.init(storeDirectory: directory, settings: .standard)
+    }
+    init(storeDirectory: URL, settings: UserDefaults, documentsDirectory: URL? = nil) {
+        store = storeDirectory; self.settings = settings
+        documents = documentsDirectory ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
         super.init()
+        caption = self.settings.string(forKey: "caption") ?? ""
+        modelPath = self.settings.string(forKey: "modelPath") ?? ""
+        referencePath = self.settings.string(forKey: "referencePath") ?? ""
+        pendingDownloadURL = self.settings.string(forKey: "pendingDownloadURL") ?? ""
         try? FileManager.default.createDirectory(at: store, withIntermediateDirectories: true)
         // Recorded files stay inside this app's container; only persist their basename.
         if !referencePath.isEmpty {
@@ -55,13 +74,25 @@ import IrodoriTTS
             let replacement = store.appendingPathComponent("Models/\(URL(fileURLWithPath: modelPath).lastPathComponent)")
             if FileManager.default.fileExists(atPath: replacement.path) { modelPath = replacement.path }
             else {
-                let documents = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
                 let moved = documents.appendingPathComponent(URL(fileURLWithPath: modelPath).lastPathComponent)
                 if FileManager.default.fileExists(atPath: moved.path) { modelPath = moved.path }
             }
         }
-        refreshInstalledModels()
         if !modelPath.isEmpty {
+            modelPath = URL(fileURLWithPath: modelPath).resolvingSymlinksInPath().standardizedFileURL.path
+            self.settings.set(modelPath, forKey: "modelPath")
+        }
+        refreshInstalledModels()
+        if !modelPath.isEmpty && !installedModels.contains(where: { $0.id == modelPath }) {
+            modelPath = ""; self.settings.removeObject(forKey: "modelPath")
+        }
+        if modelPath.isEmpty, let first = installedModels.first {
+            modelPath = first.id; self.settings.set(modelPath, forKey: "modelPath")
+            modelDetail = first.information.description
+        }
+        if !pendingDownloadURL.isEmpty {
+            status = "中断したダウンロードがあります。「再開」で取得済みファイルを再利用できます。"
+        } else if !modelPath.isEmpty {
             status = referencePath.isEmpty
                 ? "文章を入力して、音声を生成できます。"
                 : "登録音声の利用許可を確認して、音声を生成してください。"
@@ -70,14 +101,14 @@ import IrodoriTTS
 
     func refreshInstalledModels() {
         let files = FileManager.default
-        let documents = files.urls(for: .documentDirectory, in: .userDomainMask)[0]
         var roots = [URL]()
         for parent in [store.appendingPathComponent("Models"), documents] {
             roots += (try? files.contentsOfDirectory(at: parent, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles])) ?? []
         }
         if !modelPath.isEmpty { roots.append(URL(fileURLWithPath: modelPath)) }
         var seen = Set<String>()
-        installedModels = roots.compactMap { root in
+        installedModels = roots.compactMap { candidate in
+            let root = candidate.resolvingSymlinksInPath().standardizedFileURL
             guard seen.insert(root.path).inserted, let info = try? ModelBundle.information(at: root) else { return nil }
             return InstalledModel(url: root, information: info)
         }.sorted { $0.information.variant.rawValue < $1.information.variant.rawValue }
@@ -104,8 +135,8 @@ import IrodoriTTS
         referencePreparationMilliseconds = nil
         referenceCacheHit = false
         result = nil; waveform = []; statistics = ""; outputURL = nil
-        modelPath = url.path
-        UserDefaults.standard.set(url.path, forKey: "modelPath")
+        modelPath = url.resolvingSymlinksInPath().standardizedFileURL.path
+        self.settings.set(modelPath, forKey: "modelPath")
         refreshInstalledModels()
     }
 
@@ -123,7 +154,9 @@ import IrodoriTTS
         task = Task {
             defer { busy = false; task = nil }
             do { try await body() }
-            catch is CancellationError { status = "停止しました。" }
+            catch is CancellationError {
+                status = pausedDownload ? "取得を中断しました。「再開」で取得済みファイルを再利用できます。" : "停止しました。"
+            }
             catch { report(error) }
         }
     }
@@ -133,7 +166,8 @@ import IrodoriTTS
             self.status = "モデルをコピーして検証しています…"
             let allowed = source.startAccessingSecurityScopedResource()
             defer { if allowed { source.stopAccessingSecurityScopedResource() } }
-            let destination = self.store.appendingPathComponent("Models/\(UUID().uuidString)")
+            let parent = try self.modelDirectory()
+            let destination = parent.appendingPathComponent(UUID().uuidString, isDirectory: true)
             try await Task.detached {
                 try ModelBundle.validate(at: source, verifyHashes: true)
                 try FileManager.default.createDirectory(at: destination.deletingLastPathComponent(), withIntermediateDirectories: true)
@@ -141,26 +175,144 @@ import IrodoriTTS
                 catch { try? FileManager.default.removeItem(at: destination); throw error }
             }.value
             await self.activateModel(destination)
-            self.status = "モデルを取り込みました。音声の準備を実行してください。"
+            self.status = "モデルを取り込みました。「生成して再生」で試せます。初回準備には時間がかかります。"
         }
     }
 
+    var needsSetup: Bool { modelPath.isEmpty }
+    var shouldShowDownload: Bool { downloading || !pendingDownloadURL.isEmpty }
+    var downloadAmount: String {
+        guard let value = downloadProgress, value.totalBytes > 0 else { return "モデル情報を確認中…" }
+        return "\(Self.bytes(value.receivedBytes)) / \(Self.bytes(value.totalBytes))"
+    }
+    var downloadPhase: String {
+        guard let phase = downloadProgress?.phase else { return "モデル情報を確認しています" }
+        switch phase {
+        case .manifest: return "モデル情報を確認しています"
+        case .downloading: return "モデルをダウンロードしています"
+        case .verifying: return "ファイルの整合性を検証しています"
+        case .complete: return "ダウンロードと検証が完了しました"
+        }
+    }
+    static func bytes(_ value: Int64) -> String {
+        ByteCountFormatter.string(fromByteCount: value, countStyle: .decimal)
+    }
+    var downloadSpaceGuidance: String {
+        "空き容量は約\(Self.bytes(downloadVariant.approximateBytes * 2 + 512 * 1024 * 1024))以上が目安です。端末向けの初回最適化には追加容量が必要な場合があります。"
+    }
+
+    private func modelDirectory() throws -> URL {
+        var parent = store.appendingPathComponent("Models", isDirectory: true)
+        try FileManager.default.createDirectory(at: parent, withIntermediateDirectories: true)
+        var values = URLResourceValues(); values.isExcludedFromBackup = true
+        try parent.setResourceValues(values)
+        return parent
+    }
+
+    private func downloadDestination(_ url: URL) throws -> URL {
+        let suffix = SHA256.hash(data: Data(url.absoluteString.utf8)).map { String(format: "%02x", $0) }.joined().prefix(24)
+        return try modelDirectory().appendingPathComponent("download-\(suffix)", isDirectory: true)
+    }
+
     func download() {
-        guard let url = URL(string: manifestURL), url.scheme == "https" else { status = "HTTPSのmanifest.json URLを入力してください。"; return }
+        guard let url = URL(string: manifestURL), url.scheme == "https", url.host != nil else {
+            report(IrodoriError.invalid("HTTPSのmanifest.json URLを入力してください。")); return
+        }
+        guard pendingDownloadURL.isEmpty || pendingDownloadURL == url.absoluteString else {
+            report(IrodoriError.invalid("中断した取得データを再開するか、削除してから別のモデルを取得してください。")); return
+        }
         work {
-            self.status = "モデルを取得しています…"
-            let suffix = SHA256.hash(data: Data(url.absoluteString.utf8)).map { String(format: "%02x", $0) }.joined().prefix(24)
-            let destination = self.store.appendingPathComponent("Models/download-\(suffix)")
+            let id = UUID()
+            self.activeDownloadID = id; self.pausedDownload = false
+            self.downloading = true; self.downloadProgress = nil
+            self.pendingDownloadURL = url.absoluteString
+            self.settings.set(url.absoluteString, forKey: "pendingDownloadURL")
+            #if os(iOS)
+            self.previousIdleTimerDisabled = UIApplication.shared.isIdleTimerDisabled
+            UIApplication.shared.isIdleTimerDisabled = true
+            #endif
+            defer {
+                self.activeDownloadID = nil; self.downloading = false
+                #if os(iOS)
+                if let previous = self.previousIdleTimerDisabled { UIApplication.shared.isIdleTimerDisabled = previous }
+                self.previousIdleTimerDisabled = nil
+                #endif
+            }
+            self.status = "モデルを取得しています。完了までアプリを開いたままお待ちください。"
+            let destination = try self.downloadDestination(url)
             if FileManager.default.fileExists(atPath: destination.path) {
+                self.status = "保存済みのモデルを検証しています…"
                 try await Task.detached { try ModelBundle.validate(at: destination, verifyHashes: true) }.value
             } else {
-                try await ModelDownloader().download(manifestURL: url, to: destination) { done, total, file in
-                    Task { @MainActor in self.status = "取得 \(done)/\(total): \(file)" }
+                do {
+                    try await ModelDownloader().download(manifestURL: url, to: destination, byteProgress: { value in
+                        Task { @MainActor in
+                            guard self.activeDownloadID == id else { return }
+                            self.downloadProgress = value
+                            self.status = self.downloadPhase
+                        }
+                    })
+                } catch {
+                    if Task.isCancelled { throw CancellationError() }
+                    throw error
                 }
             }
             try Task.checkCancellation()
             await self.activateModel(destination)
-            self.status = "取得と検証が完了しました。"
+            self.pendingDownloadURL = ""; self.settings.removeObject(forKey: "pendingDownloadURL")
+            self.status = "モデルの取得が完了しました。「生成して再生」で試せます。初回準備には時間がかかります。"
+        }
+    }
+
+    func retryDownload() {
+        guard !pendingDownloadURL.isEmpty else { return }
+        manifestURL = pendingDownloadURL; download()
+    }
+    func pauseDownload() {
+        guard downloading else { return }
+        pausedDownload = true; task?.cancel()
+        status = "取得を中断しています…"
+    }
+
+    func canDeleteModel(_ installed: InstalledModel) -> Bool {
+        return SampleModelStorage.owns(installed.url, parents: [store.appendingPathComponent("Models"), documents])
+    }
+    func deleteModel(_ installed: InstalledModel) {
+        guard installedModels.contains(where: { $0.id == installed.id }), canDeleteModel(installed) else {
+            report(IrodoriError.invalid("このアプリの保存済みモデルだけを削除できます。")); return
+        }
+        work {
+            let current = self.modelPath == installed.id
+            if current { await self.engine.release(); self.ready = false }
+            let modelParent = self.store.appendingPathComponent("Models")
+            let documents = self.documents
+            try await Task.detached {
+                // Recheck ownership after the async boundary before deletion.
+                guard SampleModelStorage.owns(installed.url, parents: [modelParent, documents]) else {
+                    throw IrodoriError.invalid("削除対象を確認できませんでした。")
+                }
+                try FileManager.default.removeItem(at: installed.url)
+            }.value
+            if current {
+                self.modelPath = ""; self.settings.removeObject(forKey: "modelPath")
+                self.modelPreparationMilliseconds = nil; self.referencePreparationMilliseconds = nil
+                self.result = nil; self.waveform = []; self.outputURL = nil; self.statistics = ""
+            }
+            self.refreshInstalledModels()
+            if current, let first = self.installedModels.first { await self.activateModel(first.url) }
+            self.status = "保存済みモデルを削除しました。登録音声と書き出したWAVは保持されます。"
+        }
+    }
+    func discardPendingDownload() {
+        guard let url = URL(string: pendingDownloadURL), !busy else { return }
+        work {
+            let destination = try self.downloadDestination(url)
+            let key = SHA256.hash(data: Data(url.absoluteString.utf8)).prefix(8).map { String(format: "%02x", $0) }.joined()
+            let staging = destination.deletingLastPathComponent().appendingPathComponent(".\(destination.lastPathComponent)-\(key).partial")
+            if FileManager.default.fileExists(atPath: staging.path) { try FileManager.default.removeItem(at: staging) }
+            self.pendingDownloadURL = ""; self.downloadProgress = nil
+            self.settings.removeObject(forKey: "pendingDownloadURL")
+            self.status = "中断した取得データを削除しました。"
         }
     }
 
@@ -174,7 +326,7 @@ import IrodoriTTS
             try await Task.detached { _ = try ReferenceAudio.read(source); try FileManager.default.copyItem(at: source, to: destination) }.value
             self.ready = false
             self.referencePath = destination.path
-            UserDefaults.standard.set(destination.path, forKey: "referencePath")
+            self.settings.set(destination.path, forKey: "referencePath")
             self.status = "参照音声を登録しました。"
         }
     }
@@ -218,6 +370,7 @@ import IrodoriTTS
     }
 
     func stop() {
+        if downloading { pauseDownload(); return }
         task?.cancel()
         stopPlayback()
         status = busy ? "停止しています…" : "停止しました。"
@@ -299,7 +452,14 @@ import IrodoriTTS
     func report(_ error: Error) {
         let cocoa = error as NSError
         if cocoa.domain == NSCocoaErrorDomain && cocoa.code == NSUserCancelledError { return }
-        let message = error.localizedDescription
+        let message: String
+        if let urlError = error as? URLError {
+            switch urlError.code {
+            case .notConnectedToInternet, .networkConnectionLost, .timedOut, .cannotConnectToHost, .cannotFindHost:
+                message = "通信を完了できませんでした。接続を確認して「再開」を押してください。取得済みファイルは再利用します。"
+            default: message = urlError.localizedDescription
+            }
+        } else { message = error.localizedDescription }
         status = message.contains("sentence exceeds model limit")
             ? "文章がモデルの上限を超えています。短くして、もう一度生成してください。"
             : message
@@ -331,7 +491,7 @@ import IrodoriTTS
             let directory = self.store.appendingPathComponent("References")
             if FileManager.default.fileExists(atPath: directory.path) { try FileManager.default.removeItem(at: directory) }
             self.ready = false
-            self.referencePath = ""; UserDefaults.standard.removeObject(forKey: "referencePath")
+            self.referencePath = ""; self.settings.removeObject(forKey: "referencePath")
             self.status = "登録音声と参照特徴キャッシュを削除しました。"
         }
     }
@@ -345,7 +505,7 @@ import IrodoriTTS
             guard let url = recordingURL else { return }
             do { _ = try ReferenceAudio.read(url)
                 ready = false
-                referencePath = url.path; UserDefaults.standard.set(url.path, forKey: "referencePath")
+                referencePath = url.path; self.settings.set(url.path, forKey: "referencePath")
                 status = "録音を登録しました。"
             } catch { try? FileManager.default.removeItem(at: url); report(error) }
             return
@@ -366,6 +526,20 @@ import IrodoriTTS
                 AVLinearPCMIsFloatKey: false, AVLinearPCMIsBigEndianKey: false])
             guard self.recorder?.record() == true else { throw IrodoriError.invalid("録音を開始できません。") }
             self.recordingURL = url; self.recording = true; self.status = "録音中。3〜10秒を目安に停止してください。"
+        }
+    }
+}
+
+// Only direct, non-symlink children of app-owned model directories can be
+// deleted. Never delete a document-picker source or a directory outside them.
+enum SampleModelStorage {
+    static func owns(_ url: URL, parents: [URL]) -> Bool {
+        let candidate = url.standardizedFileURL
+        guard (try? candidate.resourceValues(forKeys: [.isSymbolicLinkKey, .isDirectoryKey]))?.isSymbolicLink == false,
+              (try? candidate.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true else { return false }
+        return parents.contains { parent in
+            candidate.deletingLastPathComponent().resolvingSymlinksInPath().standardizedFileURL.path == parent.resolvingSymlinksInPath().standardizedFileURL.path &&
+            candidate.resolvingSymlinksInPath().deletingLastPathComponent().standardizedFileURL.path == parent.resolvingSymlinksInPath().standardizedFileURL.path
         }
     }
 }

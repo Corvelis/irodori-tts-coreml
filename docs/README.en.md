@@ -22,7 +22,7 @@ The Hugging Face repository keeps standard files at its root and light files und
 Clone the [code repository](https://github.com/Corvelis/irodori-tts-coreml), then download the matching model bundle into a new folder beside it:
 
 ```sh
-git clone --branch v0.2.0 --depth 1 https://github.com/Corvelis/irodori-tts-coreml.git
+git clone --depth 1 https://github.com/Corvelis/irodori-tts-coreml.git
 cd irodori-tts-coreml
 ```
 
@@ -43,19 +43,19 @@ Add `--reference ./reference.wav` to use a reference voice. Output is 48 kHz mon
 
 ## Open the samples
 
-Open `Examples/IrodoriSamples.xcodeproj`. Choose IrodoriMac for Mac or IrodoriiOS for a connected iPhone. Configure your own signing team and bundle identifier. UI labels are currently Japanese; see [the walkthrough](SAMPLES.md).
+Open `Examples/IrodoriSamples.xcodeproj`. Choose IrodoriMac for Mac or IrodoriiOS for a connected iPhone. Configure your own signing team and bundle identifier. UI labels are Japanese; see [the English walkthrough](SAMPLES.en.md).
 
-1. **フォルダを選ぶ** / **モデルを変更**: select the folder containing manifest.json and all packages for the selected model, not an individual package. It is verified and copied into the app.
+1. On first launch, choose standard FP32 (the default) or light INT8 and press **モデルをダウンロード**. Download size, byte progress and verification status are displayed. No Hugging Face login or URL entry is required. Alternatively, **フォルダを選ぶ** / **モデルを変更**: select the folder containing manifest.json and all packages for the selected model, not an individual package. It is verified and copied into the app.
 2. Enable the voice-permission toggle for a reference. **音声を選ぶ** imports a file; **録音する** starts recording and **録音を停止** stops it. Begin with a clear 3–10 second clip you are authorized to use.
 3. **準備** prepares the model/reference. **生成して再生** synthesizes the entire prepared input once and plays the completed WAV, also preparing if needed. The GUI sample does not split at punctuation or play partial PCM. Long inputs wait for complete synthesis and are rejected if they exceed model limits, rather than silently split or truncated. The output player supports pause/resume/replay. **停止** stops playback and cancels further synthesis output.
 4. **WAVを保存** exports the completed WAV. The app's generated.wav is replaced by the next successful synthesis.
 5. **登録音声とキャッシュを削除** deletes all reference copies/recordings owned by this sample and the feature cache. External originals, models and generated WAV are retained.
 
-For a first playback, leave the reference unset and the caption empty, import the model folder and press **生成して再生** using the default text. Separate preparation is optional. Choose a model under **取得するモデル**, then press **モデルをダウンロード**. Switch installed bundles using **保存済みモデル**. Switching releases the old sessions, preserves the reference selection/caption, and clears displayed synthesis results. Custom URLs remain available under **URLからダウンロード**. The light model can also be downloaded with `irodori download --variant light-int8 --destination NEW_DIRECTORY`.
+For a first playback, leave the reference unset and the caption empty, download or import a model and press **生成して再生** using the default text. Separate preparation is optional. Choose a model under **取得するモデル**, then press **モデルをダウンロード**. Switch installed bundles using **保存済みモデル**. Switching releases the old sessions, preserves the reference selection/caption, and clears displayed synthesis results. Custom URLs remain available under **URLからダウンロード**. The light model can also be downloaded with `irodori download --variant light-int8 --destination NEW_DIRECTORY`.
 
 The UI uses two columns on wide Mac windows and a vertical layout on iPhone, with separate model/voice settings and RTF, synthesis time and audio duration.
 
-One voice is selected at a time; there is no named voice library UI. Selection persists, but the consent toggle resets on launch. The previous generated WAV remains on disk, but its playback card is not restored on relaunch. Imported models and compilation caches need extra disk space. Old model copies are not automatically deleted.
+One voice is selected at a time; there is no named voice library UI. Selection persists, but the consent toggle resets on launch. The previous generated WAV remains on disk, but its playback card is not restored on relaunch. Imported models and compilation caches need extra disk space. Old model copies are not automatically deleted. Use **モデルを管理** to delete app-owned models. External originals, registered voices and exported WAVs are retained. Interrupted downloads can be retried or discarded; verified complete files are reused, while an interrupted individual file starts again. Keep the app open during downloads; on iPhone a background transition pauses the transfer. See [TestFlight distribution](TESTFLIGHT.en.md) and [privacy](PRIVACY.en.md).
 
 ## Use the SDK in your app
 

@@ -28,6 +28,10 @@ struct ContentView: View {
     @State private var importing = false
     @State private var importKind: ImportKind = .model
     @State private var downloadExpanded = false
+    @State private var managingModels = false
+    @State private var modelToDelete: SampleModel.InstalledModel?
+    @State private var deletingPartial = false
+    @Environment(\.scenePhase) private var scenePhase
     #if os(macOS)
     @State private var exportingWAV = false
     @State private var wavDocument: SampleWAVDocument?
@@ -41,6 +45,7 @@ struct ContentView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 28) {
                     header
+                    if model.needsSetup || model.shouldShowDownload { modelSetup }
                     if geometry.size.width >= 840 {
                         HStack(alignment: .top, spacing: 24) {
                             workspace.frame(maxWidth: .infinity)
@@ -62,6 +67,18 @@ struct ContentView: View {
             .scrollDismissesKeyboard(.interactively)
         }
         .tint(StudioStyle.accent)
+        #if os(iOS)
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background { model.pauseDownload() }
+        }
+        #endif
+        .sheet(isPresented: $managingModels) { modelManager }
+        .confirmationDialog("中断した取得データを削除しますか？", isPresented: $deletingPartial) {
+            Button("取得データを削除", role: .destructive) { model.discardPendingDownload() }
+            Button("キャンセル", role: .cancel) {}
+        } message: {
+            Text("途中まで取得したファイルを削除します。保存済みモデルと登録音声は削除しません。")
+        }
         .fileImporter(isPresented: $importing,
                       allowedContentTypes: importKind == .model ? [.folder] : [.audio]) { result in
             switch result {
@@ -109,6 +126,120 @@ struct ContentView: View {
         }
     }
 
+    private var modelSetup: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Label(model.needsSetup ? "はじめにモデルを準備" : "モデルの取得", systemImage: "arrow.down.circle")
+                .font(.title3.weight(.semibold))
+            if model.needsSetup {
+                Text("モデルを取得したら、下の文章を「生成して再生」で読み上げられます。声の登録はあとから追加できます。")
+                    .font(.subheadline).foregroundStyle(.secondary)
+            }
+            if model.downloading {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Text(model.downloadPhase).font(.subheadline.weight(.medium))
+                        Spacer()
+                        if let progress = model.downloadProgress, progress.totalBytes > 0 {
+                            Text(progress.fractionCompleted, format: .percent.precision(.fractionLength(0)))
+                                .font(.caption.monospacedDigit())
+                        }
+                    }
+                    if let progress = model.downloadProgress, progress.totalBytes > 0 {
+                        ProgressView(value: progress.fractionCompleted)
+                            .accessibilityIdentifier("downloadProgress")
+                        Text(model.downloadAmount).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                    } else { ProgressView().controlSize(.small) }
+                    Text("完了までアプリを開いたままお待ちください。画面を切り替えると取得を中断し、戻ってから再開できます。")
+                        .font(.caption).foregroundStyle(.secondary)
+                    Button("ダウンロードを中断", action: model.pauseDownload).buttonStyle(.bordered)
+                        .accessibilityIdentifier("pauseDownload")
+                }
+            } else if !model.pendingDownloadURL.isEmpty {
+                Label("ダウンロードを再開できます", systemImage: "arrow.clockwise")
+                    .font(.subheadline.weight(.medium))
+                Text("アプリを開いたまま再開してください。通信エラーの場合は接続も確認してください。")
+                    .font(.caption).foregroundStyle(.secondary)
+                Text("検証済みのファイルは再利用します。中断したファイルは先頭から取得します。")
+                    .font(.caption).foregroundStyle(.secondary)
+                HStack {
+                    Button("再開する", action: model.retryDownload)
+                        .buttonStyle(.borderedProminent).accessibilityIdentifier("retryDownload")
+                    Button("取得データを削除", role: .destructive) { deletingPartial = true }
+                        .buttonStyle(.bordered).accessibilityIdentifier("discardDownload")
+                }.font(.subheadline).disabled(model.busy || model.recording)
+            } else { downloadControls }
+        }.studioCard()
+    }
+
+    private var downloadControls: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Picker("取得するモデル", selection: $model.downloadVariant) {
+                ForEach(ModelVariant.allCases) { variant in
+                    Text("\(variant.title) · \(SampleModel.bytes(variant.approximateBytes))").tag(variant)
+                }
+            }
+            .pickerStyle(.menu).accessibilityIdentifier("downloadVariant")
+            Text(model.downloadVariant == .standard
+                 ? "標準FP32版。音質比較の基準となるモデルです。"
+                 : "容量を抑えたINT8版。モデルの選択後も音声登録と話し方の指定が使えます。")
+                .font(.caption).foregroundStyle(.secondary)
+            Text("\(model.downloadVariant.minimumOS)以降 · Wi-Fiでの取得をおすすめします。")
+                .font(.caption).foregroundStyle(.secondary)
+            Text(model.downloadSpaceGuidance).font(.caption2).foregroundStyle(.secondary)
+            Button(action: model.downloadSelectedVariant) {
+                Label("モデルをダウンロード", systemImage: "arrow.down.circle.fill")
+                    .frame(maxWidth: .infinity).padding(.vertical, 8)
+            }
+            .buttonStyle(.borderedProminent).accessibilityIdentifier("downloadModel")
+            .disabled(!model.downloadVariant.isSupported)
+        }.disabled(model.busy || model.recording || !model.pendingDownloadURL.isEmpty)
+    }
+
+    private var modelManager: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack {
+                Text("保存済みモデル").font(.title3.weight(.semibold))
+                Spacer()
+                Button("閉じる") { managingModels = false }.disabled(model.busy)
+            }
+            Text("使わないモデルを削除して空き容量を確保できます。削除したモデルは再取得できます。")
+                .font(.caption).foregroundStyle(.secondary)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    ForEach(model.installedModels) { installed in
+                        HStack(spacing: 12) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(installed.information.description).font(.subheadline.weight(.medium))
+                                Text(installed.id == model.modelPath ? "使用中" : "保存済み")
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            if installed.id != model.modelPath {
+                                Button("使う") { model.selectModel(installed.id) }
+                            }
+                            if model.canDeleteModel(installed) {
+                                Button(role: .destructive) {
+                                    modelToDelete = installed
+                                } label: { Image(systemName: "trash") }
+                                .accessibilityLabel("\(installed.information.description)を削除")
+                            }
+                        }.disabled(model.busy || model.recording)
+                        Divider()
+                    }
+                    if model.installedModels.isEmpty { Text("保存済みモデルはありません。").font(.subheadline) }
+                }
+            }
+        }
+        .padding(24).frame(idealWidth: 520, maxWidth: 680, minHeight: 260, idealHeight: 420)
+        .confirmationDialog("保存済みモデルを削除しますか？", isPresented: Binding(
+            get: { modelToDelete != nil }, set: { if !$0 { modelToDelete = nil } }), presenting: modelToDelete) { installed in
+                Button("モデルを削除", role: .destructive) { model.deleteModel(installed); modelToDelete = nil }
+                Button("キャンセル", role: .cancel) { modelToDelete = nil }
+            } message: { installed in
+                Text("\(installed.information.description)をこのアプリから削除します。再度ダウンロードできます。登録音声と書き出したWAVは削除しません。")
+            }
+    }
+
     private var workspace: some View {
         VStack(alignment: .leading, spacing: 18) {
             composer
@@ -138,7 +269,7 @@ struct ContentView: View {
                     .scrollContentBackground(.hidden)
                     .frame(minHeight: 180, maxHeight: 240)
                     .focused($focusedField, equals: .text)
-                    .disabled(model.busy || model.recording)
+                    .disabled((model.busy && !model.downloading) || model.recording)
             }
             Rectangle().fill(.primary.opacity(0.07)).frame(height: 1)
             HStack(spacing: 12) {
@@ -254,6 +385,14 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 18) {
             modelSettings
             voiceSettings
+            DisclosureGroup("プライバシーと利用条件") {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("入力した文章、録音、参照音声は端末内で処理し、外部へ送信しません。モデル取得時はHugging Faceへ接続します。共有・保存は自分で選んだときに行います。")
+                    Text("自分の声、または明示的に許可を得た声を登録してください。生成音声にはAudioSealの透かしを付与します。")
+                    Link("モデルと利用条件", destination: URL(string: "https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML")!)
+                    Link("SDK・サンプルとライセンス", destination: URL(string: "https://github.com/Corvelis/irodori-tts-coreml")!)
+                }.font(.caption).foregroundStyle(.secondary).padding(.top, 10)
+            }.font(.caption).studioCard()
         }
     }
 
@@ -262,7 +401,7 @@ struct ContentView: View {
             HStack {
                 Label("モデル", systemImage: "cpu").font(.subheadline.weight(.semibold))
                 Spacer()
-                Text(model.modelPath.isEmpty ? "未選択" : model.ready ? "準備済み" : "選択済み")
+                Text(model.modelPath.isEmpty ? "未取得" : model.ready ? "準備済み" : "選択済み")
                     .font(.caption.weight(.medium))
                     .foregroundStyle(model.modelPath.isEmpty ? Color.secondary : StudioStyle.accent)
                     .padding(.horizontal, 9).padding(.vertical, 5)
@@ -284,10 +423,12 @@ struct ContentView: View {
                 .accessibilityIdentifier("installedModels")
                 .disabled(model.busy || model.recording)
             }
-            Button(action: model.refreshInstalledModels) {
-                Label("保存済みモデルを更新", systemImage: "arrow.clockwise")
-            }.font(.caption).buttonStyle(.plain)
-                .disabled(model.busy || model.recording)
+            HStack {
+                Button(action: model.refreshInstalledModels) { Label("更新", systemImage: "arrow.clockwise") }
+                Spacer()
+                Button { managingModels = true } label: { Label("モデルを管理", systemImage: "externaldrive") }
+                    .accessibilityIdentifier("manageModels")
+            }.font(.caption).buttonStyle(.plain).disabled(model.busy || model.recording)
             HStack {
                 Button {
                     focusedField = nil; importKind = .model; importing = true
@@ -299,19 +440,7 @@ struct ContentView: View {
             }
             .font(.caption.weight(.medium)).buttonStyle(.bordered)
             .disabled(model.busy || model.recording)
-            VStack(alignment: .leading, spacing: 10) {
-                Picker("取得するモデル", selection: $model.downloadVariant) {
-                    ForEach(ModelVariant.allCases) { variant in
-                        Text(String(format: "%@ · %.2f GB", variant.title, Double(variant.approximateBytes) / 1_000_000_000)).tag(variant)
-                    }
-                }
-                .pickerStyle(.menu).accessibilityIdentifier("downloadVariant")
-                Text("\(model.downloadVariant.minimumOS)以降")
-                    .font(.caption2).foregroundStyle(.secondary)
-                Button("モデルをダウンロード", action: model.downloadSelectedVariant)
-                    .buttonStyle(.bordered).accessibilityIdentifier("downloadModel")
-                    .disabled(!model.downloadVariant.isSupported)
-            }.font(.caption).disabled(model.busy || model.recording)
+            if !model.needsSetup && !model.shouldShowDownload { downloadControls }
             DisclosureGroup("URLからダウンロード", isExpanded: $downloadExpanded) {
                 VStack(alignment: .leading, spacing: 10) {
                     TextField("manifest.json のHTTPS URL", text: $model.manifestURL)
@@ -320,7 +449,7 @@ struct ContentView: View {
                         .buttonStyle(.bordered).disabled(model.manifestURL.isEmpty)
                 }.padding(.top, 10)
             }
-            .font(.caption).disabled(model.busy || model.recording)
+            .font(.caption).disabled(model.busy || model.recording || !model.pendingDownloadURL.isEmpty)
             if let milliseconds = model.modelPreparationMilliseconds {
                 Text(String(format: "準備 %.0f ms · 参照 %.0f ms%@", milliseconds,
                             model.referencePreparationMilliseconds ?? 0, model.referenceCacheHit ? "（キャッシュ）" : ""))
