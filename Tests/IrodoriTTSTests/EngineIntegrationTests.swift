@@ -9,6 +9,27 @@ private final class ChunkCollector: @unchecked Sendable {
 }
 
 final class EngineIntegrationTests: XCTestCase {
+    func testFixedSeedsReproducePCMAndReportActualSeeds() async throws {
+        guard let models = ProcessInfo.processInfo.environment["IRODORI_TEST_MODELS"] else {
+            throw XCTSkip("Set IRODORI_TEST_MODELS for fixed-seed audio tests")
+        }
+        let engine = IrodoriEngine()
+        try await engine.prepare(modelDirectory: URL(fileURLWithPath: models))
+        let input = "こんにちは。今日はいい天気ですね。"
+        let first = try await engine.synthesize(input, seed: 98_765, splitSentences: false, watermark: nil)
+        let repeatAudio = try await engine.synthesize(input, seed: 98_765, splitSentences: false, watermark: nil)
+        XCTAssertEqual(first.generationSeeds, [98_765])
+        XCTAssertEqual(first.pcm16, repeatAudio.pcm16, "Fixed input and seed must preserve PCM in this runtime")
+        let other = try await engine.synthesize(input, seed: 98_766, splitSentences: false, watermark: nil)
+        XCTAssertEqual(other.generationSeeds, [98_766]); XCTAssertNotEqual(first.pcm16, other.pcm16)
+        let maximum = try await engine.synthesize("はい。", seed: UInt32.max, watermark: nil)
+        XCTAssertEqual(maximum.generationSeeds, [UInt32.max])
+        let random = try await engine.synthesize("はい。", seed: nil, watermark: nil)
+        XCTAssertEqual(random.generationSeeds.count, 1)
+        let zero = try await engine.synthesize("はい。", seed: 0, watermark: nil)
+        XCTAssertEqual(zero.generationSeeds, [0])
+        await engine.release()
+    }
     func testWholeInputKeepsSanitizationAndRejectsLimitsWithoutSplitting() async throws {
         guard let models = ProcessInfo.processInfo.environment["IRODORI_TEST_MODELS"] else {
             throw XCTSkip("Set IRODORI_TEST_MODELS for whole-input tests")

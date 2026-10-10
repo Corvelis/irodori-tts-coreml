@@ -21,6 +21,8 @@
 		BFFF18F0E9D23E47388D96F8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 71F3213D2E3FE109ADC36269 /* Assets.xcassets */; };
 		F091DDF5D0580AB99EEB8AA2 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D01DDD14D4D1B19D69119E92 /* ContentView.swift */; };
 		F460FB6586FE719021FB2EE7 /* SampleModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D054EB3DD880176C092D5871 /* SampleModel.swift */; };
+		E2E5ABEA2A924A6284877512 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E2E5ABEA2A924A6284877511 /* PrivacyInfo.xcprivacy */; };
+		E2E5ABEA2A924A6284877513 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E2E5ABEA2A924A6284877511 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +35,7 @@
 		D01DDD14D4D1B19D69119E92 /* ContentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D054EB3DD880176C092D5871 /* SampleModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SampleModel.swift; sourceTree = "<group>"; };
 		E97F8BC922A5CBFD3D739F16 /* PCMPlayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PCMPlayer.swift; sourceTree = "<group>"; };
+		E2E5ABEA2A924A6284877511 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +111,7 @@
 				8DA68563B9EEEBD92A5B9C51 /* SampleApp.swift */,
 				D054EB3DD880176C092D5871 /* SampleModel.swift */,
 				71F3213D2E3FE109ADC36269 /* Assets.xcassets */,
+				E2E5ABEA2A924A6284877511 /* PrivacyInfo.xcprivacy */,
 			);
 			name = Shared;
 			path = Shared;
@@ -195,6 +199,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BFFF18F0E9D23E47388D96F8 /* Assets.xcassets in Resources */,
+				E2E5ABEA2A924A6284877512 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,6 +208,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0F1E0330CB3ED26727B08335 /* Assets.xcassets in Resources */,
+				E2E5ABEA2A924A6284877513 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,7 +301,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Irodori Core ML";
@@ -304,7 +310,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.example.irodori.coreml.ios;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
@@ -321,14 +327,14 @@
 				CODE_SIGN_ENTITLEMENTS = macOS/IrodoriMac.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Irodori Core ML";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "参照音声として自分の声を録音します。";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.example.irodori.coreml.osx;
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;
@@ -403,7 +409,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iOS/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Irodori Core ML";
@@ -412,7 +418,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.example.irodori.coreml.ios;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 5.0;
@@ -428,14 +434,14 @@
 				CODE_SIGN_ENTITLEMENTS = macOS/IrodoriMac.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Irodori Core ML";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "参照音声として自分の声を録音します。";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.2.0;
+				MARKETING_VERSION = 0.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = org.example.irodori.coreml.osx;
 				SDKROOT = macosx;
 				SWIFT_VERSION = 5.0;

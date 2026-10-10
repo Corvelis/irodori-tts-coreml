@@ -18,6 +18,8 @@ afplay ./irodori-output.wav
 
 `--caption '落ち着いた、やさしい話し方。'` で声・話し方を指定できます。captionは本文として読ませず、独立した条件としてモデルへ渡します。日本語の短い説明を使ってください。参照ありなら、その声に合う感情や話し方を指定します。省略または空文字で無効になり、同じengineでは指示の特徴を再利用します。詳細は[Voice Design](API.md#声話し方の指示voice-design)を参照してください。
 
+CLI `0.2.1` 以降では `--seed 12345` でseedを固定できます。0〜4294967295の整数を指定し、省略すると従来どおりランダムです。JSONの `runs[].generationSeeds` に成功した文ごとの実際のseedを返します。気に入った生成のseedを指定し直すときは、モデル・参照・caption・本文と分割条件も一致させてください。seedは声IDではなく、異なる文章・モデル・端末・OSでも完全に同じ声やPCMになる保証はありません。
+
 `--reference` を省くと参照なしで生成します。`--raw` は文章整形・分割を無効にします。`--repeat N` は同じengine・参照で1〜100回生成し、synthesizeでは最後の音声だけをoutputに保存します。出力WAVとレポートは既存ファイルを置換するため、残したい結果には別名を付けてください。
 
 ## モデル取得
@@ -41,12 +43,12 @@ afplay ./irodori-output.wav
   --reference ./reference.wav \
   --repeat 3 --report ./irodori-benchmark.json \
   --output-directory ./irodori-benchmark-audio \
-  --irodori-fixed-seed --irodori-seed 11 --irodori-diagnostics
+  --seed 11 --irodori-diagnostics
 ```
 
 音声の出力先ディレクトリは未作成のものを使います。各周の各文章を `pass-0-case-0.wav` のように保存します。casesは `[{"name":"short","text":"はい。"}]` 形式で1〜100件です。
 
-**benchmarkは常にrawTextモードです。** 整形・長文の自動分割を含む通常利用を確認するときは、synthesizeをraw指定なしで使います。固定seedは比較時の診断用で、異なるOS・端末でもPCMが完全一致する保証ではありません。
+**benchmarkは常にrawTextモードです。** 整形・長文の自動分割を含む通常利用を確認するときは、synthesizeをraw指定なしで使います。固定seedは通常生成にも使えますが、異なるOS・端末でもPCMが完全一致する保証ではありません。
 
 | JSONの項目 | 意味 |
 |---|---|

@@ -17,6 +17,13 @@ public struct SynthesisResult: Sendable {
     public let metrics: [[String: Double]]
     public let diagnostics: [[String: String]]
     public let watermark: WatermarkInfo?
+    /// One actual seed per generated sentence, including randomly selected seeds.
+    public var generationSeeds: [UInt32] {
+        metrics.compactMap { values in
+            guard let seed = values["generationSeed"] else { return nil }
+            return UInt32(exactly: seed)
+        }
+    }
     public var audioSeconds: Double { Double(pcm16.count) / 96_000 }
     public var rtf: Double { synthesisMilliseconds / 1000 / max(audioSeconds, 0.000001) }
     public func writeWAV(to url: URL) throws { try ReferenceAudio.writeWAV(pcm16: pcm16, to: url) }
@@ -94,7 +101,10 @@ public final class IrodoriEngine: @unchecked Sendable {
     /// Set splitSentences to false to synthesize the sanitized input as one utterance.
     /// In that mode length-limit errors are returned without splitting or truncating.
     /// Cancellation discards subsequent chunks; an in-flight Core ML prediction finishes first.
-    public func synthesize(_ text: String, caption: String = "", rawText: Bool = false, splitSentences: Bool = true,
+    /// A nil seed keeps random sampling. A supplied seed is reused for each sentence.
+    /// Reproducibility also requires the same model, reference, caption, input and splitting.
+    public func synthesize(_ text: String, caption: String = "", seed: UInt32? = nil,
+                           rawText: Bool = false, splitSentences: Bool = true,
                            watermark: WatermarkOptions? = WatermarkOptions(),
                            onChunk: (@Sendable (PCMChunk) -> Void)? = nil) async throws -> SynthesisResult {
         let cancellation = CancellationFlag()
@@ -129,7 +139,8 @@ public final class IrodoriEngine: @unchecked Sendable {
                     }
                     let sentenceStart = ProcessInfo.processInfo.systemUptime
                     do {
-                        let output = try self.native.synthesizeText(sentence, caption: caption, onPcm: { bytes in
+                        let output = try self.native.synthesizeText(sentence, caption: caption,
+                                                                  seed: seed.map { NSNumber(value: $0) }, onPcm: { bytes in
                             if cancellation.cancelled || callbackError != nil { return }
                             received = true
                             do {

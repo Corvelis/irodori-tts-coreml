@@ -41,7 +41,7 @@ Irodori TTS v4.1 Small MFをiPhoneとApple Silicon Macで動かすSwift SDKで�
 モデルの取得先は新しいフォルダを指定してください。
 
 ```sh
-git clone --branch v0.2.0 --depth 1 https://github.com/Corvelis/irodori-tts-coreml.git
+git clone --depth 1 https://github.com/Corvelis/irodori-tts-coreml.git
 cd irodori-tts-coreml
 swift build -c release
 .build/release/irodori download --manifest 'https://huggingface.co/AILogDev/Irodori-TTS-v4.1-Small-MF-CoreML/resolve/b02a670f0cb41c382844672fa8f0f03b3b9b8082/manifest.json' --destination ../Irodori-TTS-v4.1-Small-MF-CoreML
@@ -58,10 +58,16 @@ afplay ./irodori-output.wav
 
 1. `Examples/IrodoriSamples.xcodeproj` をXcodeで開きます。
 2. Macは `IrodoriMac`、iPhoneは `IrodoriiOS` schemeを選びます。自分のSigning Teamと一意のBundle Identifierを設定して実行します。
-3. 「モデル」で取得する版を選び、「モデルをダウンロード」を押します。取得済みなら「フォルダを選ぶ」でモデル一式を取り込みます。「保存済みモデル」から切り替えられます。
+3. 初回画面の「はじめにモデルを準備」で取得する版を選び、「モデルをダウンロード」を押します。取得済みなら「フォルダを選ぶ」でモデル一式を取り込みます。「保存済みモデル」から切り替えられます。
 4. まず「参照なし」で「生成して再生」を押します。声を指定する場合は、録音または音声ファイルの取り込みを行います。
 
+ダウンロードの容量と進捗を表示し、中断後の再開と保存済みモデルの削除に対応します。[TestFlightでの配布手順](docs/TESTFLIGHT.md)も用意しています。
+
 サンプルは入力全体を一度に合成し、完成したWAVを再生します。再生・一時停止・再開・停止・WAV保存に対応します。上限を超えた場合は文章を短くしてください。[サンプルの使い方](docs/SAMPLES.md)に詳しい操作があります。
+
+### 気に入った声を保存する（SDK / サンプル0.2.1以降）
+
+サンプルの「生成のseed」でランダム／固定を選べます。気に入った生成結果の「この声に固定する」から実際のseedと声の設定を引き継ぎ、名前付きで保存・選択できます。モデル本体は複製しません。[操作手順](docs/SAMPLES.md#気に入った声に固定する)と[Swift API](docs/API.md#seedと生成の再現性021以降)を参照してください。
 
 ## 自分のアプリへSDKを追加する
 
@@ -92,6 +98,7 @@ func makeWAV(engine: IrodoriEngine, models: URL, output: URL) async throws {
 |---|---|
 | モデルを取得する | [モデル取得と配置](docs/HUGGINGFACE.md) |
 | SDKをXcodeへ追加する | [導入ガイド](docs/GETTING_STARTED.md) / [API](docs/API.md) |
+| TestFlightでサンプルを配布する | [配布手順](docs/TESTFLIGHT.md) / [プライバシー](docs/PRIVACY.md) |
 | 録音・再生する | [サンプル操作](docs/SAMPLES.md) / [音声登録と削除](docs/VOICE_REGISTRATION.md) |
 | 音声の透かしを使う | [透かしの付与と検出](docs/WATERMARK.md) |
 | チャンク通知・停止を実装する | [再生と停止](docs/STREAMING.md) |

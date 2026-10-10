@@ -8,6 +8,7 @@ project = Xcodeproj::Project.new(path.to_s)
 group = project.main_group.new_group('Shared', 'Shared')
 refs = root.join('Examples/Shared').glob('*.swift').sort.map { |file| group.new_file(file.basename.to_s) }
 assets = group.new_file('Assets.xcassets')
+privacy = group.new_file('PrivacyInfo.xcprivacy')
 package = project.new(Xcodeproj::Project::Object::XCLocalSwiftPackageReference)
 package.relative_path = '..'
 project.root_object.package_references << package
@@ -15,6 +16,7 @@ project.root_object.package_references << package
   target = project.new_target(:application, name, platform, deployment)
   target.add_file_references(refs)
   target.resources_build_phase.add_file_reference(assets, true)
+  target.resources_build_phase.add_file_reference(privacy, true)
   product = project.new(Xcodeproj::Project::Object::XCSwiftPackageProductDependency)
   product.package = package
   product.product_name = 'IrodoriTTS'
@@ -31,8 +33,8 @@ project.root_object.package_references << package
     s['INFOPLIST_KEY_NSMicrophoneUsageDescription'] = '参照音声として自分の声を録音します。'
     s['INFOPLIST_KEY_CFBundleDisplayName'] = 'Irodori Core ML'
     s['CODE_SIGN_STYLE'] = 'Automatic'
-    s['MARKETING_VERSION'] = '0.2.0'
-    s['CURRENT_PROJECT_VERSION'] = '2'
+    s['MARKETING_VERSION'] = '0.2.1'
+    s['CURRENT_PROJECT_VERSION'] = '3'
     if platform == :ios
       s['TARGETED_DEVICE_FAMILY'] = '1,2'
       s['INFOPLIST_FILE'] = 'iOS/Info.plist'

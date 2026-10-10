@@ -32,6 +32,8 @@ func selectVoice(engine: IrodoriEngine, referenceURL: URL?) async throws {
 
 `nil` を渡すと現在の参照を外し、参照なしで合成します。ディスクキャッシュや元ファイルの削除ではありません。別のURLを登録すれば声を切り替えられますが、複数話者の一覧や選択状態の永続化はSDK利用側で実装します。
 
+サンプル `0.2.1` 以降は、参照音声・指示・固定seed・モデルの版を名前付きで保存できます。参照音声は設定専用のコピーとして保持します。生成結果の「この声に固定する」は実際のseedと条件を引き継ぎ、「この音声を参照に登録」は完成音声を新しい参照として取り込みます。[保存と呼び出しの手順](SAMPLES.md#気に入った声に固定する)を参照してください。
+
 ## 処理時間が0 msになる理由
 
 サンプルは時間を小数点なしで表示します。再利用によって短時間で終わった処理が、丸められて0 msと表示される場合があります。
@@ -49,6 +51,7 @@ func selectVoice(engine: IrodoriEngine, referenceURL: URL?) async throws {
 | 保存物 | 場所 | 保持・削除 |
 |---|---|---|
 | 取り込んだ音声・録音 | `IrodoriSample/References/` | 選び直した過去コピーも残る。サンプルの削除ボタンでまとめて削除 |
+| 保存した声の設定 | UserDefaultsの `voicePresets` と `References/` 内の専用コピー | 名前・モデルの識別情報・指示・固定seed・任意の参照。設定は個別削除でき、参照の一括削除では参照付きの設定も削除 |
 | 選択状態 | UserDefaultsの `referencePath` | サンプルの削除ボタンで解除 |
 | 参照特徴 | Caches内 `irodori-reference-coreml-v1/` | `clearReferenceCache()` で削除 |
 | 生成WAV | `IrodoriSample/generated.wav` | 次の生成成功時に上書き。参照削除では残る。再起動時のUIには再表示しない |
@@ -60,6 +63,8 @@ SDKの `registerReference` 自体は元音声ファイルをコピーしませ�
 ## 削除を実装する
 
 `try await engine.clearReferenceCache()` は、このengineの保持中の参照と、そのアプリが使う参照特徴ディスクキャッシュ全体を消します。元音声は消さないため、アプリ自身が作成した音声コピーと選択状態も別途削除します。[サンプルのdeleteReference](../Examples/Shared/SampleModel.swift)が実装例です。
+
+サンプルの「保存した声を管理」は個別の設定と専用の参照コピーを削除します。「登録音声とキャッシュを削除」は取り込み・録音・生成音声から登録した参照と、参照付きの保存設定をまとめて削除し、参照なしの設定は残します。
 
 CLIは同じユーザーのCaches領域を共有します。他のengineがメモリに保持する参照までは削除しないため、複数engineを使うアプリでは利用を止めてから削除を管理してください。現在のCLIには音声削除コマンドはありません。
 
